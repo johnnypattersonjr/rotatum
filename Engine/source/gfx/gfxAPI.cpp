@@ -41,7 +41,6 @@ ImplementEnumType( GFXAdapterType,
    "Back-end graphics API used by the GFX subsystem.\n\n"
    "@ingroup GFX" )
    { OpenGL, "OpenGL", "OpenGL." },
-   { Direct3D8, "D3D8", "Direct3D 8." },
    { Direct3D9, "D3D9", "Direct3D 9." },
    { NullDevice, "NullDevice", "Null device for dedicated servers." }
 EndImplementEnumType;

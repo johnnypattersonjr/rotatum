@@ -77,9 +77,6 @@ inline static void _GFXInitReportAdapters(Vector<GFXAdapter*> &adapters)
       case NullDevice:
          Con::printf("   Null device found");
          break;
-      case Direct3D8:
-         Con::printf("   Direct 3D (version 8.1) device found");
-         break;
       default :
          Con::printf("   Unknown device found");
          break;
@@ -193,7 +190,7 @@ GFXAdapter* GFXInit::chooseAdapter( GFXAdapterType type)
 
 const char* GFXInit::getAdapterNameFromType(GFXAdapterType type)
 {
-   static const char* _names[] = { "OpenGL", "D3D9", "D3D8", "NullDevice" };
+   static const char* _names[] = { "OpenGL", "D3D9", "NullDevice" };
    
    if( type < 0 || type >= GFXAdapterType_Count )
    {
@@ -240,7 +237,7 @@ GFXAdapter *GFXInit::getBestAdapterChoice()
    // If D3D is unavailable, we're not on windows, so GL is de facto the
    // best choice!
    F32 highestSM9 = 0.f, highestSMGL = 0.f;
-   GFXAdapter  *foundAdapter8 = NULL, *foundAdapter9 = NULL, 
+   GFXAdapter  *foundAdapter9 = NULL,
                *foundAdapterGL = NULL;
 
    for(S32 i=0; i<smAdapters.size(); i++)
@@ -264,25 +261,17 @@ GFXAdapter *GFXInit::getBestAdapterChoice()
          }
          break;
 
-      case Direct3D8:
-         if(!foundAdapter8)
-            foundAdapter8 = currAdapter;
-         break;
-
       default:
          break;
       }
    }
 
-   // Return best found in order DX9, GL, DX8.
+   // Return best found in order DX9, GL.
    if(foundAdapter9)
       return foundAdapter9;
 
    if(foundAdapterGL)
       return foundAdapterGL;
-
-   if(foundAdapter8)
-      return foundAdapter8;
 
    // Uh oh - we didn't find anything. Grab whatever we can that's not Null...
    for(S32 i=0; i<smAdapters.size(); i++)
@@ -388,7 +377,7 @@ DefineEngineStaticMethod( GFXInit, getAdapterName, String, ( S32 index ),,
 }
 
 DefineEngineStaticMethod( GFXInit, getAdapterType, GFXAdapterType, ( S32 index ),,
-   "Returns the type (D3D9, D3D8, GL, Null) of a graphics adapter.\n"
+   "Returns the type (D3D9, GL, Null) of a graphics adapter.\n"
    "@param index The index of the adapter." )
 {
    Vector<GFXAdapter*> adapters( __FILE__, __LINE__ );

@@ -115,7 +115,6 @@ addEngineSrcDir( 'shaderGen' );
 switch( Generator::$platform )
 {
    case "win32":
-      //addEngineSrcDir( 'gfx/D3D8' );
       addEngineSrcDir( 'gfx/D3D' );
       addEngineSrcDir( 'gfx/D3D9' );
       addEngineSrcDir( 'gfx/D3D9/pc' );
@@ -157,12 +156,10 @@ addIncludePath( getAppLibSrcDir() ); 	   // main lib source dir relative to app 
 
 if ( Generator::$platform == "win32" )
 {
-   addIncludePath( getAppLibSrcDir() . 'directx8' );
    addIncludePath( getAppLibSrcDir() . 'openal/win32' );
    
    addProjectLibDir( getAppLibSrcDir() . 'SDL/win32' );
    addProjectLibDir( getAppLibSrcDir() . 'unicode' );
-   addProjectLibDir( getAppLibSrcDir() . 'directx8' );
 }
 
 ?>

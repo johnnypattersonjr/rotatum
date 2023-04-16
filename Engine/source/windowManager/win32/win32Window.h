@@ -37,7 +37,6 @@ class Win32Window : public PlatformWindow
    friend class Win32WindowManager;
    friend class GFXPCD3D9Device;
    friend class GFXPCD3D9WindowTarget;
-   friend class GFXD3D8WindowTarget;
 
 public:
    struct Accelerator

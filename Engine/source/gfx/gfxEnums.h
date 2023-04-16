@@ -276,7 +276,6 @@ enum GFXAdapterType
 {
    OpenGL = 0,
    Direct3D9,
-   Direct3D8,
    NullDevice,
    GFXAdapterType_Count
 };
