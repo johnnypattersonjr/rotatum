@@ -224,10 +224,6 @@ function DatablockEditorPlugin::isExcludedDatablockType( %this, %className )
          return true;
       case "SFXTrack": // Abstract.
          return true;  
-      case "SFXFMODEvent": // Internally created.
-         return true;
-      case "SFXFMODEventGroup": // Internally created.
-         return true;
    }
    return false;
 }
@@ -734,8 +730,7 @@ function DatablockEditorPlugin::canBeClientSideDatablock( %className )
            "SFXAmbience" or
            "SFXEnvironment" or
            "SFXState" or
-           "SFXDescription" or
-           "SFXFMODProject":
+           "SFXDescription":
          return true;
          
       default:

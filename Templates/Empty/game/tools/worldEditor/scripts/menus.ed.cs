@@ -137,9 +137,6 @@ function EditorGui::buildMenus(%this)
       //item[7] = "-";
       //item[8] = "Export Terraform Data..." TAB "" TAB "Heightfield::saveBitmap(\"\");";
 
-   %fileMenu.appendItem( "-" );
-   %fileMenu.appendItem( "Add FMOD Designer Audio..." TAB "" TAB "AddFMODProjectDlg.show();" );
-
    %fileMenu.appendItem("-");
    %fileMenu.appendItem("Play Level" TAB "F11" TAB "Editor.close(\"PlayGui\");");
 

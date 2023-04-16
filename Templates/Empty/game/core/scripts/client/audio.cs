@@ -212,34 +212,27 @@ function sfxCompareProvider( %providerA, %providerB )
 {
    if( %providerA $= %providerB )
       return 0;
-      
+
    switch$( %providerA )
    {
-      // Always prefer FMOD over anything else.
-      case "FMOD":
-         return 1;
-         
-      // Prefer OpenAL over anything but FMOD.
+      // Always prefer OpenAL over anything else.
       case "OpenAL":
-         if( %providerB $= "FMOD" )
-            return -1;
-         else
-            return 1;
-            
+         return 1;
+
       // As long as the XAudio SFX provider still has issues,
       // choose stable DSound over it.
       case "DirectSound":
-         if( %providerB $= "FMOD" || %providerB $= "OpenAL" )
+         if( %providerB $= "OpenAL" )
             return -1;
          else
             return 0;
-            
+
       case "XAudio":
-         if( %providerB !$= "FMOD" && %providerB !$= "OpenAL" && %providerB !$= "DirectSound" )
+         if( %providerB !$= "OpenAL" && %providerB !$= "DirectSound" )
             return 1;
          else
             return -1;
-         
+
       default:
          return -1;
    }

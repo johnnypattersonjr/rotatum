@@ -91,7 +91,6 @@ class Torque3D
         // Modules
         includeModule( 'core' );
         includeModule( 'dsound' );
-        //includeModule( 'fmod'); // FMOD support removed until made as a 3rd party library
         includeModule( 'T3D' );
         includeModule( 'advancedLighting' );
         includeModule( 'basicLighting' );
