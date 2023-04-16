@@ -47,7 +47,6 @@
 #include "core/strings/stringFunctions.h"
 #include "console/console.h"
 #include "platform/profiler.h"
-#include "cinterface/cinterface.h";
 
 //TODO: file io still needs some work...
 
@@ -580,13 +579,7 @@ StringTableEntry Platform::getExecutablePath()
    // this isn't actually being used due to some static constructors at bundle load time
    // calling this method (before there is a chance to set it)
    // for instance, FMOD sound provider (this should be fixed in FMOD as it is with windows)
-   if (!cwd && torque_getexecutablepath())
-   {
-      // we're in a plugin using the cinterface
-      cwd = torque_getexecutablepath();
-      chdir(cwd);
-   }
-   else if(!cwd)
+   if(!cwd)
    {
       NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
       

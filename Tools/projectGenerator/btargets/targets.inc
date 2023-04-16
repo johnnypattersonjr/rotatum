@@ -28,10 +28,7 @@ $c = BuildTarget::add(	'VS9 Xenon',							// Name
                         'projects/',	                        // Project output directory (relative to solution)
                         '../../source/',				        // Base directory		         	
                         'vc2k8_360_proj.tpl',				    // App Project Template
-                        'vc2k8_360_proj.tpl',				    // Shared App Project Template
                         'vc2k8_360_lib_proj.tpl',			    // Lib Project Template	
-                        'vc2k8_360_dll_proj.tpl',			    // Shared Lib Project Template	
-                        '',			                            // ActiveX Project Template	(not supported on 360)
                         '.vcproj' );					        // File ext to write the project to
 
 // Solution template and extension
@@ -50,10 +47,7 @@ $c = BuildTarget::add(	'VS9 PS3',							// Name
                         'projects/',	                        // Project output directory (relative to solution)
                         '../../source/',				        // Base directory		         	
                         'vc2k8_ps3_proj.tpl',				    // App Project Template
-                        'vc2k8_ps3_proj.tpl',				    // Shared App Project Template
                         'vc2k8_ps3_lib_proj.tpl',			    // Lib Project Template	
-                        'vc2k8_ps3_dll_proj.tpl',			    // Shared Lib Project Template	
-                        '',			                            // ActiveX Project Template	(not supported on ps3)
                         '.vcproj' );					        // File ext to write the project to
 
 // Solution template and extension
@@ -73,10 +67,7 @@ $c = BuildTarget::add(	'VS9',							   // Name
                         'projects/',	                   // Project output directory (relative to solution)
                         '../../source/',				   // Base directory         
                         'vc2k8_proj.tpl',				   // App Project Template
-                        'vc2k8_shared.tpl',				   // Shared App Project Template
                         'vc2k8_lib_proj.tpl',			   // Lib Project Template
-                        'vc2k8_dll_proj.tpl',			   // Shared Lib Project Template
-                        'vc2k8_activex_proj.tpl',		   // ActiveX Control	
                         '.vcproj' );				       // File ext to write the project to
                   
 // Solution template and extension
@@ -98,10 +89,7 @@ $c = BuildTarget::add(	'VS2010',							   // Name
                         'projects/',	                   // Project output directory (relative to solution)
                         '../../source/',				   // Base directory         
                         'vc2010_proj.tpl',				   // App Project Template
-                        'vc2010_shared.tpl',				   // Shared App Project Template
                         'vc2010_lib_proj.tpl',			   // Lib Project Template
-                        'vc2010_dll_proj.tpl',			   // Shared Lib Project Template
-                        'vc2010_activex_proj.tpl',		   // ActiveX Control	
                         '.vcxproj' );				       // File ext to write the project to
                   
 // Solution template and extension
@@ -123,10 +111,7 @@ $c = BuildTarget::add( 'Xcode',						         // Name
                       '',	                              // Project output directory (relative to solution)
                       '../../source/',				         // Base directory
                       'xcode.tpl',				            // App Project Template
-                      'xcodeSharedApp.tpl',				   // Shared App Project Template
                       'xcodeLib.tpl',				         // Lib Project Template
-                      'xcodeSharedLib.tpl',			      // Shared Lib Project Template
-                      'xcodeSafariPlugin.tpl',			   // Safari Plugin
                       '.xcodeproj/project.pbxproj' );    // File ext to write the project to
 
 $c->setDelimiters( '[', ']' ); 						// What delimeters does this template use?
@@ -145,10 +130,7 @@ $c = BuildTarget::add( 'Make',                // Name
 		       '',                    // Project Output directory (relative to solution)
 		       '../../source/',       // Base directory
 		       'makeApp.tpl',         // App Project Template
-		       'makeAppShared.tpl',   // Shared App Project Template
 		       'makeLib.tpl',         // Lib Project Template
-		       'makeSo.tpl',          // Shared Lib Project Template
-		       '',                    // NP Plugin
 		       '' );                  // File ext to write the project to
 
 $c->setSolutionInfo( 'makeSolution.tpl', '', '' );
@@ -167,10 +149,7 @@ $c = BuildTarget::add( 'Make Dedicated',      // Name
 		       '',                    // Project Output directory (relative to solution)
 		       '../../source/',       // Base directory
 		       'makeApp.tpl',         // App Project Template
-		       'makeAppShared.tpl',   // Shared App Project Template
 		       'makeLib.tpl',         // Lib Project Template
-		       'makeSo.tpl',          // Shared Lib Project Template
-		       '',                    // NP Plugin
 		       '' );                  // File ext to write the project to
 
 $c->setSolutionInfo( 'makeSolution.tpl', '', '' );
@@ -191,10 +170,7 @@ $c = BuildTarget::add( 'build',						// Name
                   'projects/',	                  // Project output directory (relative to solution)
                   '../source/',         			// Base directory
                   'buildManifest.tpl',         	// App Project Template
-                  'buildManifest.tpl',         	// Shared Project Template
                   '',         				   // Lib Project Template
-                  '',         				   // Shared Lib Project Template
-                  '',         				   // ActiveX Project Template
                   '.txt' );
          
 $c->setFileExtensions( 'c', 'cc', 'h', 'cpp', 'inl', 'asm', 'm', 'mm' );

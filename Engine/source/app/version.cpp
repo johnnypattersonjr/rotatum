@@ -121,12 +121,3 @@ ConsoleFunction(isDemo, bool, 1, 1, "")
    return false;
 #endif
 }
-
-ConsoleFunction(isWebDemo, bool, 1, 1, "")
-{
-#ifdef TORQUE_DEMO
-   return Platform::getWebDeployment();
-#else
-   return false;
-#endif
-}

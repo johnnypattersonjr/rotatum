@@ -1591,18 +1591,6 @@ DefineEngineFunction( displaySplashWindow, bool, (),,
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction( getWebDeployment, bool, (),,
-   "Test whether Torque is running in web-deployment mode.\n"
-   "In this mode, Torque will usually run within a browser and certain restrictions apply (e.g. Torque will not "
-   "be able to enter fullscreen exclusive mode).\n"
-   "@return True if Torque is running in web-deployment mode.\n"
-   "@ingroup Platform" )
-{
-   return Platform::getWebDeployment();
-}
-
-//-----------------------------------------------------------------------------
-
 DefineEngineFunction( countBits, S32, ( S32 v ),,
    "Count the number of bits that are set in the given 32 bit integer.\n"
    "@param v An integer value.\n\n"

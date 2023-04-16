@@ -31,10 +31,6 @@ require_once( "Project.php" );
 require_once( "BuildTarget.php" );
 require_once( "Torque3D.php");
 require_once( "WindowsRegistry.php");
-require_once( "WebPlugin.php");
-require_once( "ActiveXWebPlugin.php");
-require_once( "NPWebPlugin.php");
-require_once( "SafariWebPlugin.php");
 
 
 class Generator
@@ -308,11 +304,6 @@ class Generator
         self::$project_cur->guid = $guid;
     }
     
-    static function setProjectModuleDefinitionFile ( $mdef )
-    {
-        self::$project_cur->moduleDefinitionFile = $mdef;
-    }
-    
     static function beginModule( $name )
     {
         if( !self::$module_cur )
@@ -375,26 +366,6 @@ class Generator
                     // Merge lib includes to global lib include array
                     self::$app_lib_includes = array_merge( self::$app_lib_includes, self::$project_cur->includes );
                 }
-                else if ( $type == Project::$TYPE_SHARED_LIB )
-                {
-                    // Merge lib includes into app include list
-                    self::$app_lib_includes = array_merge( self::$app_lib_includes, self::$project_cur->includes );
-                }
-                else if ( $type == Project::$TYPE_ACTIVEX )
-                {
-                    // Merge lib includes into app include list
-                    self::$app_lib_includes = array_merge( self::$app_lib_includes, self::$project_cur->includes );
-                }
-                else if ( $type == Project::$TYPE_SAFARI )
-                {
-                    // Merge lib includes into app include list
-                    self::$app_lib_includes = array_merge( self::$app_lib_includes, self::$project_cur->includes );
-                }
-                else if ( $type == Project::$TYPE_SHARED_APP )
-                {
-                    // Merge lib includes into app include list
-                    self::$app_lib_includes = array_merge( self::$app_lib_includes, self::$project_cur->includes );
-                }
                 else if ( $type == Project::$TYPE_APP )
                 {
                     // Merge lib includes into app include list
@@ -415,61 +386,6 @@ class Generator
         }
         else
             trigger_error( "Generator::endProjectConfig() - no currently open project!", E_USER_ERROR );	 	   
-    }
-
-    static function beginActiveXConfig( $lib_name, $guid = '', $game_dir = 'game', $output_name = '' )
-    {  
-        self::beginProjectConfig( $lib_name, Project::$TYPE_ACTIVEX, $guid, $game_dir, $output_name );
-        
-        // Handle ActiveX specific setup (including ATL template processing, etc)
-        $activex = new ActiveXWebPlugin();
-        $activex->process(self::$project_cur);
-    }
-
-    static function endActiveXConfig()
-    {
-        self::endProjectConfig( Project::$TYPE_ACTIVEX );
-    }
-
-    static function beginSafariConfig( $lib_name, $guid = '', $game_dir = 'game', $output_name = '' )
-    {  
-        self::beginProjectConfig( $lib_name, Project::$TYPE_SAFARI, $guid, $game_dir, $output_name );
-        
-        // Handle Safari specific setup 
-        $safari = new SafariWebPlugin();
-        $safari->process(self::$project_cur);
-    }
-
-    static function endSafariConfig()
-    {
-        self::endProjectConfig( Project::$TYPE_SAFARI );
-    }
-
-    
-    static function beginNPPluginConfig( $lib_name, $guid = '', $game_dir = 'game', $output_name = '' )
-    {  
-        self::beginProjectConfig( $lib_name, Project::$TYPE_SHARED_LIB, $guid, $game_dir, $output_name );
-        self::$project_cur->setUniformOutputFile();
-
-        // Handle NP specific setup (resource template processing, etc)
-        $NP = new NPWebPlugin();
-        $NP->process(self::$project_cur);
-    }
-
-    static function endNPPluginConfig()
-    {
-        self::endProjectConfig( Project::$TYPE_SHARED_LIB );
-    }
-
-
-    static function beginSharedLibConfig( $lib_name, $guid = '', $game_dir = 'game', $output_name = '' )
-    {  
-        self::beginProjectConfig( $lib_name, Project::$TYPE_SHARED_LIB, $guid, $game_dir, $output_name );
-    }
-
-    static function endSharedLibConfig()
-    {
-        self::endProjectConfig( Project::$TYPE_SHARED_LIB );
     }
 
     static function beginCSProjectConfig( $lib_name, $guid = '', $game_dir = 'game', $output_name = '' )
@@ -493,16 +409,6 @@ class Generator
         self::endProjectConfig( Project::$TYPE_LIB );
     }
 	
-    static function beginSharedAppConfig( $app_name, $guid = '', $game_dir = 'game', $output_name = '' )
-    {
-        self::beginProjectConfig( $app_name, Project::$TYPE_SHARED_APP, $guid, $game_dir, $output_name );
-    }
-    
-    static function endSharedAppConfig()
-    {
-        self::endProjectConfig( Project::$TYPE_SHARED_APP);   
-    }
-
     
     static function beginAppConfig( $app_name, $guid = '', $game_dir = 'game', $output_name = '' )
     {

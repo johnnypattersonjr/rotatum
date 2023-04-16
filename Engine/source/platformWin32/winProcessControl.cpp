@@ -25,8 +25,7 @@
 
 void Platform::postQuitMessage(const U32 in_quitVal)
 {
-   if (!Platform::getWebDeployment())
-      PostQuitMessage(in_quitVal);
+   PostQuitMessage(in_quitVal);
 }
 
 void Platform::debugBreak()

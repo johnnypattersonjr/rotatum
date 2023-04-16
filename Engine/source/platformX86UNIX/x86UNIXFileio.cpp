@@ -55,7 +55,6 @@
  #include "console/console.h"
  #include "core/strings/stringFunctions.h"
  #include "util/tempAlloc.h"
- #include "cinterface/cinterface.h"
 
  #if defined(__FreeBSD__)
     #include <sys/types.h>
@@ -929,9 +928,6 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
  //-----------------------------------------------------------------------------
  bool Platform::setCurrentDirectory(StringTableEntry newDir)
  {
-    if (Platform::getWebDeployment())
-       return true;
-
     TempAlloc< UTF8 > buf( dStrlen( newDir ) + 2 );
 
     dStrcpy( buf, newDir );
@@ -957,16 +953,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
 {
    if( !sBinPathName[0] )
    {
-      const char *cpath;
-      if( (cpath = torque_getexecutablepath()) )
-      {
-         dStrncpy(sBinPathName, cpath, sizeof(sBinPathName));
-         chdir(sBinPathName);
-      }
-      else
-      {
-         getcwd(sBinPathName, sizeof(sBinPathName)-1);
-      }
+      getcwd(sBinPathName, sizeof(sBinPathName)-1);
    }
 
    return StringTable->insert(sBinPathName);
@@ -1248,23 +1235,4 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
 StringTableEntry Platform::getExecutableName()
 {
    return StringTable->insert(sBinName);
-}
-
-extern "C"
-{
-   void setExePathName(const char* exePathName)
-   {
-      if (exePathName == NULL)
-         sBinPathName[0] = '\0';
-      else
-         dStrncpy(sBinPathName, exePathName, sizeof(sBinPathName));
-
-      // set the base exe name field
-      char *binName = dStrrchr(sBinPathName, '/');
-      if( !binName )
-         binName = sBinPathName;
-      else
-         *binName++ = '\0';
-      sBinName = binName;
-   }
 }

@@ -812,10 +812,6 @@ StringTableEntry Platform::getCurrentDirectory()
 
 bool Platform::setCurrentDirectory(StringTableEntry newDir)
 {
-
-   if (Platform::getWebDeployment())
-      return true;
-
    TempAlloc< TCHAR > buf( dStrlen( newDir ) + 2 );
 
 #ifdef UNICODE
@@ -836,32 +832,22 @@ static void getExecutableInfo( StringTableEntry* path, StringTableEntry* exe )
 
    if( !pathEntry )
    {
-      if (!Platform::getWebDeployment())
-      {
-         WCHAR cen_buf[ 2048 ];
-         GetModuleFileNameW( NULL, cen_buf, sizeof( cen_buf ) / sizeof( cen_buf[ 0 ] ) );
-         forwardslash( cen_buf );
+      WCHAR cen_buf[ 2048 ];
+      GetModuleFileNameW( NULL, cen_buf, sizeof( cen_buf ) / sizeof( cen_buf[ 0 ] ) );
+      forwardslash( cen_buf );
 
-         WCHAR* delimiter = dStrrchr( cen_buf, '/' );
-         if( delimiter )
-            *delimiter = '\0';
+      WCHAR* delimiter = dStrrchr( cen_buf, '/' );
+      if( delimiter )
+         *delimiter = '\0';
 
-         char* pathBuf = convertUTF16toUTF8( cen_buf );
-         char* exeBuf = convertUTF16toUTF8( delimiter + 1 );
+      char* pathBuf = convertUTF16toUTF8( cen_buf );
+      char* exeBuf = convertUTF16toUTF8( delimiter + 1 );
 
-         pathEntry = StringTable->insert( pathBuf );
-         exeEntry = StringTable->insert( exeBuf );
+      pathEntry = StringTable->insert( pathBuf );
+      exeEntry = StringTable->insert( exeBuf );
 
-         SAFE_DELETE_ARRAY( pathBuf );
-         SAFE_DELETE_ARRAY( exeBuf );
-      }
-      else
-      {
-         char cdir[4096];
-         GetCurrentDirectoryA(4096, cdir);
-         pathEntry = StringTable->insert(cdir);
-         exeEntry = StringTable->insert("WebGameCtrl.exe");
-      }
+      SAFE_DELETE_ARRAY( pathBuf );
+      SAFE_DELETE_ARRAY( exeBuf );
    }
 
    if( path )

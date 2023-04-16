@@ -1157,20 +1157,3 @@ static void sgPCD3D9DeviceHandleCommandLine( S32 argc, const char **argv )
 
 // Register the command line parsing hook
 static ProcessRegisterCommandLine sgCommandLine( sgPCD3D9DeviceHandleCommandLine );
-
-extern "C" HRESULT WINAPI D3D_GetBackBufferNoRef(IDirect3DSurface9 **ppSurface)
-{
-    HRESULT hr = S_OK;
-  
-    GFXD3D9Device *dev = static_cast<GFXD3D9Device *>(GFX);
-
-    if (!dev)
-    {
-       *ppSurface = NULL;
-       return S_OK;
-    }
-
-    *ppSurface = dev->getBackBuffer();
-
-    return hr;
-}

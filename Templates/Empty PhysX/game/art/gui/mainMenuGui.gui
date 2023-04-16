@@ -120,11 +120,3 @@
    };
 };
 //--- OBJECT WRITE END ---
-
-function MainMenuGui::onWake(%this)
-{
-   if (isFunction("getWebDeployment") &&
-       getWebDeployment() &&
-       isObject(%this-->ExitButton))
-      %this-->ExitButton.setVisible(false);
-}

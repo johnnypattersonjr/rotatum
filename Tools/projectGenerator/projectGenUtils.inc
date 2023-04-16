@@ -27,20 +27,18 @@
 //
 //--------------------------------------------------------------------------------
 
-function beginProject($name, $sharedConfig)
+function beginProject($name)
 {
     // Set the game project name, this is what your game's exe/dll will be called
     setGameProjectName($name);
-    
-    if (Generator::$platform == "win32" && $sharedConfig)
-        beginSolutionConfig( $name, '{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}' );
 
-	
+    if (Generator::$platform == "win32")
+        beginSolutionConfig( $name, '{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}' );
 }
 
-function endProject($sharedConfig)
+function endProject()
 {
-    if (Generator::$platform == "win32" && $sharedConfig)
+    if (Generator::$platform == "win32")
         endSolutionConfig();
 }
 
@@ -87,46 +85,6 @@ function includeModule( $modName )
    require( Generator::getGeneratorModulesPath() . $modName . '.inc' );
 }
 
-function beginActiveXConfig( $lib_name, $guid = '', $gameDir = 'game', $output_name = '' )
-{    
-	Generator::beginActiveXConfig( $lib_name, $guid, $gameDir, $output_name );
-}
-
-function endActiveXConfig()
-{
-	Generator::endActiveXConfig();
-}
-
-function beginSafariConfig( $lib_name, $guid = '', $gameDir = 'game', $output_name = '' )
-{    
-	Generator::beginSafariConfig( $lib_name, $guid, $gameDir, $output_name );
-}
-
-function endSafariConfig()
-{
-	Generator::endSafariConfig();
-}
-
-function beginSharedLibConfig( $lib_name, $guid = '', $gameDir = 'game', $output_name = '' )
-{    
-	Generator::beginSharedLibConfig( $lib_name, $guid, $gameDir, $output_name );
-}
-
-function endSharedLibConfig()
-{
-	Generator::endSharedLibConfig();
-}
-
-function beginNPPluginConfig( $lib_name, $guid = '', $gameDir = 'game', $output_name = '' )
-{    
-	Generator::beginNPPluginConfig( $lib_name, $guid, $gameDir, $output_name );
-}
-
-function endNPPluginConfig()
-{
-	Generator::endNPPluginConfig();
-}
-
 
 function beginLibConfig( $lib_name, $guid = '', $gameDir = 'game', $output_name = '' )
 {    
@@ -146,16 +104,6 @@ function beginAppConfig( $app_name, $guid = '', $game_dir = 'game', $output_name
 function endAppConfig()
 {
 	Generator::endAppConfig();
-}
-
-function beginSharedAppConfig( $app_name, $guid = '', $game_dir = 'game', $output_name = '' )
-{    
-   Generator::beginSharedAppConfig( $app_name, $guid, $game_dir, $output_name );
-}
-
-function endSharedAppConfig()
-{
-	Generator::endSharedAppConfig();
 }
 
 
@@ -293,12 +241,6 @@ function setProjectGUID( $guid )
 {
 	Generator::setProjectGUID( $guid );
 }
-
-function setProjectModuleDefinitionFile( $mdef )
-{
-	Generator::setProjectModuleDefinitionFile( $mdef );
-}
-
 
 function addProjectLibDir( $dir )
 {

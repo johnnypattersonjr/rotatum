@@ -716,19 +716,9 @@ String   Platform::FS::getAssetDir()
 {
    char cen_buf[2048];
 #ifdef TORQUE_UNICODE
-   if (!Platform::getWebDeployment())
-   {
-      TCHAR buf[ 2048 ];
-      ::GetModuleFileNameW( NULL, buf, sizeof( buf ) );
-      convertUTF16toUTF8( buf, cen_buf, sizeof( cen_buf ) );
-   }
-   else
-   {
-      TCHAR buf[ 2048 ];
-      GetCurrentDirectoryW( sizeof( buf ) / sizeof( buf[ 0 ] ), buf );
-      convertUTF16toUTF8( buf, cen_buf, sizeof( cen_buf ) );
-      return Path::CleanSeparators(cen_buf);
-   }
+   TCHAR buf[ 2048 ];
+   ::GetModuleFileNameW( NULL, buf, sizeof( buf ) );
+   convertUTF16toUTF8( buf, cen_buf, sizeof( cen_buf ) );
 #else
    ::GetModuleFileNameA( NULL, cen_buf, 2047);
 #endif

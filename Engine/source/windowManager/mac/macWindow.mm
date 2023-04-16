@@ -101,16 +101,6 @@ MacWindow::~MacWindow()
    sInstance = NULL;
 }
 
-extern "C"
-{
-
-void torque_setsafariwindow( NSWindow *window, S32 x, S32 y, S32 width, S32 height)
-{
-   MacWindow::setSafariWindow(window, x, y, width, height);
-}
-
-}
-
 void MacWindow::hideBrowserWindow(bool hide)
 {
    if (sSafariWindowInfo && sInstance && sInstance->mCocoaWindow)

@@ -130,16 +130,7 @@ function OptionsDlg::setPane(%this, %pane)
 
 function OptionsDlg::onWake(%this)
 {
-   if ( isFunction("getWebDeployment") && getWebDeployment() )
-   {
-      // Cannot enable full screen under web deployment
-      %this-->OptGraphicsFullscreenToggle.setStateOn( false );
-      %this-->OptGraphicsFullscreenToggle.setVisible( false );
-   }
-   else
-   {
-      %this-->OptGraphicsFullscreenToggle.setStateOn( Canvas.isFullScreen() );
-   }
+   %this-->OptGraphicsFullscreenToggle.setStateOn( Canvas.isFullScreen() );
    %this-->OptGraphicsVSyncToggle.setStateOn( !$pref::Video::disableVerticalSync );
    
    OptionsDlg.initResMenu();
@@ -286,18 +277,6 @@ function OptionsDlg::initResMenu( %this )
    %resMenu = %this-->OptGraphicsResolutionMenu;	   
    %resMenu.clear();
    
-   // If we are in a browser then we can't change our resolution through
-   // the options dialog
-   if (getWebDeployment())
-   {
-      %count = 0;
-      %currRes = getWords(Canvas.getVideoMode(), $WORD::RES_X, $WORD::RES_Y);
-      %resMenu.add(%currRes, %count);
-      %count++;
-
-      return;
-   }
-   
    // Loop through all and add all valid resolutions
    %count = 0;
    %resCount = Canvas.getModeCount();
@@ -341,29 +320,15 @@ function OptionsDlg::applyGraphics( %this, %testNeedApply )
          MessageBoxOK( "Change requires restart", "Please restart the game for a display device change to take effect." );
    }
 
-   // Gather the new video mode.
-   if ( isFunction("getWebDeployment") && getWebDeployment() )
-   {
-      // Under web deployment, we use the custom resolution rather than a Canvas
-      // defined one.
-      %newRes = %this-->OptGraphicsResolutionMenu.getText();
-   }
-   else
-   {
-	   %newRes = getWords( Canvas.getMode( %this-->OptGraphicsResolutionMenu.getSelected() ), $WORD::RES_X, $WORD::RES_Y ); 
-   }
+	// Gather the new video mode.
+	%newRes = getWords( Canvas.getMode( %this-->OptGraphicsResolutionMenu.getSelected() ), $WORD::RES_X, $WORD::RES_Y ); 
 	%newBpp        = 32; // ... its not 1997 anymore.
 	%newFullScreen = %this-->OptGraphicsFullscreenToggle.getValue() ? "true" : "false";
 	%newRefresh    = %this-->OptRefreshSelectMenu.getSelected();
 	%newVsync = !%this-->OptGraphicsVSyncToggle.getValue();	
 	%newFSAA = %this-->OptAAQualityPopup.getSelected();
 
-   // Under web deployment we can't be full screen.
-   if ( isFunction("getWebDeployment") && getWebDeployment() )
-   {
-      %newFullScreen = false;
-   }
-   else if ( %newFullScreen $= "false" )
+	if ( %newFullScreen $= "false" )
 	{
       // If we're in windowed mode switch the fullscreen check
       // if the resolution is bigger than the desktop.

@@ -61,9 +61,4 @@ void DisplayErrorAlert(const char* errMsg, bool showSDLError = true);
 // (Found this function at http://www.codeguru.com/string/stristr.html)
 extern char *stristr(char *szStringToBeSearched, const char *szSubstringToSearchFor);
 
-extern "C"
-{
-   // x86UNIX doesn't have a way to automatically get the executable file name
-   void setExePathName(const char* exePathName);
-}
 #endif

@@ -28,9 +28,7 @@ $Pref::WorldEditor::FileSpec = "Torque Mission Files (*.mis)|*.mis|All Files (*.
 
 function EditorFileMenu::onMenuSelect(%this)
 {
-   // don't do this since it won't exist if this is a "demo"
-   if(!isWebDemo())
-      %this.enableItem(2, EditorIsDirty());
+   %this.enableItem(2, EditorIsDirty());
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -88,7 +86,7 @@ function EditorClearDirty()
 
 function EditorQuitGame()
 {
-   if( EditorIsDirty() && !isWebDemo())
+   if( EditorIsDirty() )
    {
       MessageBoxYesNoCancel("Level Modified", "Would you like to save your changes before quitting?", "EditorSaveMissionMenu(); quit();", "quit();", "" );
    }
@@ -98,7 +96,7 @@ function EditorQuitGame()
 
 function EditorExitMission()
 {  
-   if( EditorIsDirty() && !isWebDemo() )
+   if( EditorIsDirty() )
    {
       MessageBoxYesNoCancel("Level Modified", "Would you like to save your changes before exiting?", "EditorDoExitMission(true);", "EditorDoExitMission(false);", "");
    }
@@ -108,7 +106,7 @@ function EditorExitMission()
 
 function EditorDoExitMission(%saveFirst)
 {
-   if(%saveFirst && !isWebDemo())
+   if(%saveFirst)
    {
       EditorSaveMissionMenu();
    }
@@ -209,9 +207,6 @@ function EditorOpenDeclarationInTorsion( %object )
 
 function EditorNewLevel( %file )
 {
-   if(isWebDemo())
-      return;
-      
    %saveFirst = false;
    if ( EditorIsDirty() )
    {
@@ -248,7 +243,7 @@ function EditorNewLevel( %file )
 
 function EditorSaveMissionMenu()
 {
-   if(!$Pref::disableSaving && !isWebDemo())
+   if(!$Pref::disableSaving)
    {
       if(EditorGui.saveAs)
          EditorSaveMissionAs();
@@ -338,7 +333,7 @@ function EditorSaveMissionAs( %missionName )
       return;
    }
    
-   if(!$Pref::disableSaving && !isWebDemo())
+   if(!$Pref::disableSaving)
    {
       // If we didn't get passed a new mission name then
       // prompt the user for one.
@@ -462,7 +457,7 @@ function EditorSaveMissionAs( %missionName )
 
 function EditorOpenMission(%filename)
 {
-   if( EditorIsDirty() && !isWebDemo() )
+   if( EditorIsDirty() )
    {
       // "EditorSaveBeforeLoad();", "getLoadFilename(\"*.mis\", \"EditorDoLoadMission\");"
       if(MessageBox("Mission Modified", "Would you like to save changes to the current mission \"" @
@@ -530,7 +525,7 @@ function EditorOpenMission(%filename)
 
 function EditorExportToCollada()
 {
-   if ( !$Pref::disableSaving && !isWebDemo() )
+   if ( !$Pref::disableSaving )
    {
       %dlg = new SaveFileDialog()
       {
@@ -566,7 +561,7 @@ function EditorExportToCollada()
 function EditorMakePrefab()
 {
    // Should this be protected or not?
-   if ( !$Pref::disableSaving && !isWebDemo() )
+   if ( !$Pref::disableSaving )
    {
       %dlg = new SaveFileDialog()
       {

@@ -26,7 +26,6 @@
 
 class Torque3D
 {
-    static $sharedConfig = true;
     static $projectName = "";
     
     static function includeDefaultLibs()
@@ -58,32 +57,16 @@ class Torque3D
         
         setPlatform( $platform );
 
-        beginProject( $projectName, self::$sharedConfig );
+        beginProject( $projectName );
         
         self::includeDefaultLibs();
         
-        $ext = "DLL";
-        if ( Generator::$platform == "mac" )
-            $ext = "Bundle";
-   
-
-        //some platforms will not want a shared config        
-        if ( Generator::$platform == "360" || Generator::$platform == "ps3" )
-            self::$sharedConfig = false;
-
-        //begin either a shared lib config, or a static app config
-        if ( self::$sharedConfig )
-            beginSharedLibConfig( getGameProjectName().' '.$ext, '{C0FCDFF9-E125-412E-87BC-2D89DB971CAB}', 'game', getGameProjectName() );
-        else
-            beginAppConfig( getGameProjectName(), '{C0FCDFF9-E125-412E-87BC-2D89DB971CAB}', 'game', getGameProjectName() );
+        beginAppConfig( getGameProjectName(), '{C0FCDFF9-E125-412E-87BC-2D89DB971CAB}', 'game', getGameProjectName() );
         
         /// Prefs
         addProjectDefine( 'TORQUE_SHADERGEN' );
         addProjectDefine( 'TORQUE_UNICODE' );
         
-        if ( self::$sharedConfig )
-           addProjectDefine( 'TORQUE_SHARED' );    
-
         /// For OPCODE
         addProjectDefine( 'BAN_OPCODE_AUTOLINK' );
         addProjectDefine( 'ICE_NO_DLL' );
@@ -160,8 +143,6 @@ class Torque3D
 
         if (Generator::$platform == "win32")
         {
-            setProjectModuleDefinitionFile('../../' . getLibSrcDir() . 'Torque3D/msvc/torque3d.def');
-
             addProjectDefine( 'UNICODE' );
             addProjectDefine( 'INITGUID' );
             addProjectDefine( '_CRT_SECURE_NO_DEPRECATE' );
@@ -193,47 +174,12 @@ class Torque3D
     
     static function endConfig()
     {
-        //end shared/static config
-        if ( self::$sharedConfig )
-           endSharedLibConfig();
-        else
-           endAppConfig();
-
-        //add the shared application only if this is a shared config
-        if ( self::$sharedConfig )
-        {
-            /////// Application Config
-            beginSharedAppConfig( getGameProjectName(), '{CDECDFF9-E125-523F-87BC-2D89DB971CAB}' );
-
-                addProjectDefine( 'TORQUE_SHARED' );
-
-                addEngineSrcDir( 'main' );
-                
-                if (Generator::$platform == "win32")
-                {
-                    addProjectDefine( 'WIN32' );
-                    addProjectDependency( getGameProjectName() . ' DLL' );
-                }
-
-                if (Generator::$platform == "mac")
-                {
-                    addProjectDefine( '__MACOSX__' );
-                    addProjectDependency( getGameProjectName() . ' Bundle' );
-                    addProjectDependency( getGameProjectName() . ' Plugin' );
-                }
-
-            endSharedAppConfig();
-        }
+        endAppConfig();
         
         // Add solution references for Visual Studio projects
         if (Generator::$platform == "win32" || Generator::$platform == "360" || Generator::$platform == "ps3")
         {
-           if ( !self::$sharedConfig )
-              beginSolutionConfig( getGameProjectName(), '{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}' );
-              
               addSolutionProjectRef( getGameProjectName() );
-              if ( self::$sharedConfig )
-                 addSolutionProjectRef( getGameProjectName() . ' DLL' );
                  
               addSolutionProjectRef( 'collada_dom' );
               addSolutionProjectRef( 'ljpeg' );
@@ -253,15 +199,10 @@ class Torque3D
                  addSolutionProjectRef( 'libvorbis' );
                  addSolutionProjectRef( 'libtheora' );
               }
-              
-           if ( !self::$sharedConfig )
-              endSolutionConfig();
         }
         
-        endProject(self::$sharedConfig);
-        
+        endProject();
     }
-        
 }
 
 ?>

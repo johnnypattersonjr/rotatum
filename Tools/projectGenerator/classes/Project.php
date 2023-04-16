@@ -27,11 +27,7 @@
 class Project
 {
    public static $TYPE_APP    =     'app';
-   public static $TYPE_SHARED_APP = 'sharedapp';
    public static $TYPE_LIB    =     'lib';
-   public static $TYPE_SHARED_LIB = 'shared';
-   public static $TYPE_ACTIVEX =    'activex';
-   public static $TYPE_SAFARI =     'safari';
    public static $TYPE_CSPROJECT =     'csproj';
    
    public $name;               // Project name
@@ -49,7 +45,6 @@ class Project
    public $additionalExePath;  // Additional section to inject into executable path
    public $dependencies;       // Projects this project depends on
    public $references;         // for managed projects, references to required assemblies
-   public $moduleDefinitionFile;       // definition file to control shared library exports on windows
    public $projectFileExt;
    
    public $commandDebug = "";
@@ -94,34 +89,14 @@ class Project
         return $this->type == self::$TYPE_APP;
     }
 
-    public function isSharedApp()
-    {
-        return $this->type == self::$TYPE_SHARED_APP;
-    }
-
     public function isLib()
     {
         return $this->type == self::$TYPE_LIB;
     }
 
-    public function isSharedLib()
-    {
-        return $this->type == self::$TYPE_SHARED_LIB;
-    }
-
     public function isCSProject()
     {
         return $this->type == self::$TYPE_CSPROJECT;
-    }
-
-    public function isActiveX()
-    {
-        return $this->type == self::$TYPE_ACTIVEX;
-    }
-
-    public function isSafari()
-    {
-        return $this->type == self::$TYPE_SAFARI;
     }
 
     public function setUniformOutputFile()
@@ -332,7 +307,6 @@ class Project
         $tpl->assign_by_ref( 'projLibDirs',  $this->lib_dirs );
         $tpl->assign_by_ref( 'projDepend',   $this->dependencies );
         $tpl->assign_by_ref( 'gameProjectName', getGameProjectName() );
-        $tpl->assign_by_ref( 'projModuleDefinitionFile',   $this->moduleDefinitionFile );
         $tpl->assign_by_ref( 'projSubSystem', $this->projSubSystem );
         
         if (Generator::$useDLLRuntime)
@@ -347,21 +321,10 @@ class Project
             $tpl->assign( 'projRuntimeRelease', 0 );
             $tpl->assign( 'projRuntimeDebug', 1 );       
         }
-        
-        if (!$this->commandDebug && ( $this->isSharedLib() || $this->isSharedApp() ))
-        {
-        
-            $command = "$(TargetDir)\\".$this->outputName;
-            $tpl->assign( 'commandDebug' , $command."_DEBUG.exe");
-            $tpl->assign( 'commandRelease' , $command.".exe");
-            $tpl->assign( 'commandOptimized' , $command."_OPTIMIZEDDEBUG.exe");
-        }
-        else
-        {
-            $tpl->assign_by_ref( 'commandDebug' , $this->commandDebug);
-            $tpl->assign_by_ref( 'commandRelease' , $this->commandRelease);
-            $tpl->assign_by_ref( 'commandOptimized' , $this->commandOptimized);
-        }
+
+        $tpl->assign_by_ref( 'commandDebug' , $this->commandDebug);
+        $tpl->assign_by_ref( 'commandRelease' , $this->commandRelease);
+        $tpl->assign_by_ref( 'commandOptimized' , $this->commandOptimized);
 
         $tpl->assign_by_ref( 'argsDebug' , $this->argsDebug);
         $tpl->assign_by_ref( 'argsRelease' , $this->argsRelease);
@@ -376,7 +339,7 @@ class Project
           $projectDepends[$pname] = $p;
           
           if ( $p )
-            $ptypes[$pname] = $p->isSharedLib() || $p->isSafari();
+            $ptypes[$pname] = false;
         }
         
         $tpl->assign_by_ref( 'projTypes',   $ptypes );
@@ -503,14 +466,6 @@ class Project
                    $template = $output->template_app;
                 else if ($this->isLib())
                    $template = $output->template_lib;
-                else if ($this->isSharedLib())
-                   $template = $output->template_shared_lib;
-                else if ($this->isSharedApp())
-                   $template = $output->template_shared_app;
-                else if ($this->isActiveX())
-                   $template = $output->template_activex;
-                else if ($this->isSafari())
-                   $template = $output->template_activex; //rename template?
                 else if ($this->isCSProject())
                   $template = $output->template_csproj;
 

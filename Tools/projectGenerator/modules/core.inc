@@ -31,9 +31,6 @@ addEngineSrcDir('component');
 addEngineSrcDir('component/interfaces');
 
 // Core
-if (Generator::isApp())
-	addSrcDir( '../source' );
-    
 addEngineSrcDir('console');
 addEngineSrcDir('core');
 addEngineSrcDir('core/stream');
@@ -57,7 +54,6 @@ addEngineSrcDir('math');
 addEngineSrcDir('math/util');
 addEngineSrcDir('math/test');
 addEngineSrcDir('platform');
-addEngineSrcDir('cinterface');
 
 switch( Generator::$platform )
 {

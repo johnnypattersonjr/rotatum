@@ -31,10 +31,7 @@ class BuildTarget
     public $project_rel_path;
     public $base_dir;
     public $template_app;
-    public $template_shared_app;
     public $template_lib;
-    public $template_shared_lib;
-    public $template_activex;
     public $template_sln;
     public $template_user;
     public $template_csproj;
@@ -49,9 +46,9 @@ class BuildTarget
     public $rdelim;
     
     
-    static function add( $name, $out, $project, $base, $template_app, $template_shared_app, $template_lib, $template_shared_lib, $template_activex, $out_ext )
+    static function add( $name, $out, $project, $base, $template_app, $template_lib, $out_ext )
     {
-        $c = new BuildTarget( $name, $out, $project, $base, $template_app, $template_shared_app, $template_lib, $template_shared_lib, $template_activex, $out_ext );
+        $c = new BuildTarget( $name, $out, $project, $base, $template_app, $template_lib, $out_ext );
         
         self::$instances[ $name ] = $c;
         
@@ -63,7 +60,7 @@ class BuildTarget
         return self::$instances;
     }
     
-    function BuildTarget( $name, $out, $project, $base, $template_app, $template_shared_app, $template_lib, $template_shared_lib, $template_activex, $out_ext )
+    function BuildTarget( $name, $out, $project, $base, $template_app, $template_lib, $out_ext )
     {
         $this->name 	  	   = $name;
         $this->output_dir 	= $out;
@@ -71,10 +68,7 @@ class BuildTarget
         $this->output_ext	   = $out_ext;
         $this->base_dir	  	= $base;
         $this->template_app	= $template_app;
-        $this->template_shared_app	= $template_shared_app;
         $this->template_lib	= $template_lib;
-        $this->template_shared_lib	= $template_shared_lib;
-        $this->template_activex = $template_activex;
         $this->template_csproj = "";
         $this->template_user = "";
         

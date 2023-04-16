@@ -137,7 +137,7 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
 	mSuppressReset = true;
 
    // Can't switch to fullscreen while a child of another window
-   if(mode.fullScreen && !Platform::getWebDeployment() && mOwningManager->getParentWindow())
+   if(mode.fullScreen && mOwningManager->getParentWindow())
    {
       mOldParent = (HWND)mOwningManager->getParentWindow();
       mOwningManager->setParentWindow(NULL);
@@ -149,7 +149,7 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
    }
 
 	// Set our window to have the right style based on the mode
-   if(mode.fullScreen && !Platform::getWebDeployment() && !mOffscreenRender)
+   if(mode.fullScreen && !mOffscreenRender)
 	{
 		SetWindowLong( getHWND(), GWL_STYLE, WS_POPUP);
 		SetWindowPos( getHWND(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
@@ -189,27 +189,7 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
          }
       }
 
-      // Make sure we're the correct resolution for web deployment
-      if (!Platform::getWebDeployment() || !mOwningManager->getParentWindow() || mOffscreenRender)
-      {
-         setSize(mode.resolution);
-      }
-      else
-      {
-         HWND parentWin = (HWND)mOwningManager->getParentWindow();
-         RECT windowRect;
-         GetClientRect(parentWin, &windowRect);
-         Point2I res(windowRect.right-windowRect.left, windowRect.bottom-windowRect.top);
-         if (res.x == 0 || res.y == 0)
-         {
-            // Must be too early in the window set up to obtain the parent's size.
-            setSize(mode.resolution);
-         }
-         else
-         {
-            setSize(res);
-         }
-      }
+      setSize(mode.resolution);
 
       if (!mOffscreenRender)
       {
@@ -679,25 +659,10 @@ LRESULT PASCAL Win32Window::WindowProc( HWND hWnd, UINT message, WPARAM wParam, 
 		return MA_ACTIVATE;
 
 	case WM_MOUSEMOVE:
-      if (window && GetFocus() != hWnd && IsChild(hWnd, GetFocus()))
-      {
-         SetFocus(hWnd);
-         break;
-      }
-
-		// If our foreground window is the browser and we don't have focus grab it
-		if (Platform::getWebDeployment() && GetFocus() != hWnd)
+		if(window && GetFocus() != hWnd && IsChild(hWnd, GetFocus()))
 		{
-			HWND phwnd = GetParent(hWnd);
-			while (phwnd)
-			{
-				if (GetForegroundWindow() == phwnd)
-				{
-					SetFocus(hWnd);
-					break;
-				}
-				phwnd = GetParent(phwnd);
-			}
+			SetFocus(hWnd);
+			break;
 		}
 		break;
 

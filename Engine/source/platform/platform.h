@@ -392,12 +392,6 @@ namespace Platform
 
    /// Check if a given input event should be excluded.
    const bool checkKeyboardInputExclusion(const InputEventInfo *info);
-	
-   
-   /// Set/Get whether this is a web deployment 
-	bool getWebDeployment();
-   void setWebDeployment(bool v);
-   
 };
 
 //------------------------------------------------------------------------------

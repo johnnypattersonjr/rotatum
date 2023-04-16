@@ -2401,9 +2401,6 @@ DefineEngineMethod( GuiCanvas, toggleFullscreen, void, (),,
 				   "Canvas.toggleFullscreen();"
 				   "@endtsexample\n\n")
 {
-	if (Platform::getWebDeployment())
-      return;
-
    if (!object->getPlatformWindow())
       return;
 
@@ -2499,9 +2496,6 @@ DefineEngineMethod( GuiCanvas, setWindowPosition, void, ( Point2I position ),,
 
 ConsoleMethod( GuiCanvas, isFullscreen, bool, 2, 2, "() - Is this canvas currently fullscreen?" )
 {
-   if (Platform::getWebDeployment())
-      return false;
-
    if (!object->getPlatformWindow())
       return false;
 
@@ -2625,9 +2619,6 @@ ConsoleMethod( GuiCanvas, setVideoMode, void, 5, 8,
 
    vm.resolution  = Point2I(width, height);
    vm.fullScreen  = dAtob(argv[4]);
-
-   if (Platform::getWebDeployment())
-      vm.fullScreen  = false;
 
    // These optional params are set to default at construction of vm. If they
    // aren't specified, just leave them at whatever they were set to.

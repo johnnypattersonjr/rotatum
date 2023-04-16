@@ -85,8 +85,5 @@ $tpl->clear_all_cache();
 
 Generator::generateSolutions( $tpl );
 
-// finally write out the sample.html for web deployment (if any)
-WebPlugin::writeSampleHtml();
-
 exit;
 ?>

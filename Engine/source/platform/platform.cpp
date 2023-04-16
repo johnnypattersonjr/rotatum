@@ -46,7 +46,6 @@ S32 sgTimeManagerProcessInterval = 1;
 
 Vector<Platform::KeyboardInputExclusion> gKeyboardExclusionList;
 bool gInitKeyboardExclusionList = false;
-static bool gWebDeployment = false;
 
 void Platform::initConsole()
 {
@@ -141,15 +140,3 @@ S32 Platform::compareModifiedTimes( const char *firstPath, const char *secondPat
 
    return compareFileTimes( firstModTime, secondModTime );
 }
-
-bool Platform::getWebDeployment()
-{
-   return gWebDeployment;
-}
-
-void Platform::setWebDeployment(bool v)
-{
-   gWebDeployment = v;
-}
-
-

@@ -329,15 +329,11 @@ inline U32 NSModifiersToTorqueModifiers( NSUInteger mods )
    mTorqueWindow->appEvent.trigger(mTorqueWindow->getWindowId(), GainFocus);   
 }
 
-#ifndef TORQUE_SHARED
-
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender
 {
    Platform::postQuitMessage(0);
    return NSTerminateCancel;
 }
-
-#endif
 
 #pragma mark -
 #pragma mark Window Delegate

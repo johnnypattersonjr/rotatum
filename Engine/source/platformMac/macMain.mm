@@ -28,9 +28,6 @@
 #include "console/console.h"
 #include "platform/threads/thread.h"
 
-// TODO: let the mainLoop's sleep time happen via rescheduling the timer every run-through.
-extern S32 sgTimeManagerProcessInterval;
-
 @interface MainLoopTimerHandler : NSObject
 {
    U32 argc;
@@ -81,7 +78,6 @@ extern S32 sgTimeManagerProcessInterval;
 
 #pragma mark -
 
-#ifndef TORQUE_SHARED
 //-----------------------------------------------------------------------------
 // main() - the real one - this is the actual program entry point.
 //-----------------------------------------------------------------------------
@@ -105,77 +101,6 @@ S32 main(S32 argc, const char **argv)
 
    return appReturn;
 }
-
-#endif
-
-static NSApplication *app = NULL;
-static NSAutoreleasePool* pool = NULL;
-
-void torque_mac_engineinit(S32 argc, const char **argv)
-{
-   
-   if (!Platform::getWebDeployment())
-   {
-      pool = [[NSAutoreleasePool alloc] init];
-      app = [NSApplication sharedApplication];
-   }
-   
-}
-
-void torque_mac_enginetick()
-{
-
-   if (!Platform::getWebDeployment())
-   {
-          
-      NSEvent *e = [app nextEventMatchingMask: NSAnyEventMask
-                        untilDate: [NSDate distantPast] 
-                        inMode: NSDefaultRunLoopMode
-                        dequeue: YES];
-      if (e)
-         [app sendEvent: e];
-
-   }
-}
-
-void torque_mac_engineshutdown()
-{
-   if (!Platform::getWebDeployment())
-   {
-      [pool release];
-   }
-}
-
-
-extern "C" {
-
-//-----------------------------------------------------------------------------
-// torque_macmain() - entry point for application using bundle
-//-----------------------------------------------------------------------------
-S32 torque_macmain(S32 argc, const char **argv)
-{   
-   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-
-   // get command line and text file args, filter them
-      
-   // now, we prepare to hand off execution to torque & macosx.
-   U32 appReturn = 0;         
-   printf("installing torque main loop timer\n");
-   [MainLoopTimerHandler startTimerWithintervalMs:1 argc:argc argv:argv];
-   printf("starting NSApplicationMain\n");
-   appReturn = NSApplicationMain(argc, argv);
-   printf("NSApplicationMain exited\n");
-   
-   // shut down the engine
-   
-   [pool release];
-
-   return appReturn;
-}
-
-} // extern "C"
-
-
 
 #pragma mark ---- Init funcs  ----
 //------------------------------------------------------------------------------

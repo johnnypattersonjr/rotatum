@@ -283,9 +283,6 @@ void Platform::shutdown()
 }
 
 extern bool LinkConsoleFunctions;
-
-#ifndef TORQUE_SHARED
-
 extern S32 TorqueMain(S32 argc, const char **argv);
 
 //--------------------------------------
@@ -369,109 +366,6 @@ S32 PASCAL WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
    return retVal;
 #endif
 }
-
-#else //TORQUE_SHARED
-
-extern "C"
-{
-	bool torque_engineinit(int argc, const char **argv);
-	int  torque_enginetick();
-	bool torque_engineshutdown();
-};
-
-int TorqueMain(int argc, const char **argv)
-{
-	if (!torque_engineinit(argc, argv))
-		return 1;
-
-	while(torque_enginetick())
-	{
-
-	}
-
-	torque_engineshutdown();
-
-	return 0;
-
-}
-
-
-
-extern "C" {
-
-S32 torque_winmain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
-{
-	Vector<char *> argv( __FILE__, __LINE__ );
-
-	char moduleName[256];
-#ifdef TORQUE_UNICODE
-	{
-		TCHAR buf[ 256 ];
-		GetModuleFileNameW( NULL, buf, sizeof( buf ) );
-		convertUTF16toUTF8( buf, moduleName, sizeof( moduleName ) );
-}
-#else
-	GetModuleFileNameA(NULL, moduleName, sizeof(moduleName));
-#endif
-	argv.push_back(moduleName);
-
-	for (const char* word,*ptr = lpszCmdLine; *ptr; )
-	{
-		// Eat white space
-		for (; dIsspace(*ptr) && *ptr; ptr++)
-			;
-
-      // Test for quotes
-      bool withinQuotes = dIsquote(*ptr);
-
-      if (!withinQuotes)
-      {
-		   // Pick out the next word
-		   for (word = ptr; !dIsspace(*ptr) && *ptr; ptr++)
-			   ;
-      }
-      else
-      {
-         // Advance past the first quote.  We don't want to include it.
-         ptr++;
-
-		   // Pick out the next quote
-		   for (word = ptr; !dIsquote(*ptr) && *ptr; ptr++)
-			   ;
-      }
-
-		// Add the word to the argument list.
-		if (*word) 
-		{
-			int len = ptr - word;
-			char *arg = (char *) dMalloc(len + 1);
-			dStrncpy(arg, word, len);
-			arg[len] = 0;
-			argv.push_back(arg);
-		}
-
-      // If we had a quote, skip past it for the next arg
-      if (withinQuotes && *ptr)
-      {
-         ptr++;
-      }
-	}
-
-	winState.appInstance = hInstance;
-
-	S32 retVal = TorqueMain(argv.size(), (const char **) argv.address());
-
-	for(U32 j = 1; j < argv.size(); j++)
-		dFree(argv[j]);
-
-	return retVal;
-}
-
-} // extern "C"
-
-#endif
-
-
 
 //--------------------------------------
 
