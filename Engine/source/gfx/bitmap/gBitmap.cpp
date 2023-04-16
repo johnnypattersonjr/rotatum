@@ -460,11 +460,7 @@ bool GBitmap::setFormat(GFXFormat fmt)
          switch ( fmt )
          {
             case GFXFormatR5G5B5A1:
-#ifdef _XBOX
-               bitmapConvertRGB_to_1555(mBits, pixels);
-#else
                bitmapConvertRGB_to_5551(mBits, pixels);
-#endif
                mInternalFormat = GFXFormatR5G5B5A1;
                mBytesPerPixel  = 2;
                break;

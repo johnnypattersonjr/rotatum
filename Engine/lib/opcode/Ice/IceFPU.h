@@ -12,10 +12,6 @@
 #ifndef __ICEFPU_H__
 #define __ICEFPU_H__
 
-#if defined( PLATFORM_XENON )
-#  include <PPCIntrinsics.h>
-#endif
-
 	#define	SIGN_BITMASK			0x80000000
 
 	//! Integer representation of a floating-point value.
@@ -56,8 +52,6 @@
 					mov             [retval], eax
 			}
 			return retval;
-#elif defined( PLATFORM_XENON )
-      return __fsqrts( square );
 #else
 		return( sqrtf( square ) );
 #endif
@@ -286,21 +280,6 @@
 		_asm	fcompp
 		return Res;
 	}
-#elif defined( PLATFORM_XENON )
-
-inline float FCMax2(float a, float b) { return (float)__fsel((a) - (b), a, b ); }
-inline float FCMin2(float a, float b) { return (float)__fsel((a) - (b), b, a ); }
-
-inline float FCMax3(float a, float b, float c)
-{
-   return (float)__fsel( (a) - (b), __fsel( (a) - (c), a, c ), __fsel( (b) - (c), b, c ) );
-}
-
-inline float FCMin3(float a, float b, float c)
-{
-   return (float)__fsel( (a) - (b), __fsel( (b) - (c), c, b ), __fsel( (a) - (c), c, a ) );
-}
-
 #else
 inline float FCMax2(float a, float b) { return a>b ? a : b; }
 inline float FCMin2(float a, float b) { return a>b ? b : a; }

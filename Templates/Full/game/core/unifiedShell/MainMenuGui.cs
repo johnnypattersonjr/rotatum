@@ -32,14 +32,8 @@ function ListMenu::onAdd(%this)
    // Defunct for now
    //%this.addRow("Select Model", "onSelectModel", 4, -15);
 
-   // No need for video options on Xbox 360
-   if ( $platform $= "xenon" )
-      %this.addRow("Exit Game", "onQuit", 4, -15);
-   else
-   {
-      %this.addRow("Setup", "onOptions", 4, -15);
-      %this.addRow("Exit Game", "onQuit", 6, -15);
-   }
+   %this.addRow("Setup", "onOptions", 4, -15);
+   %this.addRow("Exit Game", "onQuit", 6, -15);
 }
 
 //------------------------------------------------------------------------------

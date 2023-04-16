@@ -2365,10 +2365,6 @@ U32 GuiControl::clipText( String &text, U32 clipWidth ) const
 
 void GuiControl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent &lastGuiEvent)
 {
-#ifdef _XBOX
-   return;
-#endif
-
    TORQUE_UNUSED(lastGuiEvent);
 
    if( !getRoot() )

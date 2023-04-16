@@ -1018,10 +1018,8 @@ bool GFXPCD3D9Device::beginSceneInternal()
 GFXWindowTarget * GFXPCD3D9Device::allocWindowTarget( PlatformWindow *window )
 {
    AssertFatal(window,"GFXD3D9Device::allocWindowTarget - no window provided!");
-#ifndef TORQUE_OS_XENON
    AssertFatal(dynamic_cast<Win32Window*>(window), 
       "GFXD3D9Device::allocWindowTarget - only works with Win32Windows!");
-#endif
 
    // Set up a new window target...
    GFXPCD3D9WindowTarget *gdwt = new GFXPCD3D9WindowTarget();

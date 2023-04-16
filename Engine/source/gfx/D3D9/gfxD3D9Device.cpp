@@ -33,9 +33,7 @@
 #include "gfx/D3D9/gfxD3D9OcclusionQuery.h"
 #include "gfx/D3D9/gfxD3D9Shader.h"
 #include "windowManager/platformWindow.h"
-#ifndef TORQUE_OS_XENON
-#  include "windowManager/win32/win32Window.h"
-#endif
+#include "windowManager/win32/win32Window.h"
 
 D3DXFNTable GFXD3D9Device::smD3DX;
 
@@ -86,10 +84,8 @@ GFXD3D9Device::GFXD3D9Device( LPDIRECT3D9 d3d, U32 index )
    // Set up the Enum translation tables
    GFXD3D9EnumTranslate::init();
 
-#if !defined(TORQUE_OS_XENON)
    mD3DEx = NULL;
    mD3DDeviceEx = NULL;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -144,35 +140,7 @@ GFXD3D9Device::~GFXD3D9Device()
 //------------------------------------------------------------------------------
 inline void GFXD3D9Device::setupGenericShaders( GenericShaderType type /* = GSColor */ )
 {
-#ifdef WANT_TO_SIMULATE_UI_ON_360
-   if( mGenericShader[GSColor] == NULL )
-   {
-      mGenericShader[GSColor] =           createShader( "shaders/common/genericColorV.hlsl", 
-         "shaders/common/genericColorP.hlsl", 
-         2.f );
-
-      mGenericShader[GSModColorTexture] = createShader( "shaders/common/genericModColorTextureV.hlsl", 
-         "shaders/common/genericModColorTextureP.hlsl", 
-         2.f );
-
-      mGenericShader[GSAddColorTexture] = createShader( "shaders/common/genericAddColorTextureV.hlsl", 
-         "shaders/common/genericAddColorTextureP.hlsl", 
-         2.f );
-   }
-
-   mGenericShader[type]->process();
-
-   MatrixF world, view, proj;
-   mWorldMatrix[mWorldStackSize].transposeTo( world );
-   mViewMatrix.transposeTo( view );
-   mProjectionMatrix.transposeTo( proj );
-
-   mTempMatrix = world * view * proj;
-
-   setVertexShaderConstF( VC_WORLD_PROJ, (F32 *)&mTempMatrix, 4 );
-#else
    disableShaders();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -454,11 +422,7 @@ void GFXD3D9Device::reacquireDefaultPoolResources()
       mDynamicPB = new GFXD3D9PrimitiveBuffer(this, 0, 0, GFXBufferTypeDynamic);
 
    D3D9Assert( mD3DDevice->CreateIndexBuffer( sizeof( U16 ) * MAX_DYNAMIC_INDICES, 
-#ifdef TORQUE_OS_XENON
-      D3DUSAGE_WRITEONLY,
-#else
       D3DUSAGE_WRITEONLY | D3DUSAGE_DYNAMIC,
-#endif
       GFXD3D9IndexFormat[GFXIndexFormat16], D3DPOOL_DEFAULT, &mDynamicPB->ib, NULL ), "Failed to allocate dynamic IB" );
 
    // Grab the depth-stencil...
@@ -488,7 +452,7 @@ GFXD3D9VertexBuffer* GFXD3D9Device::findVBPool( const GFXVertexFormat *vertexFor
 {
    PROFILE_SCOPE( GFXD3D9Device_findVBPool );
 
-   // Verts needed is ignored on the base device, 360 is different
+   // Verts needed is ignored on the base device
    for( U32 i=0; i<mVolatileVBList.size(); i++ )
       if( mVolatileVBList[i]->mVertexFormat.isEqual( *vertexFormat ) )
          return mVolatileVBList[i];
@@ -519,11 +483,7 @@ GFXD3D9VertexBuffer * GFXD3D9Device::createVBPool( const GFXVertexFormat *vertex
    //   Con::printf("Created buff with type %x", vertFlags);
 
    D3D9Assert( mD3DDevice->CreateVertexBuffer( vertSize * MAX_DYNAMIC_VERTS, 
-#ifdef TORQUE_OS_XENON
-      D3DUSAGE_WRITEONLY,
-#else
       D3DUSAGE_WRITEONLY | D3DUSAGE_DYNAMIC,
-#endif
       0, 
       D3DPOOL_DEFAULT, 
       &newBuff->vb, 
@@ -754,9 +714,7 @@ GFXPrimitiveBuffer * GFXD3D9Device::allocPrimitiveBuffer(   U32 numIndices,
 
    case GFXBufferTypeDynamic:
    case GFXBufferTypeVolatile:
-#ifndef TORQUE_OS_XENON
       usage |= D3DUSAGE_DYNAMIC;
-#endif
       break;
    }
 
@@ -823,10 +781,7 @@ GFXVertexBuffer * GFXD3D9Device::allocVertexBuffer(   U32 numVerts,
    case GFXBufferTypeDynamic:
    case GFXBufferTypeVolatile:
       pool = D3DPOOL_DEFAULT;
-      usage |= D3DUSAGE_WRITEONLY;
-#ifndef TORQUE_OS_XENON
-      usage |= D3DUSAGE_DYNAMIC;
-#endif
+      usage |= D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY;
       break;
    }
 
@@ -956,7 +911,6 @@ void GFXD3D9Device::setTextureInternal( U32 textureUnit, const GFXTextureObject 
 //-----------------------------------------------------------------------------
 void GFXD3D9Device::setLightInternal(U32 lightStage, const GFXLightInfo light, bool lightEnable)
 {
-#ifndef TORQUE_OS_XENON
    if(!lightEnable)
    {
       mD3DDevice->LightEnable(lightStage, false);
@@ -1003,12 +957,10 @@ void GFXD3D9Device::setLightInternal(U32 lightStage, const GFXLightInfo light, b
 
    mD3DDevice->SetLight(lightStage, &d3dLight);
    mD3DDevice->LightEnable(lightStage, true); 
-#endif
 }
 
 void GFXD3D9Device::setLightMaterialInternal(const GFXLightMaterial mat)
 {
-#ifndef TORQUE_OS_XENON
    D3DMATERIAL9 d3dmat;
    dMemset(&d3dmat, 0, sizeof(D3DMATERIAL9));
    D3DCOLORVALUE col;
@@ -1039,15 +991,12 @@ void GFXD3D9Device::setLightMaterialInternal(const GFXLightMaterial mat)
 
    d3dmat.Power = mat.shininess;
    mD3DDevice->SetMaterial(&d3dmat);
-#endif
 }
 
 void GFXD3D9Device::setGlobalAmbientInternal(ColorF color)
 {
-#ifndef TORQUE_OS_XENON
    mD3DDevice->SetRenderState(D3DRS_AMBIENT,
       D3DCOLOR_COLORVALUE(color.red, color.green, color.blue, color.alpha));
-#endif
 }
 
 //------------------------------------------------------------------------------

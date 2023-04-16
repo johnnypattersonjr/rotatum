@@ -96,10 +96,6 @@ enum ProcessorType
    CPU_PowerPC_G4_7455,
    CPU_PowerPC_G4_7447, 
    CPU_PowerPC_G5,
-
-   // Xenon
-   CPU_Xenon,
-
 };
 
 /// Properties for CPU.

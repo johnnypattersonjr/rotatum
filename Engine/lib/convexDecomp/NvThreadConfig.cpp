@@ -111,8 +111,6 @@ NxU32 tc_timeGetTime(void)
       struct timeval tp;
       gettimeofday(&tp, (struct timezone *)0);
       return tp.tv_sec * 1000 + tp.tv_usec / 1000;
-   #elif defined( _XBOX )
-      return GetTickCount();
    #else
       return timeGetTime();
    #endif
@@ -131,8 +129,6 @@ void tc_spinloop()
 {
    #ifdef __linux__
       asm ( "pause" );
-   #elif defined( _XBOX )
-      // Pause would do nothing on the Xbox. Threads are not scheduled.
    #else
       __asm { pause };
    #endif
@@ -144,8 +140,6 @@ void tc_interlockedExchange(void *dest, const int64_t exchange)
 	  // not working
 	  assert(false);
 	  //__sync_lock_test_and_set((int64_t*)dest, exchange);
-   #elif defined( _XBOX )
-   InterlockedExchange((volatile LONG *)dest, exchange);
    #else
       __asm
       {
@@ -172,8 +166,6 @@ NxI32 tc_interlockedCompareExchange(void *dest, NxI32 exchange, NxI32 compare)
 	  return 0;
 	  //return __sync_val_compare_and_swap((uintptr_t*)dest, exchange, compare);
 	  //return __sync_bool_compare_and_swap((uintptr_t*)dest, exchange, compare);
-   #elif defined( _XBOX )
-     return InterlockedCompareExchange((volatile LONG *)dest, exchange, compare);
    #else
       char _ret;
       //
@@ -202,9 +194,6 @@ NxI32 tc_interlockedCompareExchange(void *dest, const NxI32 exchange1, const NxI
 	  //uint64_t exchange = ((uint64_t)exchange1 << 32) | (uint64_t)exchange2;
 	  //uint64_t compare = ((uint64_t)compare1 << 32) | (uint64_t)compare2;
 	  //return __sync_bool_compare_and_swap((int64_t*)dest, exchange, compare);
-   #elif defined( _XBOX )
-     assert(false);
-     return 0;
    #else
       char _ret;
       //

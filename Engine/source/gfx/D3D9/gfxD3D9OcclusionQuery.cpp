@@ -59,11 +59,7 @@ bool GFXD3D9OcclusionQuery::begin()
 
    if ( mQuery == NULL )
    {
-#ifdef TORQUE_OS_XENON
-      HRESULT hRes = static_cast<GFXD3D9Device*>( mDevice )->getDevice()->CreateQueryTiled( D3DQUERYTYPE_OCCLUSION, 2, &mQuery );
-#else
       HRESULT hRes = static_cast<GFXD3D9Device*>( mDevice )->getDevice()->CreateQuery( D3DQUERYTYPE_OCCLUSION, &mQuery );
-#endif
 
       AssertFatal( hRes != D3DERR_NOTAVAILABLE, "GFXD3D9OcclusionQuery::begin - Hardware does not support D3D9 Occlusion-Queries, this should be caught before this type is created" );
       AssertISV( hRes != E_OUTOFMEMORY, "GFXD3D9OcclusionQuery::begin - Out of memory" );

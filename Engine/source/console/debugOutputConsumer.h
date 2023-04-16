@@ -27,7 +27,7 @@
 
 //#define TORQUE_LOCBUILD
 
-#if !defined(TORQUE_DEBUG) && defined(TORQUE_OS_XENON) && !defined(TORQUE_LOCBUILD)
+#if !defined(TORQUE_DEBUG) && !defined(TORQUE_LOCBUILD)
 #define DISABLE_DEBUG_SPEW
 #endif
 

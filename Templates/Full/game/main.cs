@@ -195,8 +195,7 @@ function displayHelp() {
 // Default to a new logfile each session.
 if( !$logModeSpecified )
 {
-   if( $platform !$= "xbox" && $platform !$= "xenon" )
-      setLogMode(6);
+   setLogMode(6);
 }
 
 // Get the first dir on the list, which will be the last to be applied... this
@@ -246,22 +245,6 @@ if ($displayHelp) {
 else {
    onStart();
    echo("Engine initialized...");
-   
-   // Auto-load on the 360
-   if( $platform $= "xenon" )
-   {
-      %mission = "levels/Empty Terrain.mis";
-      
-      echo("Xbox360 Autoloading level: '" @ %mission @ "'");
-      
-      
-      if ($pref::HostMultiPlayer)
-         %serverType = "MultiPlayer";
-      else
-         %serverType = "SinglePlayer";
-
-      createAndConnectToLocalServer( %serverType, %mission );
-   }
 }
 
 // Display an error message for unused arguments

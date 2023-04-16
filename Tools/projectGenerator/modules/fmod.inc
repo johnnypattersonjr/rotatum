@@ -31,43 +31,6 @@ beginModule( 'fmod' );
       case "mac":
         addLibIncludePath( 'fmod/inc' );
         break;
-        
-      case "360":
-        // Assume 32-bit system
-        $FMOD_PATH = "C:/Program Files/FMOD SoundSystem/FMOD Programmers API Xbox 360/";
-        
-        // Ohnoes! Try 64-bit!
-        if (!file_exists($FMOD_PATH))
-          $FMOD_PATH = "C:/Program Files (x86)/FMOD SoundSystem/FMOD Programmers API Xbox 360/";
-        
-        if (!file_exists($FMOD_PATH))
-        {
-           $allgood = false;
-           echo "\n\n FMOD integration failed to find Xbox360 installation!\n";
-           echo "   - FMOD_PATH is set to $FMOD_PATH\n\n"; 
-        }
-        else
-        {
-          echo "\n\nFMOD integration for Torque3D on the Xbox360\n";
-          echo "   - FMOD_PATH is set to $FMOD_PATH\n\n";
-          
-          // Fmod API
-          addIncludePath($FMOD_PATH . 'api/inc');
-          addProjectLibDir($FMOD_PATH . 'api/lib');
-          
-          // Fmod Designer API
-          addIncludePath($FMOD_PATH . 'fmoddesignerapi/api/inc');
-          addProjectLibDir($FMOD_PATH . 'fmoddesignerapi/api/lib');
-          
-          addProjectLibInput('fmodxbox360.lib');
-          
-          addProjectLibInput('xmahal.lib');
-          addProjectLibInput('xmic.lib');
-          
-          // Prior to June 2009 XDK, FMOD requires xaudio.lib
-          //addProjectLibInput('xaudio.lib');
-        }
-        break;
    }
    
   // Source

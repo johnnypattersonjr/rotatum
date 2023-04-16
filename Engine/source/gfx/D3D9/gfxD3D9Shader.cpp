@@ -22,11 +22,7 @@
 
 #include "platform/platform.h"
 
-#if defined(TORQUE_OS_XENON)
-#  include <xtl.h>
-#else
-#  include <d3d9.h>
-#endif
+#include <d3d9.h>
 
 #include "gfx/D3D9/gfxD3D9Shader.h"
 #include "gfx/D3D9/gfxD3D9Device.h"
@@ -58,21 +54,13 @@ public:
 
    STDMETHOD(Close)(THIS_ LPCVOID pData);
 
-   // 360 
-   STDMETHOD(Open)(THIS_ D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes, /* OUT */ LPSTR pFullPath, DWORD cbFullPath);
-
-   // PC
-   STDMETHOD(Open)(THIS_ D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes)
-   {
-      return Open( IncludeType, pFileName, pParentData, ppData, pBytes, NULL, 0 );
-   }
+   STDMETHOD(Open)(THIS_ D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes);
 };
 
 _gfxD3DXIncludeRef GFXD3D9Shader::smD3DXInclude = NULL;
 
 HRESULT _gfxD3DXInclude::Open(THIS_ D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, 
-                              LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes, 
-                              LPSTR pFullPath, DWORD cbFullPath)
+                              LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes)
 {
    // First try making the path relative to the parent.
    Torque::Path path = Torque::Path::Join( mLastPath.last(), '/', pFileName );
@@ -780,10 +768,6 @@ bool GFXD3D9Shader::_compileShader( const Torque::Path &filePath,
    U32 flags = 0;
 #endif
 
-#ifdef TORQUE_OS_XENON
-   flags |= D3DXSHADER_PREFER_FLOW_CONTROL;
-#endif
-
 #ifdef D3DXSHADER_USE_LEGACY_D3DX9_31_DLL
    if( D3DX_SDK_VERSION >= 32 )
    {
@@ -797,7 +781,7 @@ bool GFXD3D9Shader::_compileShader( const Torque::Path &filePath,
    }
 #endif
 
-#if !defined(TORQUE_OS_XENON) && (D3DX_SDK_VERSION <= 40)
+#if D3DX_SDK_VERSION <= 40
 #error This version of the DirectX SDK is too old. Please install a newer version of the DirectX SDK: http://msdn.microsoft.com/en-us/directx/default.aspx
 #endif
 

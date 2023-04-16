@@ -1517,10 +1517,6 @@ void Precipitation::renderObject(ObjectRenderInst *ri, SceneRenderState *state, 
    if (overrideMat)
       return;
 
-#ifdef TORQUE_OS_XENON
-   return;
-#endif
-
    GameConnection* conn = GameConnection::getConnectionToServer();
    if (!conn)
       return; //need connection to server

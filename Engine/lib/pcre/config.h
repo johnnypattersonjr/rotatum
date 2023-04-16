@@ -87,9 +87,7 @@ them both to 0; an emulation function will be used. */
 #define HAVE_STRING_H 1
 
 /* Define to 1 if you have the `strtoll' function. */
-#if defined(SN_TARGET_PS3)
-#define HAVE_STRTOLL 1
-#endif
+/* #undef HAVE_STRTOLL */
 
 /* Define to 1 if you have the `strtoq' function. */
 /* Both Mac and Linux support strtoq - Andrew Galante, GG 8/2/2009 */

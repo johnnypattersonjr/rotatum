@@ -181,11 +181,7 @@ void GFXD3D9Cubemap::initDynamic( U32 texSize, GFXFormat faceFormat )
    // might want to try this as a 16 bit texture...
    D3D9Assert( D3D9Device->CreateCubeTexture( texSize,
                                             1, 
-#ifdef TORQUE_OS_XENON
-                                            0,
-#else
                                             D3DUSAGE_RENDERTARGET, 
-#endif
                                             GFXD3D9TextureFormat[faceFormat],
                                             D3DPOOL_DEFAULT, 
                                             &mCubeTex, 

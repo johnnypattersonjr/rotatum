@@ -53,10 +53,6 @@
 
 #include "opcode/Opcode.h"
 
-#if defined(TORQUE_OS_XENON)
-#  include "platformXbox/platformXbox.h"
-#endif
-
 GFXPrimitiveType drawTypes[] = { GFXTriangleList, GFXTriangleStrip, GFXTriangleFan };
 #define getDrawType(a) (drawTypes[a])
 
@@ -1240,19 +1236,6 @@ void TSSkinMesh::updateSkin( const Vector<MatrixF> &transforms, TSVertexBufferHa
       U8 *outPtr = reinterpret_cast<U8 *>(mVertexData.address());
       dsize_t outStride = mVertexData.vertSize();
 
-#if defined(USE_MEM_VERTEX_BUFFERS)
-      // Initialize it if NULL. 
-      // Skinning includes readbacks from memory (argh) so don't allocate with PAGE_WRITECOMBINE
-      if( instanceVB.isNull() )
-         instanceVB.set( GFX, outStride, mVertexFormat, mNumVerts, GFXBufferTypeDynamic );
-
-      // Grow if needed
-      if( instanceVB.getPointer()->mNumVerts < mNumVerts )
-         instanceVB.resize( mNumVerts );
-
-      // Lock, and skin directly into the final memory destination
-      outPtr = (U8 *)instanceVB.lock();
-#endif
       // Set position/normal to zero so we can accumulate
       zero_vert_normal_bulk(mNumVerts, outPtr, outStride);
 
@@ -1269,9 +1252,6 @@ void TSSkinMesh::updateSkin( const Vector<MatrixF> &transforms, TSVertexBufferHa
          m_matF_x_BatchedVertWeightList(curBoneMat, numVerts, curTransform.alignedMem,
             outPtr, outStride);
       }
-#if defined(USE_MEM_VERTEX_BUFFERS)
-      instanceVB.unlock();
-#endif
    }
 }
 
@@ -2308,33 +2288,15 @@ void TSMesh::_createVBIB( TSVertexBufferHandle &vb, GFXPrimitiveBufferHandle &pb
    // Number of verts can change in LOD skinned mesh
    const bool vertsChanged = ( vb && vb->mNumVerts < mNumVerts );
 
-#if defined(USE_MEM_VERTEX_BUFFERS)
-   if(!mDynamic)
-   {
-#endif
-      // Create the vertex buffer
-      if( vertsChanged || vb == NULL )
-         vb.set( GFX, mVertSize, mVertexFormat, mNumVerts, mDynamic ? 
-#if defined(TORQUE_OS_XENON)
-         // Skinned meshes still will occasionally re-skin more than once per frame.
-         // This cannot happen on the Xbox360. Until this issue is resolved, use
-         // type volatile instead. [1/27/2010 Pat]
-            GFXBufferTypeVolatile : GFXBufferTypeStatic );
-#else
-            GFXBufferTypeDynamic : GFXBufferTypeStatic );
-#endif
+   // Create the vertex buffer
+   if( vertsChanged || vb == NULL )
+     vb.set( GFX, mVertSize, mVertexFormat, mNumVerts, mDynamic ? 
+         GFXBufferTypeDynamic : GFXBufferTypeStatic );
 
-      // Copy from aligned memory right into GPU memory
-      U8 *vertData = (U8*)vb.lock();
-#if defined(TORQUE_OS_XENON)
-      XMemCpyStreaming_WriteCombined( vertData, mVertexData.address(), mVertexData.mem_size() );
-#else
-      dMemcpy( vertData, mVertexData.address(), mVertexData.mem_size() );
-#endif
-      vb.unlock();
-#if defined(USE_MEM_VERTEX_BUFFERS)
-   }
-#endif
+   // Copy from aligned memory right into GPU memory
+   U8 *vertData = (U8*)vb.lock();
+   dMemcpy( vertData, mVertexData.address(), mVertexData.mem_size() );
+   vb.unlock();
 
    const bool primsChanged = ( pb.isValid() && pb->mIndexCount != indices.size() );
    if( primsChanged || pb.isNull() )
@@ -2983,11 +2945,7 @@ void TSMesh::_convertToAlignedMeshData( TSMeshVertexArray &vertexData, const Vec
       vertexData.set(aligned_mem, mVertSize, mNumVerts);
       vertexData.setReady(true);
 
-#if defined(TORQUE_OS_XENON)
-      XMemCpyStreaming(vertexData.address(), mVertexData.address(), vertexData.mem_size() );
-#else
       dMemcpy(vertexData.address(), mVertexData.address(), vertexData.mem_size());
-#endif
       return;
    }
 

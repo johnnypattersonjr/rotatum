@@ -43,13 +43,9 @@ class Torque3D
         includeLib( 'pcre' ); 
         includeLib( 'convexDecomp' ); 
 
-        // Use FMOD on consoles
-        if ( Generator::$platform != "360" && Generator::$platform != "ps3" )
-        {
-           includeLib( 'libvorbis' );
-           includeLib( 'libogg' );
-           includeLib( 'libtheora' );
-        }    
+        includeLib( 'libvorbis' );
+        includeLib( 'libogg' );
+        includeLib( 'libtheora' );
     }
     
     static function beginConfig( $platform, $projectName )
@@ -87,14 +83,11 @@ class Torque3D
         addLibIncludePath( "opcode" );
         addLibIncludePath( "squish" );
         addLibIncludePath( 'convexDecomp' ); 
-        
-        if ( Generator::$platform != "360" && Generator::$platform != "ps3" )
-        {
-          addLibIncludePath( "libvorbis/include" );
-          addLibIncludePath( "libogg/include" );
-          addLibIncludePath( "libtheora/include" );
-        }
-        
+
+        addLibIncludePath( "libvorbis/include" );
+        addLibIncludePath( "libogg/include" );
+        addLibIncludePath( "libtheora/include" );
+
         // Modules
         includeModule( 'core' );
         includeModule( 'dsound' );
@@ -104,11 +97,8 @@ class Torque3D
         includeModule( 'basicLighting' );
         includeModule( 'collada' );
         
-        if ( Generator::$platform != "360" && Generator::$platform != "ps3" )
-        {
-          includeModule( 'vorbis' );
-          includeModule( 'theora' );
-        }
+        includeModule( 'vorbis' );
+        includeModule( 'theora' );
        
         if(Generator::$platform == "mac" || Generator::$platform == "win32")
            includeModule( 'openal' );
@@ -128,12 +118,9 @@ class Torque3D
         addProjectDependency( 'pcre' );
         addProjectDependency( 'convexDecomp' ); 
         
-        if ( Generator::$platform != "360" && Generator::$platform != "ps3" )
-        {
-          addProjectDependency( 'libvorbis' );
-          addProjectDependency( 'libogg' );
-          addProjectDependency( 'libtheora' );
-        }
+        addProjectDependency( 'libvorbis' );
+        addProjectDependency( 'libogg' );
+        addProjectDependency( 'libtheora' );
         
         if ( Generator::$platform == "mac" )
         {    
@@ -177,7 +164,7 @@ class Torque3D
         endAppConfig();
         
         // Add solution references for Visual Studio projects
-        if (Generator::$platform == "win32" || Generator::$platform == "360" || Generator::$platform == "ps3")
+        if (Generator::$platform == "win32")
         {
               addSolutionProjectRef( getGameProjectName() );
                  

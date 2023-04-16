@@ -45,7 +45,6 @@ void VideoFrameGrabberD3D9::captureBackBuffer()
 {
    AssertFatal( mCapture[mCurrentCapture].stage != eInSystemMemory, "Error! Trying to override a capture resource in \"SystemMemory\" stage!" );
 
-#ifndef TORQUE_OS_XENON
    LPDIRECT3DDEVICE9 D3DDevice = dynamic_cast<GFXD3D9Device *>(GFX)->getDevice();
 
    IDirect3DSurface9 * backBuffer;
@@ -74,7 +73,6 @@ void VideoFrameGrabberD3D9::captureBackBuffer()
 
    // Update the stage
    mCapture[mCurrentCapture].stage = eInVideoMemory;
-#endif
 }
 
 void VideoFrameGrabberD3D9::makeBitmap()
@@ -116,7 +114,6 @@ void VideoFrameGrabberD3D9::copyToSystemMemory(CaptureResource &capture)
 {
    AssertFatal( capture.stage == eInVideoMemory, "Error! copyToSystemMemory() can only work in resources in 'eInVideoMemory' stage!" );
 
-#ifndef TORQUE_OS_XENON
    GFXTexHandle &vidMemTex = capture.vidMemTex;
    GFXTexHandle &sysMemTex = capture.sysMemTex;
 
@@ -146,7 +143,6 @@ void VideoFrameGrabberD3D9::copyToSystemMemory(CaptureResource &capture)
 
    // Change the resource state
    capture.stage = eInSystemMemory;
-#endif
 }
 
 void VideoFrameGrabberD3D9::copyToBitmap(CaptureResource &capture)

@@ -70,8 +70,7 @@ function initClient()
    exec("art/gui/playGui.gui");
 
    // Load up the shell GUIs
-   if($platform !$= "xenon")  // Use the unified shell instead
-      exec("art/gui/mainMenuGui.gui");
+   exec("art/gui/mainMenuGui.gui");
    exec("art/gui/StartupGui.gui");
 
    // Gui scripts

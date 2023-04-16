@@ -29,9 +29,5 @@ addLibSrcDir( 'ljpeg' );
 // Additional includes
 addLibIncludePath( 'ljpeg' );
 
-// Defines
-	if ( Generator::$platform == "360" )
-      addProjectDefines( 'NO_GETENV;' );
-
 endModule();
 ?>

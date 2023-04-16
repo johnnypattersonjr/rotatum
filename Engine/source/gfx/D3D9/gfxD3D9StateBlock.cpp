@@ -22,11 +22,7 @@
 
 #include "gfx/gfxDevice.h"
 
-#if defined(TORQUE_OS_XENON)
-#  include <xtl.h>
-#else
-#  include <d3d9.h>
-#endif
+#include <d3d9.h>
 
 #include "gfx/D3D9/gfxD3D9StateBlock.h"
 #include "gfx/D3D9/gfxD3D9EnumTranslate.h"
@@ -76,21 +72,12 @@ void GFXD3D9StateBlock::activate(GFXD3D9StateBlock* oldState)
 
    // Little macro to save some typing, SD = state diff, checks for null source state block, then
    // checks to see if the states differ 
-#if defined(TORQUE_OS_XENON)
-   #define SD(x, y)  if (!oldState || oldState->mDesc.x != mDesc.x) \
-                     mD3DDevice->SetRenderState_Inline(y, mDesc.x)
-
-      // Same as above, but allows you to set the data
-   #define SDD(x, y, z) if (!oldState || oldState->mDesc.x != mDesc.x) \
-                        mD3DDevice->SetRenderState_Inline(y, z)
-#else
    #define SD(x, y)  if (!oldState || oldState->mDesc.x != mDesc.x) \
                      mD3DDevice->SetRenderState(y, mDesc.x)
 
    // Same as above, but allows you to set the data
    #define SDD(x, y, z) if (!oldState || oldState->mDesc.x != mDesc.x) \
                         mD3DDevice->SetRenderState(y, z)
-#endif
 
    // Blending
    SD(blendEnable, D3DRS_ALPHABLENDENABLE);
@@ -135,14 +122,12 @@ void GFXD3D9StateBlock::activate(GFXD3D9StateBlock* oldState)
    SD(stencilMask, D3DRS_STENCILMASK);
    SD(stencilWriteMask, D3DRS_STENCILWRITEMASK);
    SDD(fillMode, D3DRS_FILLMODE, GFXD3D9FillMode[mDesc.fillMode]);
-#if !defined(TORQUE_OS_XENON)
    SD(ffLighting, D3DRS_LIGHTING);
    SD(vertexColorEnable, D3DRS_COLORVERTEX);
 
    static DWORD swzTemp;
    getOwningDevice()->getDeviceSwizzle32()->ToBuffer( &swzTemp, &mDesc.textureFactor, sizeof(ColorI) );
    SDD(textureFactor, D3DRS_TEXTUREFACTOR, swzTemp);
-#endif
 #undef SD
 #undef SDD
 
@@ -156,7 +141,6 @@ void GFXD3D9StateBlock::activate(GFXD3D9StateBlock* oldState)
    //
    // Samplers are used by both fixed function and shaders, but the
    // number of samplers is limited by shader model.
-#if !defined(TORQUE_OS_XENON)
 
    #define TSS(x, y, z) if (!oldState || oldState->mDesc.samplers[i].x != mDesc.samplers[i].x) \
                         mD3DDevice->SetTextureStageState(i, y, z)
@@ -174,15 +158,9 @@ void GFXD3D9StateBlock::activate(GFXD3D9StateBlock* oldState)
       TSS(resultArg, D3DTSS_RESULTARG, mDesc.samplers[i].resultArg);
    }
    #undef TSS
-#endif
 
-#if defined(TORQUE_OS_XENON)
-   #define SS(x, y, z)  if (!oldState || oldState->mDesc.samplers[i].x != mDesc.samplers[i].x) \
-                        mD3DDevice->SetSamplerState_Inline(i, y, z)
-#else
    #define SS(x, y, z)  if (!oldState || oldState->mDesc.samplers[i].x != mDesc.samplers[i].x) \
                         mD3DDevice->SetSamplerState(i, y, z)
-#endif
    for ( U32 i = 0; i < getOwningDevice()->getNumSamplers(); i++ )
    {      
       SS(minFilter, D3DSAMP_MINFILTER, GFXD3D9TextureFilter[mDesc.samplers[i].minFilter]);

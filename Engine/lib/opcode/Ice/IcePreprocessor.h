@@ -12,15 +12,9 @@
 #ifndef __ICEPREPROCESSOR_H__
 #define __ICEPREPROCESSOR_H__
 	// Check platform
-   #if _XBOX_VER >= 200 
-      #pragma message("Compiling on Xbox 360...")
-      #define PLATFORM_XENON
-	#elif defined( _WIN32 ) || defined( WIN32 )
+	#if defined( _WIN32 ) || defined( WIN32 )
 		#pragma message("Compiling on Windows...")
 		#define PLATFORM_WINDOWS
-   #elif defined(SN_TARGET_PS3)
-      #pragma message("Compiling on PS3...")
-      #define PLATFORM_PS3
 	#else
 		#pragma message("Compiling on unknown platform...")
 	#endif

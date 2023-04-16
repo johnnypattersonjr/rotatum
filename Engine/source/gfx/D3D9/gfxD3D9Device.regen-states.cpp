@@ -44,7 +44,6 @@ void GFXD3D9Device::regenStates()
       Con::printf( "   mD3DDevice->SetRenderState( GFXD3D9RenderState[%d], %d );", state, temp );
    }
 
-#ifndef TORQUE_OS_XENON 
    Con::printf( "" );
    Con::printf( "   // Texture Stage states" );
 
@@ -66,7 +65,6 @@ void GFXD3D9Device::regenStates()
          Con::printf( "   mD3DDevice->SetTextureStageState( %d, GFXD3D9TextureStageState[%d], %d );", stage, state, temp );
       }
    }
-#endif
 
    Con::printf( "" );
    Con::printf( "   // Sampler states" );

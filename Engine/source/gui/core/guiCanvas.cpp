@@ -133,11 +133,7 @@ GuiCanvas::GuiCanvas(): GuiControl(),
    mFences = NULL;
    mNextFenceIdx = -1;
 
-#ifndef _XBOX
    mNumFences = Con::getIntVariable( "$pref::Video::defaultFenceCount", 0 );
-#else
-   mNumFences = 0;
-#endif
 
 #ifdef TORQUE_DEMO_PURCHASE
    mPurchaseScreen = NULL;
@@ -2271,7 +2267,7 @@ DefineEngineMethod( GuiCanvas, getMouseControl, S32, (),,
 DefineEngineFunction(excludeOtherInstance, bool, (const char* appIdentifer),,
 					 "@brief Used to exclude/prevent all other instances using the same identifier specified\n\n"
 
-					 "@note Not used on OSX, Xbox, or in Win debug builds\n\n"
+					 "@note Not used on OSX, or in Win debug builds\n\n"
 
 					 "@param appIdentifier Name of the app set up for exclusive use.\n"
 
@@ -2281,7 +2277,7 @@ DefineEngineFunction(excludeOtherInstance, bool, (const char* appIdentifer),,
 					 "@ingroup GuiCore")
 {
 	   // mac/360 can only run one instance in general.
-#if !defined(TORQUE_OS_MAC) && !defined(TORQUE_OS_XENON) && !defined(TORQUE_DEBUG)
+#if !defined(TORQUE_OS_MAC) && !defined(TORQUE_DEBUG)
    return Platform::excludeOtherInstances(appIdentifer);
 #else
    // We can just return true if we get here.

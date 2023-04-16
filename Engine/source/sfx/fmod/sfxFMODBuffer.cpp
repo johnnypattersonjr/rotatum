@@ -53,11 +53,6 @@ static const char* sExtensions[] =
    "wax",
    "wma",
    "xm",
-   
-#ifdef TORQUE_OS_XENON
-   ".xma",
-#endif
-
    NULL
 };
 

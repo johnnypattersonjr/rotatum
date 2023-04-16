@@ -111,8 +111,7 @@ protected:
    /// should not be called. 
    ///
    /// @param preserve  If set to true, the contents of the current render target 
-   //                   will be the same when _onPostRender is called. Otherwise
-   //                   the contents are undefined on console platforms.
+   //                   will be the same when _onPostRender is called.
    virtual bool _onPreRender(SceneRenderState * state, bool preserve = false);
 
    /// Resolves the active render target, pops the render target from _onPreRender, and sets debug info. 

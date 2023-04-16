@@ -77,24 +77,6 @@ typedef in_addr IN_ADDR;
 
 #define closesocket close
 
-#elif defined( TORQUE_OS_XENON )
-
-#include <Xtl.h>
-#include <string>
-
-#define TORQUE_USE_WINSOCK
-#define EINPROGRESS WSAEINPROGRESS
-#define ioctl ioctlsocket
-typedef int socklen_t;
-
-DWORD _getLastErrorAndClear()
-{
-   DWORD err = WSAGetLastError();
-   WSASetLastError( 0 );
-
-   return err;
-}
-
 #else
 
 #endif
@@ -219,20 +201,6 @@ bool Net::init()
 #if defined(TORQUE_USE_WINSOCK)
    if(!initCount)
    {
-#ifdef TORQUE_OS_XENON
-      // Configure startup parameters
-      XNetStartupParams xnsp;
-      memset( &xnsp, 0, sizeof( xnsp ) );
-      xnsp.cfgSizeOfStruct = sizeof( XNetStartupParams );
-
-#ifndef TORQUE_DISABLE_PC_CONNECTIVITY
-      xnsp.cfgFlags = XNET_STARTUP_BYPASS_SECURITY;
-      Con::warnf("XNET_STARTUP_BYPASS_SECURITY enabled! This build can talk to PCs!");
-#endif
-
-      AssertISV( !XNetStartup( &xnsp ), "Net::init - failed to init XNet" );
-#endif
-
       WSADATA stWSAData;
       AssertISV( !WSAStartup( 0x0101, &stWSAData ), "Net::init - failed to init WinSock!" );
 
@@ -260,10 +228,6 @@ void Net::shutdown()
    if(!initCount)
    {
       WSACleanup();
-
-#ifdef TORQUE_OS_XENON
-      XNetCleanup();
-#endif
    }
 #endif
 }
@@ -305,7 +269,6 @@ static void IPSocketToNetAddress(const struct sockaddr_in *sockAddr,  NetAddress
 {
    address->type = NetAddress::IPAddress;
    address->port = htons(sockAddr->sin_port);
-#ifndef TORQUE_OS_XENON
    char *tAddr;
    tAddr = inet_ntoa(sockAddr->sin_addr);
    //fprintf(stdout,"IPSocketToNetAddress(): %s\n",tAddr);fflush(NULL);
@@ -319,12 +282,6 @@ static void IPSocketToNetAddress(const struct sockaddr_in *sockAddr,  NetAddress
    address->netNum[1] = nets[1];
    address->netNum[2] = nets[2];
    address->netNum[3] = nets[3];
-#else
-   address->netNum[0] = sockAddr->sin_addr.s_net;
-   address->netNum[1] = sockAddr->sin_addr.s_host;
-   address->netNum[2] = sockAddr->sin_addr.s_lh;
-   address->netNum[3] = sockAddr->sin_addr.s_impno;
-#endif
 }
 
 NetSocket Net::openListenPort(U16 port)
@@ -478,18 +435,7 @@ bool Net::openPort(S32 port, bool doBind)
    if(udpSocket != InvalidSocket)
       ::closesocket(udpSocket);
 
-   // we turn off VDP in non-release builds because VDP does not support broadcast packets
-   // which are required for LAN queries (PC->Xbox connectivity).  The wire protocol still
-   // uses the VDP packet structure, though.
-   int protocol = 0;
-   bool useVDP = false;
-#ifdef TORQUE_DISABLE_PC_CONNECTIVITY
-   // Xbox uses a VDP (voice/data protocol) socket for networking
-   protocol = IPPROTO_VDP;
-   useVDP = true;
-#endif
-
-   udpSocket = socket(AF_INET, SOCK_DGRAM, protocol);
+   udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
 
    if(udpSocket != InvalidSocket)
    {
@@ -502,7 +448,7 @@ bool Net::openPort(S32 port, bool doBind)
       if(error == NoError)
          error = setBufferSize(udpSocket, 32768);
 
-      if(error == NoError && !useVDP)
+      if(error == NoError)
          error = setBroadcast(udpSocket, true);
 
       if(error == NoError)
@@ -633,14 +579,8 @@ void Net::process()
          break;
       case ::ConnectionPending:
          // see if it is now connected
-#ifdef TORQUE_OS_XENON
-         // WSASetLastError has no return value, however part of the SO_ERROR behavior
-         // is to clear the last error, so this needs to be done here.
-         if( ( optval = _getLastErrorAndClear() ) == -1 ) 
-#else
          if (getsockopt(currentSock->fd, SOL_SOCKET, SO_ERROR,
             (char*)&optval, &optlen) == -1)
-#endif
          {
             Con::errorf("Error getting socket options: %s",  strerror(errno));
 
@@ -976,39 +916,11 @@ bool Net::stringToAddress(const char *addressString, NetAddress  *address)
 
       if (ipAddr.sin_addr.s_addr == INADDR_NONE) // error
       {
-         // On the Xbox, 'gethostbyname' does not exist so...
-#ifndef TORQUE_OS_XENON
          struct hostent *hp;
          if((hp = gethostbyname(remoteAddr)) == 0)
             return false;
          else
             memcpy(&ipAddr.sin_addr.s_addr, hp->h_addr,  sizeof(in_addr));
-#else
-         // On the Xbox do XNetDnsLookup
-         XNDNS *pxndns = NULL;
-         HANDLE hEvent = CreateEvent(NULL, false, false, NULL);
-         XNetDnsLookup(remoteAddr, hEvent, &pxndns);
-
-         // Wait for event (passing NULL as a handle to XNetDnsLookup will NOT
-         // cause it to behave synchronously, so do not remove the handle/wait
-         while(pxndns->iStatus == WSAEINPROGRESS) 
-            WaitForSingleObject(hEvent, INFINITE);
-
-         bool foundAddr = pxndns->iStatus == 0 && pxndns->cina > 0;
-         if(foundAddr)
-         {
-            // Lets just grab the first address returned, for now
-            memcpy(&ipAddr.sin_addr, pxndns->aina,  sizeof(IN_ADDR));
-         }
-
-         XNetDnsRelease(pxndns);
-         CloseHandle(hEvent);
-
-         // If we didn't successfully resolve the DNS lookup, bail after the
-         // handles are released
-         if(!foundAddr)
-            return false;
-#endif
       }
    }
    if(portString)
@@ -1031,15 +943,8 @@ void Net::addressToString(const NetAddress *address, char  addressString[256])
          dSprintf(addressString, 256, "IP:Broadcast:%d",  ntohs(ipAddr.sin_port));
       else
       {
-#ifndef TORQUE_OS_XENON
          dSprintf(addressString, 256, "IP:%s:%d",  inet_ntoa(ipAddr.sin_addr),
          ntohs(ipAddr.sin_port));
-#else
-         dSprintf(addressString, 256, "IP:%d.%d.%d.%d:%d", ipAddr.sin_addr.s_net,
-            ipAddr.sin_addr.s_host, ipAddr.sin_addr.s_lh,
-            ipAddr.sin_addr.s_impno, ntohs( ipAddr.sin_port ) );
-
-#endif
       }
    }
    else

@@ -21,45 +21,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-///////////////////////////// VS9 Xenon /////////////////////////////
-   
-$c = BuildTarget::add(	'VS9 Xenon',							// Name		         			
-                        'buildFiles/VisualStudio 2008 (XDK)',	// Solution output directory
-                        'projects/',	                        // Project output directory (relative to solution)
-                        '../../source/',				        // Base directory		         	
-                        'vc2k8_360_proj.tpl',				    // App Project Template
-                        'vc2k8_360_lib_proj.tpl',			    // Lib Project Template	
-                        '.vcproj' );					        // File ext to write the project to
-
-// Solution template and extension
-$c->setSolutionInfo( 'vc2k8_360_sln.tpl', '', '.sln' );
-
-$c->setFileExtensions( 'c', 'cc', 'h', 'cpp', 'inl', 'm', 'mm' );
-
-$c->setPlatforms( "360" );
-         
-$c->setDontCompilePatterns( "#/platformPOSIX.*#", "#/platformMac.*#", "#/platformWin32.*#", "#\.mac\.#", "#\.win32\.#", "#/mac/#", "#/win32/#", "#\.mm$#", "#\.m$#" );
-
-///////////////////////////// VS9 PS3 /////////////////////////////
-   
-$c = BuildTarget::add(	'VS9 PS3',							// Name		         			
-                        'buildFiles/VisualStudio 2008 (PS3)',	// Solution output directory
-                        'projects/',	                        // Project output directory (relative to solution)
-                        '../../source/',				        // Base directory		         	
-                        'vc2k8_ps3_proj.tpl',				    // App Project Template
-                        'vc2k8_ps3_lib_proj.tpl',			    // Lib Project Template	
-                        '.vcproj' );					        // File ext to write the project to
-
-// Solution template and extension
-$c->setSolutionInfo( 'vc2k8_ps3_sln.tpl', '', '.sln' );
-
-$c->setFileExtensions( 'c', 'cc', 'h', 'cpp', 'inl', 'm', 'mm' );
-
-$c->setPlatforms( "ps3" );
-         
-$c->setDontCompilePatterns( "#/platformXbox.*#", "#/platformWin32.*#", "#\.mac\.#", "#\.win\.#", "#\.win32\.#", "#/mac/#", "#/win32/#", "#\.mm$#", "#\.m$#" );
-
-
 ///////////////////////////// VS9 /////////////////////////////
 
 $c = BuildTarget::add(	'VS9',							   // Name

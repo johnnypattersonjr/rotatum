@@ -104,7 +104,6 @@ MODULE_BEGIN( ShaderGenHLSL )
    {
       sInitDelegate.bind(_initShaderGenHLSL);
       SHADERGEN->registerInitDelegate(Direct3D9, sInitDelegate);
-      SHADERGEN->registerInitDelegate(Direct3D9_360, sInitDelegate);
    }
    
 MODULE_END;

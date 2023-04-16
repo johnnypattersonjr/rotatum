@@ -59,9 +59,7 @@ void GFXD3D9VertexBuffer::lock(U32 vertexStart, U32 vertexEnd, void **vertexPtr)
       break;
 
    case GFXBufferTypeDynamic:
-#ifndef TORQUE_OS_XENON
       flags |= D3DLOCK_DISCARD;
-#endif
       break;
 
    case GFXBufferTypeVolatile:
@@ -82,11 +80,7 @@ void GFXD3D9VertexBuffer::lock(U32 vertexStart, U32 vertexEnd, void **vertexPtr)
       // We created the pool when we requested this volatile buffer, so assume it exists...
       if( mVolatileBuffer->mNumVerts + vertexEnd > MAX_DYNAMIC_VERTS ) 
       {
-#ifdef TORQUE_OS_XENON
-         AssertFatal( false, "This should never, ever happen. findVBPool should have returned NULL" );
-#else
          flags |= D3DLOCK_DISCARD;
-#endif
          mVolatileStart = vertexStart  = 0;
          vertexEnd      = vertexEnd;
       }
@@ -109,26 +103,6 @@ void GFXD3D9VertexBuffer::lock(U32 vertexStart, U32 vertexEnd, void **vertexPtr)
 
    //      Con::printf("%x: Locking %s range (%d, %d)", this, (mBufferType == GFXBufferTypeVolatile ? "volatile" : "static"), lockedVertexStart, lockedVertexEnd);
 
-#ifdef TORQUE_OS_XENON
-   // If the vertex buffer which we are trying to lock is held by the D3D device
-   // on Xenon it will bomb. So if that is the case, then SetStreamSource to NULL
-   // and also call setVertexBuffer because otherwise the state-cache will be hosed
-   if( d->mCurrentVB != NULL && d->mCurrentVB->vb == vb )
-   {
-      d->setVertexBuffer( NULL );
-      d->mD3DDevice->SetStreamSource( 0, NULL, 0, 0 );
-   }
-   
-   // As of October 2006 XDK, range locking is no longer supported. Lock the whole buffer
-   // and then manually offset the pointer to simulate the subrange. -patw
-   D3D9Assert( vb->Lock( 0, 0, vertexPtr, flags),
-      "Unable to lock vertex buffer.");
-
-   U8 *tmp = (U8 *)(*vertexPtr);
-   tmp += ( vertexStart * mVertexSize );
-   *vertexPtr = tmp;
-#else
-
    U32 sizeToLock = (vertexEnd - vertexStart) * mVertexSize;
    D3D9Assert( vb->Lock(vertexStart * mVertexSize, sizeToLock, vertexPtr, flags),
       "Unable to lock vertex buffer.");
@@ -149,8 +123,6 @@ void GFXD3D9VertexBuffer::lock(U32 vertexStart, U32 vertexEnd, void **vertexPtr)
       *vertexPtr = mDebugGuardBuffer + guardSize;
 
    #endif // TORQUE_DEBUG
-
-#endif
 }
 
 void GFXD3D9VertexBuffer::unlock()
@@ -215,11 +187,7 @@ void GFXD3D9VertexBuffer::resurrect()
    if(mBufferType == GFXBufferTypeDynamic)
    {
       D3D9Assert(static_cast<GFXD3D9Device*>(mDevice)->mD3DDevice->CreateVertexBuffer( mVertexSize * mNumVerts,
-#ifdef TORQUE_OS_XENON
-         D3DUSAGE_WRITEONLY,
-#else
          D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, 
-#endif
          0, 
          D3DPOOL_DEFAULT,
          &vb,

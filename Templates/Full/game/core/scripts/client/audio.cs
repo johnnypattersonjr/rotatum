@@ -108,26 +108,6 @@ singleton SFXDescription( AudioMusic )
 /// the defaults in the $pref::SFX:: globals.
 function sfxStartup()
 {   
-   // The console builds should re-detect, by default, so that it plays nicely 
-   // along side a PC build in the same script directory.
-   
-   if( $platform $= "xenon" )
-   {
-      if( $pref::SFX::provider $= "DirectSound" || 
-          $pref::SFX::provider $= "OpenAL" )
-      {
-         $pref::SFX::provider = "";
-      }
-      
-      if( $pref::SFX::provider $= "" )
-      {
-         $pref::SFX::autoDetect = 1;
-         
-         warn( "Xbox360 is auto-detecting available sound providers..." ); 
-         warn( "   - You may wish to alter this functionality before release (core/scripts/client/audio.cs)" );
-      }
-   }
-
    echo( "sfxStartup..." );
    
    // If we have a provider set, try initialize a device now.

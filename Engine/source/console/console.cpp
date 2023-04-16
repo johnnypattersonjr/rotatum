@@ -1220,11 +1220,6 @@ void setLogMode(S32 newMode)
          consoleLogFile.close();
       }
       else if ((newMode & 0x3) == 2) {
-#ifdef _XBOX
-         // Xbox is not going to support logging to a file. Use the OutputDebugStr
-         // log consumer
-         Platform::debugBreak();
-#endif
          // Starting mode 2, must open logfile.
          consoleLogFile.open(defLogFileName, Torque::FS::File::Write);
       }

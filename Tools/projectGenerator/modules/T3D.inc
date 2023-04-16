@@ -70,19 +70,11 @@ else
 // Plstform specific stuff.
 switch( Generator::$platform )
 {
-   case "360":
-      addEngineSrcDir('ts/arch/360');
-      // Fall through
-      
    case "win32":
       addEngineSrcDir( 'terrain/hlsl' );
       addEngineSrcDir( 'forest/hlsl' );
       break;
 
-   case "ps3":
-      addEngineSrcDir('ts/arch/ps3');
-      // Fall through
-      
    case "mac":
       addEngineSrcDir( 'terrain/glsl' );
       addEngineSrcDir( 'forest/glsl' );

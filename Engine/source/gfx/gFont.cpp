@@ -100,7 +100,6 @@ GFont* GFont::load( const Torque::Path& path )
    }
    else
    {
-#ifndef TORQUE_OS_XENON
       PlatformFont   *platFont = createPlatformFont(ret->getFontFaceName(), ret->getFontSize(), ret->getFontCharSet());
 
       if ( platFont == NULL )
@@ -110,7 +109,6 @@ GFont* GFont::load( const Torque::Path& path )
       }
       else
          ret->setPlatformFont(platFont);
-#endif
    }
    
    return ret;
@@ -144,15 +142,6 @@ Resource<GFont> GFont::create(const String &faceName, U32 size, const char *cach
    if (platFont == NULL)
    {
       String fontName;
-
-#ifdef _XBOX
-      //AssertFatal( false, "Font creation is not supported on the Xbox platform. Create the font files (*.uft) using the Windows/MacOS build of the project." );
-      if(!faceName.equal("arial", String::NoCase) || size != 14)
-      {
-         return create("Arial", 14, cacheDirectory, charset);
-      }
-      return ret;
-#endif
 
       // Couldn't load the requested font.  This probably will be common
       // since many unix boxes don't have arial or lucida console installed.

@@ -88,7 +88,7 @@ list<string> cdom::makeStringList(const char* s, ...) {
 }
 
 string cdom::getCurrentDir() {
-#if defined(__CELLOS_LV2__) || defined(_XBOX_VER)
+#ifdef __CELLOS_LV2__
 	// The PS3 has no getcwd call.
 	// !!!steveT Should we return app_home instead?
 	return "/";

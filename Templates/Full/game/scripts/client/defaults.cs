@@ -32,12 +32,5 @@ $PhysXLogWarnings = false;
 
 // Finally load the preferences saved from the last
 // game execution if they exist.
-if ( $platform !$= "xenon" )
-{
-   if ( isFile( "./prefs.cs" ) )
-      exec( "./prefs.cs" );
-}
-else
-{
-   echo( "Not loading client prefs.cs on Xbox360" );
-}
+if ( isFile( "./prefs.cs" ) )
+   exec( "./prefs.cs" );

@@ -77,8 +77,7 @@ function initClient()
    exec("art/gui/controlsHelpDlg.gui");
 
    // Load up the shell GUIs
-   if($platform !$= "xenon")  // Use the unified shell instead
-      exec("art/gui/mainMenuGui.gui");
+   exec("art/gui/mainMenuGui.gui");
    exec("art/gui/joinServerDlg.gui");
    exec("art/gui/endGameGui.gui");
    exec("art/gui/StartupGui.gui");

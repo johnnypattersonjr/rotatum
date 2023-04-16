@@ -28,10 +28,6 @@ beginModule( 'lpng' );
 	// Additional includes
 	addLibIncludePath( 'zlib' );
 	addLibIncludePath( 'lpng' );
-	
-	// Defines
-	if ( Generator::$platform == "360" )
-      addProjectDefines( 'PNG_NO_ASSEMBLER_CODE' );
-	
+
 endModule();
 ?>

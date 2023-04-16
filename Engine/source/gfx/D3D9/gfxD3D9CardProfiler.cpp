@@ -49,12 +49,6 @@ void GFXD3D9CardProfiler::init()
    D3DCAPS9 caps;
    D3D9Assert(mD3DDevice->GetDeviceCaps(&caps), "GFXD3D9CardProfiler::init - failed to get device caps!");
 
-#ifdef TORQUE_OS_XENON
-   mCardDescription = "Xbox360 GPU";
-   mChipSet = "ATI";
-   mVersionString = String::ToString(_XDK_VER);
-   mVideoMemory = 512 * 1024 * 1024;
-#else
    WMIVideoInfo wmiVidInfo;
    if( wmiVidInfo.profileAdapters() )
    {
@@ -65,7 +59,6 @@ void GFXD3D9CardProfiler::init()
       mVersionString = adapter.driverVersion;
       mVideoMemory = adapter.vram;
    }
-#endif
 
    Parent::init();
 }
@@ -108,15 +101,6 @@ bool GFXD3D9CardProfiler::_queryFormat( const GFXFormat fmt, const GFXTexturePro
 
    D3DFORMAT texFormat = GFXD3D9TextureFormat[fmt];
 
-#if defined(TORQUE_OS_XENON)
-   inOutAutogenMips = false;
-   adapterFormat = D3DFMT_A8B8G8R8;
-
-   if(profile->isRenderTarget())
-   {
-      texFormat = (D3DFORMAT)MAKELEFMT(texFormat);
-   }
-#else
    if( profile->isRenderTarget() )
       usage |= D3DUSAGE_RENDERTARGET;
    else if( profile->isZTarget() )
@@ -127,7 +111,6 @@ bool GFXD3D9CardProfiler::_queryFormat( const GFXFormat fmt, const GFXTexturePro
    
    if( inOutAutogenMips )
       usage |= D3DUSAGE_AUTOGENMIPMAP;
-#endif
 
    // Early-check to see if the enum translation table has an unsupported value
    if(texFormat == (_D3DFORMAT)GFX_UNSUPPORTED_VAL)
@@ -138,7 +121,6 @@ bool GFXD3D9CardProfiler::_queryFormat( const GFXFormat fmt, const GFXTexturePro
 
    bool retVal = SUCCEEDED( hr );
 
-#if !defined(TORQUE_OS_XENON)
    // If check device format failed, and auto gen mips were requested, try again
    // without autogen mips.
    if( !retVal && inOutAutogenMips )
@@ -155,7 +137,6 @@ bool GFXD3D9CardProfiler::_queryFormat( const GFXFormat fmt, const GFXTexturePro
       if( retVal )
          inOutAutogenMips = false;
    }
-#endif
 
    return retVal;
 }

@@ -39,15 +39,7 @@ uniform float2 texSize0;
 
 float4 mad(float4 m, float4 a, float4 b) 
 {
-   #if defined(XBOX)
-      float4 result;
-      asm {
-         mad result, m, a, b
-      };
-      return result;
-   #else
-      return m * a + b;
-   #endif
+   return m * a + b;
 }
 
 
@@ -63,17 +55,7 @@ float4 tex2Dlevel0(sampler2D map, float2 texcoord)
 // Same as above, this eases translation to assembly code;
 float4 tex2Doffset(sampler2D map, float2 texcoord, float2 offset) 
 {
-   #if defined(XBOX) && MAX_SEARCH_STEPS < 6
-      float4 result;
-      float x = offset.x;
-      float y = offset.y;
-      asm {
-         tfetch2D result, texcoord, map, OffsetX = x, OffsetY = y
-      };
-      return result;
-   #else
-      return tex2Dlevel0(map, texcoord + PIXEL_SIZE * offset);
-   #endif
+   return tex2Dlevel0(map, texcoord + PIXEL_SIZE * offset);
 }
 
 

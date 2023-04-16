@@ -94,18 +94,6 @@ switch( Generator::$platform )
      addEngineSrcDir('windowManager/mac');
      break;
 
-   case "360":
-     addEngineSrcDir('platformXbox');
-     addEngineSrcDir('platformXbox/threads');
-     addEngineSrcDir('windowManager/360');
-     break;
-     
-   case "ps3":
-     addEngineSrcDir('platformPS3');
-     addEngineSrcDir('platformPS3/threads');
-     addEngineSrcDir('windowManager/ps3');
-     break;
-
    case "linux":
    case "linux_dedicated":
      addEngineSrcDir('platformX86UNIX');
@@ -133,23 +121,8 @@ switch( Generator::$platform )
       addEngineSrcDir( 'gfx/D3D9/pc' );
       addEngineSrcDir( 'shaderGen/hlsl' );
       break;
-   case "360":
-      addEngineSrcDir( 'gfx/D3D9' );
-      addEngineSrcDir( 'gfx/D3D9/360' );
-      addEngineSrcDir( 'shaderGen/hlsl' );
-      addEngineSrcDir( 'shaderGen/360' );
-      break;
    case "mac":
       addEngineSrcDir( 'gfx/gl/ggl/mac' );
-
-      // GFX - GGL
-      addEngineSrcDir( 'gfx/gl' );
-      addEngineSrcDir( 'gfx/gl/ggl' );
-      addEngineSrcDir( 'gfx/gl/ggl/generated' );
-      addEngineSrcDir( 'shaderGen/glsl' );
-      break;
-   case "ps3":
-      addEngineSrcDir( 'gfx/gl/ggl/ps3' );
 
       // GFX - GGL
       addEngineSrcDir( 'gfx/gl' );

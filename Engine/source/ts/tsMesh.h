@@ -47,14 +47,6 @@
 
 #include "core/util/safeDelete.h"
 
-#if defined(TORQUE_OS_XENON)
-//#  define USE_MEM_VERTEX_BUFFERS
-#endif
-
-#if defined(USE_MEM_VERTEX_BUFFERS)
-#  include "gfx/D3D9/360/gfx360MemVertexBuffer.h"
-#endif
-
 namespace Opcode { class Model; class MeshInterface; }
 namespace IceMaths { class IndexedTriangle; class Point; }
 
@@ -89,12 +81,7 @@ struct TSDrawPrimitive
    S32 matIndex;    ///< holds material index & element type (see above enum)
 };
 
-#if defined(USE_MEM_VERTEX_BUFFERS)
-struct __NullVertexStruct {};
-typedef GFX360MemVertexBufferHandle<__NullVertexStruct> TSVertexBufferHandle;
-#else
 typedef GFXVertexBufferDataHandle TSVertexBufferHandle;
-#endif
 
 
 ///
@@ -264,7 +251,7 @@ class TSMesh
    Point3F billboardAxis;
 
    /// @name Convex Hull Data
-   /// Convex hulls are convex (no angles >= 180º) meshes used for collision
+   /// Convex hulls are convex (no angles >= 180ï¿½) meshes used for collision
    /// @{
 
    Vector<Point3F> planeNormals;

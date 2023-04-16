@@ -66,12 +66,6 @@ GFXD3D9PrimitiveBuffer::~GFXD3D9PrimitiveBuffer()
 {
    if( mBufferType != GFXBufferTypeVolatile )
    {
-#if defined(TORQUE_OS_XENON)
-      if(ib->IsSet(reinterpret_cast<GFXD3D9Device *>(mDevice)->mD3DDevice))
-      {
-         reinterpret_cast<GFXD3D9Device *>(mDevice)->mD3DDevice->SetIndices(NULL);
-      }
-#endif
       SAFE_RELEASE( ib );
    }
 }
@@ -100,11 +94,7 @@ void GFXD3D9PrimitiveBuffer::resurrect()
    if ( mBufferType != GFXBufferTypeDynamic )
       return;
       
-   U32 usage = D3DUSAGE_WRITEONLY;
-
-#ifndef TORQUE_OS_XENON
-   usage |= D3DUSAGE_DYNAMIC;
-#endif
+   U32 usage = D3DUSAGE_WRITEONLY | D3DUSAGE_DYNAMIC;
 
    D3DPOOL pool = D3DPOOL_DEFAULT;
 

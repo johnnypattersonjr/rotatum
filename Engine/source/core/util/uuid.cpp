@@ -95,9 +95,7 @@ typedef struct {
     unsigned16 cs;        /* saved clock sequence */
 } uuid_state;
 
-#if defined(_XBOX)
-#include <xtl.h>
-#elif defined(_WIN32)
+#if defined(_WIN32)
 #include <windows.h>
 #else
 #include <sys/types.h>
@@ -333,15 +331,8 @@ static void get_system_time(uuid_time_t *uuid_time)
     *uuid_time = time.QuadPart;
 }
 
-#if defined(_XBOX)
-#include "platform/platformAssert.h"
-#endif
-
 static void get_random_info(unsigned char seed[16])
 {
-#if defined(_XBOX)
-   AssertFatal(false, "get_random_info not implemented on Xbox360");
-#else
     MD5_CTX c;
     struct {
         MEMORYSTATUS m;
@@ -365,7 +356,6 @@ static void get_random_info(unsigned char seed[16])
     GetComputerName(r.hostname, &r.l );
     MD5Update(&c, (unsigned char *) &r, sizeof(r));
     MD5Final(seed, &c);
-#endif
 }
 
 #else /* WIN32 */

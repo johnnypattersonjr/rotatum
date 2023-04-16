@@ -294,9 +294,6 @@ void RenderParticleMgr::render( SceneRenderState *state )
       OffscreenSystemEntry &systemEntry = *reinterpret_cast<OffscreenSystemEntry *>(itr->inst);
 
       // Setup target
-      // NOTE: If you are using this on the Xbox360 with Basic Lighting,
-      // you are going to have to mess with either the render order, or 
-      // you are going to have to make this a 'preserve' draw
       if(!RenderToSingleTarget)
          mTargetChainIdx = systemEntry.targetChainIdx;
       _onPreRender(state);

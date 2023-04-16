@@ -25,12 +25,8 @@
 
 #include "platform/tmm_off.h"
 
-#ifdef TORQUE_OS_XENON
-#  include "platformXbox/platformXbox.h"
-#else
-#  include <d3dx9.h>
-#  include "platformWin32/platformWin32.h"
-#endif
+#include <d3dx9.h>
+#include "platformWin32/platformWin32.h"
 #ifndef _GFXD3D9STATEBLOCK_H_
 #include "gfx/D3D9/gfxD3D9StateBlock.h"
 #endif
@@ -50,13 +46,7 @@
 #include "platform/platformDlibrary.h"
 #endif
 
-#ifndef TORQUE_OS_XENON
 #include <DxErr.h>
-#else
-#include <dxerr9.h>
-#define DXGetErrorStringA DXGetErrorString9A
-#define DXGetErrorDescriptionA DXGetErrorDescription9A
-#endif
 
 #include "platform/tmm_on.h"
 
@@ -155,10 +145,8 @@ protected:
    LPDIRECT3D9       mD3D;        ///< D3D Handle
    LPDIRECT3DDEVICE9 mD3DDevice;  ///< Handle for D3DDevice
 
-#if !defined(TORQUE_OS_XENON)
    LPDIRECT3D9EX       mD3DEx;             ///< D3D9Ex Handle
    LPDIRECT3DDEVICE9EX mD3DDeviceEx; ///< Handle for D3DDevice9Ex
-#endif
 
    U32  mAdapterIndex;            ///< Adapter index because D3D supports multiple adapters
 
@@ -217,8 +205,6 @@ protected:
    /// Called by base GFXDevice to actually set a const buffer
    virtual void setShaderConstBufferInternal(GFXShaderConstBuffer* buffer);
 
-   // CodeReview - How exactly do we want to deal with this on the Xenon?
-   // Right now it's just in an #ifndef in gfxD3D9Device.cpp - AlexS 4/11/07
    virtual void setLightInternal(U32 lightStage, const GFXLightInfo light, bool lightEnable);
    virtual void setLightMaterialInternal(const GFXLightMaterial mat);
    virtual void setGlobalAmbientInternal(ColorF color);
@@ -342,11 +328,7 @@ public:
    DWORD getMultisampleLevel() const { return mMultisampleLevel; } 
 
    // Whether or not the Direct3D device was created with Direct3D9Ex support
-#if !defined(TORQUE_OS_XENON)
    virtual bool isD3D9Ex() { return mD3DEx != NULL; }
-#else
-   virtual bool isD3D9Ex() { return false; }
-#endif
 
    // Get the backbuffer, currently only access for WPF support
    virtual IDirect3DSurface9* getBackBuffer() { return mDeviceBackbuffer; }

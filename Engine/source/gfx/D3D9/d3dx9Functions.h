@@ -86,24 +86,6 @@ D3DX_FUNCTION( D3DXCreateTexture, HRESULT,
                D3DPOOL                   Pool,
                LPDIRECT3DTEXTURE9*       ppTexture) )
 
-#ifdef TORQUE_OS_XENON
-D3DX_FUNCTION( D3DXLoadVolumeFromMemory, HRESULT,
-               (LPDIRECT3DVOLUME9         pDestVolume,
-               CONST PALETTEENTRY*       pDestPalette,
-               CONST D3DBOX*             pDestBox,
-               LPCVOID                   pSrcMemory,
-               D3DFORMAT                 SrcFormat,
-               UINT                      SrcRowPitch,
-               UINT                      SrcSlicePitch,
-               CONST PALETTEENTRY*       pSrcPalette,
-               CONST D3DBOX*             pSrcBox,
-               BOOL                      SrcParentPacked,
-               UINT                      SrcParentWidth,
-               UINT                      SrcParentHeight,
-               UINT                      SrcParentDepth,
-               DWORD                     Filter,
-               D3DCOLOR                  ColorKey) )
-#else
 D3DX_FUNCTION( D3DXLoadVolumeFromMemory, HRESULT,
                (LPDIRECT3DVOLUME9         pDestVolume,
                CONST PALETTEENTRY*       pDestPalette,
@@ -116,7 +98,6 @@ D3DX_FUNCTION( D3DXLoadVolumeFromMemory, HRESULT,
                CONST D3DBOX*             pSrcBox,
                DWORD                     Filter,
                D3DCOLOR                  ColorKey) )
-#endif
 
 D3DX_FUNCTION( D3DXSaveTextureToFileInMemory, HRESULT,
                (LPD3DXBUFFER *ppDestBuf,

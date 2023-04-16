@@ -39,7 +39,7 @@ static const MBReturnVal gsDontSave = MRDontSave;
 
 AFTER_MODULE_INIT( Sim )
 {
-   #if !defined( _XBOX ) && !defined( TORQUE_DEDICATED )
+   #if !defined( TORQUE_DEDICATED )
    Con::addConstant( "$MROk", TypeS32, &gsOK, "Determines the ok button press state in a message box.\n"
 	   "@ingroup Platform" );
    Con::addConstant( "$MRCancel", TypeS32, &gsCancel, "Determines the cancel button press state in a message box.\n"

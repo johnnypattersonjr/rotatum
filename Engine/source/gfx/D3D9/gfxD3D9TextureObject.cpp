@@ -24,12 +24,6 @@
 #include "gfx/D3D9/gfxD3D9TextureObject.h"
 #include "platform/profiler.h"
 
-#ifdef TORQUE_OS_XENON
-#include "gfx/D3D9/360/gfx360Device.h"
-#include "gfx/D3D9/360/gfx360Target.h"
-#include "gfx/D3D9/gfxD3D9EnumTranslate.h"
-#endif
-
 U32 GFXD3D9TextureObject::mTexCount = 0;
 
 //*****************************************************************************
@@ -87,13 +81,8 @@ GFXLockedRect *GFXD3D9TextureObject::lock(U32 mipLevel /*= 0*/, RectI *inRect /*
       GFXD3D9TextureObject *to = (GFXD3D9TextureObject *) &(*mLockTex);
       D3D9Assert( to->get2DTex()->GetSurfaceLevel( 0, &dest ), "GFXD3D9TextureObject::lock - failed to get dest texture's surface." );
 
-#ifndef TORQUE_OS_XENON
       LPDIRECT3DDEVICE9 D3DDevice = dynamic_cast<GFXD3D9Device *>(GFX)->getDevice();
       HRESULT rtLockRes = D3DDevice->GetRenderTargetData( source, dest );
-#else
-      AssertFatal(false, "Use different functionality on the Xbox 360 to perform this task.");
-      HRESULT rtLockRes = E_FAIL;
-#endif
       source->Release();
 
       if(!SUCCEEDED(rtLockRes))
@@ -140,7 +129,6 @@ void GFXD3D9TextureObject::unlock(U32 mipLevel)
 {
    AssertFatal( mLocked, "GFXD3D9TextureObject::unlock - Attempting to unlock a surface that has not been locked" );
 
-#ifndef TORQUE_OS_XENON
    if( mProfile->isRenderTarget() )
    {
       IDirect3DSurface9 *dest;
@@ -153,7 +141,6 @@ void GFXD3D9TextureObject::unlock(U32 mipLevel)
       mLocked = false;
    }
    else
-#endif
    {
       D3D9Assert( get2DTex()->UnlockRect(mipLevel), 
          "GFXD3D9TextureObject::unlock - could not unlock non-RT texture." );
@@ -195,10 +182,6 @@ void GFXD3D9TextureObject::resurrect()
 
 bool GFXD3D9TextureObject::copyToBmp(GBitmap* bmp)
 {
-#ifdef TORQUE_OS_XENON
-   // TODO: Implement Xenon version -patw
-   return false;
-#else
    if (!bmp)
       return false;
 
@@ -273,5 +256,4 @@ bool GFXD3D9TextureObject::copyToBmp(GBitmap* bmp)
    PROFILE_END();
 
    return true;
-#endif
 }

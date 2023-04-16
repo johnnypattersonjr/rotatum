@@ -36,9 +36,6 @@ namespace GFXD3D9EnumTranslate
 extern _D3DFORMAT GFXD3D9IndexFormat[GFXIndexFormat_COUNT];
 extern _D3DSAMPLERSTATETYPE GFXD3D9SamplerState[GFXSAMP_COUNT];
 extern _D3DFORMAT GFXD3D9TextureFormat[GFXFormat_COUNT];
-#ifdef TORQUE_OS_XENON
-extern _D3DFORMAT GFXD3D9RenderTargetFormat[GFXFormat_COUNT];
-#endif
 extern _D3DRENDERSTATETYPE GFXD3D9RenderState[GFXRenderState_COUNT];
 extern _D3DTEXTUREFILTERTYPE GFXD3D9TextureFilter[GFXTextureFilter_COUNT];
 extern _D3DBLEND GFXD3D9Blend[GFXBlend_COUNT];

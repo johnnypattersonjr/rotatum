@@ -28,8 +28,7 @@
 #endif
 
 /// This #define is used by the FrameAllocator to align starting addresses to
-/// be byte aligned to this value. This is important on the 360 and possibly
-/// on other platforms as well. Use this #define anywhere alignment is needed.
+/// be byte aligned to this value. Use this #define anywhere alignment is needed.
 ///
 /// NOTE: Do not change this value per-platform unless you have a very good
 /// reason for doing so. It has the potential to cause inconsistencies in 

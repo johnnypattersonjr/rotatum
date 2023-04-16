@@ -29,8 +29,6 @@ beginModule( 'dsound' );
       addEngineSrcDir('sfx/xaudio');
       addProjectLibInput('x3daudio.lib');
    }
-   else if ( Generator::$platform == "360" )
-      addEngineSrcDir('sfx/xaudio');
 
 endModule();
 

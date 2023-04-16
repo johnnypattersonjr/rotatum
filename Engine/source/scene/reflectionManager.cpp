@@ -242,15 +242,8 @@ GFXTextureObject* ReflectionManager::getRefractTex()
    GFXFormat targetFormat = target->getFormat();
    const Point2I &targetSize = target->getSize();
 
-#if defined(TORQUE_OS_XENON)
-   // On the Xbox360, it needs to do a resolveTo from the active target, so this
-   // may as well be the full size of the active target
-   const U32 desWidth = targetSize.x;
-   const U32 desHeight = targetSize.y;
-#else
    const U32 desWidth = mFloor( (F32)targetSize.x * smRefractTexScale );
    const U32 desHeight = mFloor( ( F32)targetSize.y * smRefractTexScale );
-#endif
 
    if ( mRefractTex.isNull() || 
         mRefractTex->getWidth() != desWidth ||
