@@ -1,6 +1,4 @@
-echo Changing to %4 ...
-cd %4
-echo Generating %2 and %3 with prefix %1.
-..\..\bin\bison\bison.exe -o %2 %3 --defines -p %1
-echo Renaming %2 to %5 .
-move /Y %2 %5
+echo Changing to %5 ...
+cd %5
+echo Generating %3 and %4 with prefix %2.
+%1 -o %3 %4 --defines -p %2 --header=%6

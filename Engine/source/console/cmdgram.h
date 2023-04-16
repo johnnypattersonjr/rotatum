@@ -1,14 +1,14 @@
-/* A Bison parser, made by GNU Bison 2.3.  */
+/* A Bison parser, made by GNU Bison 3.8.2.  */
 
-/* Skeleton interface for Bison's Yacc-like parsers in C
+/* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
+   Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,9 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -33,167 +31,111 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Tokens.  */
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
+
+#ifndef YY_CMD_CMDGRAM_H_INCLUDED
+# define YY_CMD_CMDGRAM_H_INCLUDED
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int CMDdebug;
+#endif
+
+/* Token kinds.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     rwDEFINE = 258,
-     rwENDDEF = 259,
-     rwDECLARE = 260,
-     rwDECLARESINGLETON = 261,
-     rwBREAK = 262,
-     rwELSE = 263,
-     rwCONTINUE = 264,
-     rwGLOBAL = 265,
-     rwIF = 266,
-     rwNIL = 267,
-     rwRETURN = 268,
-     rwWHILE = 269,
-     rwDO = 270,
-     rwENDIF = 271,
-     rwENDWHILE = 272,
-     rwENDFOR = 273,
-     rwDEFAULT = 274,
-     rwFOR = 275,
-     rwFOREACH = 276,
-     rwFOREACHSTR = 277,
-     rwIN = 278,
-     rwDATABLOCK = 279,
-     rwSWITCH = 280,
-     rwCASE = 281,
-     rwSWITCHSTR = 282,
-     rwCASEOR = 283,
-     rwPACKAGE = 284,
-     rwNAMESPACE = 285,
-     rwCLASS = 286,
-     rwASSERT = 287,
-     ILLEGAL_TOKEN = 288,
-     CHRCONST = 289,
-     INTCONST = 290,
-     TTAG = 291,
-     VAR = 292,
-     IDENT = 293,
-     TYPEIDENT = 294,
-     DOCBLOCK = 295,
-     STRATOM = 296,
-     TAGATOM = 297,
-     FLTCONST = 298,
-     opINTNAME = 299,
-     opINTNAMER = 300,
-     opMINUSMINUS = 301,
-     opPLUSPLUS = 302,
-     STMT_SEP = 303,
-     opSHL = 304,
-     opSHR = 305,
-     opPLASN = 306,
-     opMIASN = 307,
-     opMLASN = 308,
-     opDVASN = 309,
-     opMODASN = 310,
-     opANDASN = 311,
-     opXORASN = 312,
-     opORASN = 313,
-     opSLASN = 314,
-     opSRASN = 315,
-     opCAT = 316,
-     opEQ = 317,
-     opNE = 318,
-     opGE = 319,
-     opLE = 320,
-     opAND = 321,
-     opOR = 322,
-     opSTREQ = 323,
-     opCOLONCOLON = 324,
-     opNTASN = 325,
-     opNDASN = 326,
-     opMDASN = 327,
-     opSTRNE = 328,
-     UNARY = 329
-   };
+  enum yytokentype
+  {
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    rwDEFINE = 258,                /* rwDEFINE  */
+    rwENDDEF = 259,                /* rwENDDEF  */
+    rwDECLARE = 260,               /* rwDECLARE  */
+    rwDECLARESINGLETON = 261,      /* rwDECLARESINGLETON  */
+    rwBREAK = 262,                 /* rwBREAK  */
+    rwELSE = 263,                  /* rwELSE  */
+    rwCONTINUE = 264,              /* rwCONTINUE  */
+    rwGLOBAL = 265,                /* rwGLOBAL  */
+    rwIF = 266,                    /* rwIF  */
+    rwNIL = 267,                   /* rwNIL  */
+    rwRETURN = 268,                /* rwRETURN  */
+    rwWHILE = 269,                 /* rwWHILE  */
+    rwDO = 270,                    /* rwDO  */
+    rwENDIF = 271,                 /* rwENDIF  */
+    rwENDWHILE = 272,              /* rwENDWHILE  */
+    rwENDFOR = 273,                /* rwENDFOR  */
+    rwDEFAULT = 274,               /* rwDEFAULT  */
+    rwFOR = 275,                   /* rwFOR  */
+    rwFOREACH = 276,               /* rwFOREACH  */
+    rwFOREACHSTR = 277,            /* rwFOREACHSTR  */
+    rwIN = 278,                    /* rwIN  */
+    rwDATABLOCK = 279,             /* rwDATABLOCK  */
+    rwSWITCH = 280,                /* rwSWITCH  */
+    rwCASE = 281,                  /* rwCASE  */
+    rwSWITCHSTR = 282,             /* rwSWITCHSTR  */
+    rwCASEOR = 283,                /* rwCASEOR  */
+    rwPACKAGE = 284,               /* rwPACKAGE  */
+    rwNAMESPACE = 285,             /* rwNAMESPACE  */
+    rwCLASS = 286,                 /* rwCLASS  */
+    rwASSERT = 287,                /* rwASSERT  */
+    ILLEGAL_TOKEN = 288,           /* ILLEGAL_TOKEN  */
+    CHRCONST = 289,                /* CHRCONST  */
+    INTCONST = 290,                /* INTCONST  */
+    TTAG = 291,                    /* TTAG  */
+    VAR = 292,                     /* VAR  */
+    IDENT = 293,                   /* IDENT  */
+    TYPEIDENT = 294,               /* TYPEIDENT  */
+    DOCBLOCK = 295,                /* DOCBLOCK  */
+    STRATOM = 296,                 /* STRATOM  */
+    TAGATOM = 297,                 /* TAGATOM  */
+    FLTCONST = 298,                /* FLTCONST  */
+    opINTNAME = 299,               /* opINTNAME  */
+    opINTNAMER = 300,              /* opINTNAMER  */
+    opMINUSMINUS = 301,            /* opMINUSMINUS  */
+    opPLUSPLUS = 302,              /* opPLUSPLUS  */
+    STMT_SEP = 303,                /* STMT_SEP  */
+    opSHL = 304,                   /* opSHL  */
+    opSHR = 305,                   /* opSHR  */
+    opPLASN = 306,                 /* opPLASN  */
+    opMIASN = 307,                 /* opMIASN  */
+    opMLASN = 308,                 /* opMLASN  */
+    opDVASN = 309,                 /* opDVASN  */
+    opMODASN = 310,                /* opMODASN  */
+    opANDASN = 311,                /* opANDASN  */
+    opXORASN = 312,                /* opXORASN  */
+    opORASN = 313,                 /* opORASN  */
+    opSLASN = 314,                 /* opSLASN  */
+    opSRASN = 315,                 /* opSRASN  */
+    opCAT = 316,                   /* opCAT  */
+    opEQ = 317,                    /* opEQ  */
+    opNE = 318,                    /* opNE  */
+    opGE = 319,                    /* opGE  */
+    opLE = 320,                    /* opLE  */
+    opAND = 321,                   /* opAND  */
+    opOR = 322,                    /* opOR  */
+    opSTREQ = 323,                 /* opSTREQ  */
+    opCOLONCOLON = 324,            /* opCOLONCOLON  */
+    opMDASN = 325,                 /* opMDASN  */
+    opNDASN = 326,                 /* opNDASN  */
+    opNTASN = 327,                 /* opNTASN  */
+    opSTRNE = 328,                 /* opSTRNE  */
+    UNARY = 329                    /* UNARY  */
+  };
+  typedef enum yytokentype yytoken_kind_t;
 #endif
-/* Tokens.  */
-#define rwDEFINE 258
-#define rwENDDEF 259
-#define rwDECLARE 260
-#define rwDECLARESINGLETON 261
-#define rwBREAK 262
-#define rwELSE 263
-#define rwCONTINUE 264
-#define rwGLOBAL 265
-#define rwIF 266
-#define rwNIL 267
-#define rwRETURN 268
-#define rwWHILE 269
-#define rwDO 270
-#define rwENDIF 271
-#define rwENDWHILE 272
-#define rwENDFOR 273
-#define rwDEFAULT 274
-#define rwFOR 275
-#define rwFOREACH 276
-#define rwFOREACHSTR 277
-#define rwIN 278
-#define rwDATABLOCK 279
-#define rwSWITCH 280
-#define rwCASE 281
-#define rwSWITCHSTR 282
-#define rwCASEOR 283
-#define rwPACKAGE 284
-#define rwNAMESPACE 285
-#define rwCLASS 286
-#define rwASSERT 287
-#define ILLEGAL_TOKEN 288
-#define CHRCONST 289
-#define INTCONST 290
-#define TTAG 291
-#define VAR 292
-#define IDENT 293
-#define TYPEIDENT 294
-#define DOCBLOCK 295
-#define STRATOM 296
-#define TAGATOM 297
-#define FLTCONST 298
-#define opINTNAME 299
-#define opINTNAMER 300
-#define opMINUSMINUS 301
-#define opPLUSPLUS 302
-#define STMT_SEP 303
-#define opSHL 304
-#define opSHR 305
-#define opPLASN 306
-#define opMIASN 307
-#define opMLASN 308
-#define opDVASN 309
-#define opMODASN 310
-#define opANDASN 311
-#define opXORASN 312
-#define opORASN 313
-#define opSLASN 314
-#define opSRASN 315
-#define opCAT 316
-#define opEQ 317
-#define opNE 318
-#define opGE 319
-#define opLE 320
-#define opAND 321
-#define opOR 322
-#define opSTREQ 323
-#define opCOLONCOLON 324
-#define opNTASN 325
-#define opNDASN 326
-#define opMDASN 327
-#define opSTRNE 328
-#define UNARY 329
 
-
-
-
+/* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE
-#line 82 "CMDgram.y"
+union YYSTYPE
 {
+#line 82 "CMDgram.y"
+
    Token< char >           c;
    Token< int >            i;
    Token< const char* >    s;
@@ -209,14 +151,20 @@ typedef union YYSTYPE
    ObjectDeclNode*         od;
    AssignDecl              asn;
    IfStmtNode*             ifnode;
-}
-/* Line 1529 of yacc.c.  */
-#line 215 "cmdgram.h"
-	YYSTYPE;
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
-# define YYSTYPE_IS_DECLARED 1
+
+#line 156 "cmdgram.h"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
 #endif
+
 
 extern YYSTYPE CMDlval;
 
+
+int CMDparse (void);
+
+
+#endif /* !YY_CMD_CMDGRAM_H_INCLUDED  */
