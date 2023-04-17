@@ -1,0 +1,108 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Rotatum
+Upstream-Contact: Johnny Patterson <johnny.patterson.jr@gmail.com>
+Source: https://github.com/johnnypattersonjr/rotatum
+
+Files:
+	Engine/source/*
+	Templates/*
+	Tools/*
+Copyright: Copyright (c) 2012 GarageGames, LLC
+License: MIT
+
+Files:
+	Templates/Empty/game/core/scripts/client/lighting/advanced/shadowViz.gui
+	Templates/Empty/game/core/unifiedShell/GamepadButtonsGui.gui
+	Templates/Empty/game/core/unifiedShell/MainMenuGui.gui
+	Templates/Empty/game/core/unifiedShell/ObjectPickerGui.gui
+	Templates/Empty/game/core/unifiedShell/OptionsGui.gui
+	Templates/Empty/game/tools/guiEditor/gui/guiEditor.ed.gui
+	Templates/Full/game/core/scripts/client/lighting/advanced/shadowViz.gui
+	Templates/Full/game/core/unifiedShell/GamepadButtonsGui.gui
+	Templates/Full/game/core/unifiedShell/MainMenuGui.gui
+	Templates/Full/game/core/unifiedShell/ObjectPickerGui.gui
+	Templates/Full/game/core/unifiedShell/OptionsGui.gui
+	Templates/Full/game/tools/guiEditor/gui/guiEditor.ed.gui
+Copyright: Copyright (C) GarageGames.com, Inc.
+License: MIT
+
+Files:
+	Templates/Empty/game/tools/particleEditor/ParticleEditor.ed.gui
+	Templates/Full/game/tools/particleEditor/ParticleEditor.ed.gui
+Copyright: Copyright GarageGames, LLC 2011
+License: MIT
+
+Files:
+	Templates/Full/game/art/gui/playerList.gui
+Copyright: Copyright (c) 2001 GarageGames.Com
+License: MIT
+
+Files:
+	Engine/source/console/cmdgram.cpp
+	Engine/source/console/cmdgram.h
+Copyright: Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation, Inc.
+           Copyright (c) 2012 GarageGames, LLC
+License: ((GPL-3.0-or-later WITH Bison-exception-2.2) AND MIT)
+
+Files:
+	Engine/source/core/strings/stringFunctions.cpp
+Copyright: Copyright (C) 2000, 2004 by Martin Pool <mbp sourcefrog net>
+           Copyright (c) 2012 GarageGames, LLC
+License: (MIT AND Zlib)
+
+Files:
+	Engine/source/core/util/md5.cpp
+Copyright: Copyright (c) 1993 Colin Plumb
+           Copyright (c) John Walker
+License: CC0-1.0
+
+Files:
+	Engine/source/core/util/uuid.cpp
+Copyright: Copyright (C) 1998-1999 Greg Stein. All Rights Reserved.
+		   Copyright (c) 1990- 1993, 1996 Open Software Foundation, Inc.
+           Copyright (c) 1989 by Hewlett-Packard Company, Palo Alto, Ca. & Digital Equipment Corporation, Maynard, Mass.
+           Copyright (c) 1998 Microsoft.
+           Copyright (c) 2012 GarageGames, LLC
+License: (MIT AND LicenseRef-mod_dav-1.0 AND LicenseRef-rfc-4122-sample)
+
+Files:
+	Engine/source/gfx/gl/ggl/generated/glc.h
+Copyright: Copyright (c) 1991-2002 Silicon Graphics, Inc. Copyright in any portions created by third parties is as indicated elsewhere herein. All Rights Reserved.
+           Copyright (c) 2012 GarageGames, LLC
+License: (MIT AND SGI-B-1.1)
+
+Files:
+	Engine/source/gfx/gl/ggl/mac/agl.h
+	Engine/source/gfx/gl/ggl/x11/glx.h
+Copyright: Copyright (c) 1991-9 Silicon Graphics, Inc. All Rights Reserved.
+           Copyright (c) 2012 GarageGames, LLC
+License: (MIT AND LicenseRef-GLX-Public-License-1.0)
+
+Files:
+	Engine/source/gfx/test/stanfordBunny.cpp
+Copyright: Copyright � 2006 Apple Computer, Inc., All Rights Reserved
+License: AML
+
+Files:
+	Engine/source/platform/platformCPUCount.cpp
+Copyright: Copyright (c) 2005 Intel Corporation
+           Copyright (c) 2012 GarageGames, LLC
+License: (MIT AND CC0-1.0)
+
+Files:
+	Engine/source/platformX86UNIX/gl_types.h
+Copyright: Copyright (C) 1999-2000  Brian Paul   All Rights Reserved.
+           Copyright (c) 2012 GarageGames, LLC
+License: MIT
+
+Files:
+	Engine/source/sfx/openal/aldlist.cpp
+	Engine/source/sfx/openal/win32/LoadOAL.cpp
+Copyright: Copyright (c) 2006, Creative Labs Inc. All rights reserved.
+License: BSD-3-Clause
+
+Files:
+	Templates/Empty/game/shaders/common/postFx/fxaa/Fxaa3_11.h
+	Templates/Full/game/shaders/common/postFx/fxaa/Fxaa3_11.h
+Copyright: COPYRIGHT (C) 2010, 2011 NVIDIA CORPORATION. ALL RIGHTS RESERVED.
+License: LicenseRef-Nvidia-Fxaa-3.11-sample
