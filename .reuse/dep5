@@ -106,3 +106,8 @@ Files:
 	Templates/Full/game/shaders/common/postFx/fxaa/Fxaa3_11.h
 Copyright: COPYRIGHT (C) 2010, 2011 NVIDIA CORPORATION. ALL RIGHTS RESERVED.
 License: LicenseRef-Nvidia-Fxaa-3.11-sample
+
+Files:
+	Engine/bin/nasm/*
+Copyright: Copyright (c) 1996-2015 The NASM development team
+License: BSD-2-Clause
