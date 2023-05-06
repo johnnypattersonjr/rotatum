@@ -111,3 +111,12 @@ Files:
 	Engine/bin/nasm/*
 Copyright: Copyright (c) 1996-2015 The NASM development team
 License: BSD-2-Clause
+
+Files:
+	.gitattributes
+	.gitignore
+	Templates/Empty/.gitignore
+	Templates/Full/.gitignore
+	Tools/dae2dts/.gitignore
+Copyright: Copyright (c) Johnny Patterson
+License: CC0-1.0

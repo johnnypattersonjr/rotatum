@@ -1,0 +1,12 @@
+* text=auto
+*.cs text eol=crlf
+*.gui text eol=crlf
+
+*.asm linguist-language=Assembly
+*.c linguist-language=C++
+*.cc linguist-language=C++
+*.cs linguist-langauge=TorqueScript
+*.cpp linguist-language=C++
+*.gui linguist-langauge=TorqueScript
+*.h linguist-language=C++
+*.inl linguist-language=C++
