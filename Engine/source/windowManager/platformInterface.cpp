@@ -37,9 +37,9 @@
 // WindowManager
 //
 // PlatformWindowManager::get() wrapped in Macro WindowManager
-static AutoPtr< PlatformWindowManager > smWindowManager;
 PlatformWindowManager *PlatformWindowManager::get() 
 {
+   static AutoPtr< PlatformWindowManager > smWindowManager;
    if( smWindowManager.isNull() )
       smWindowManager = CreatePlatformWindowManager();
    return smWindowManager.ptr();
