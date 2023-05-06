@@ -120,3 +120,19 @@ Files:
 	Tools/dae2dts/.gitignore
 Copyright: Copyright (c) Johnny Patterson
 License: CC0-1.0
+
+Files:
+	CMakeLists.txt
+	Engine/CMakeLists.txt
+	Engine/cmake/*
+	Engine/lib/CMakeLists.txt
+	Engine/lib/cmake/*
+	Engine/source/CMakeLists.txt
+	Engine/source/*.cmake
+	Templates/CMakeLists.txt
+	Templates/Empty/CMakeLists.txt
+	Templates/Full/CMakeLists.txt
+	Tools/CMakeLists.txt
+	Tools/dae2dts/CMakeLists.txt
+Copyright: Copyright (c) Johnny Patterson
+License: GPL-3.0-or-later
