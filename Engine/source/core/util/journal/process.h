@@ -37,9 +37,6 @@
 #define PROCESS_RENDER_ORDER 0.8f
 #define PROCESS_LAST_ORDER 1.0f
 
-class StandardMainLoop;
-
-
 /// Event generation signal.
 ///
 /// Objects that generate events need to register a callback with
@@ -144,12 +141,10 @@ public:
    /// Trigger the registered shutdown functions
    static bool shutdown();
 
-private:
-   friend class StandardMainLoop;
-
    /// Trigger the registered command line handling functions
    static void handleCommandLine(S32 argc, const char **argv);
 
+private:
    /// Private constructor
    Process();
 
