@@ -1618,33 +1618,36 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
 
    // Signal the interested parties.
    GuiCanvas::getGuiCanvasFrameSignal().trigger(true);
-      
-   // Gross hack to make sure we don't end up with advanced lighting and msaa 
-   // at the same time, which causes artifacts. At the same time we don't 
-   // want to just throw the settings the user has chosen if the light manager 
-   // changes at a later time.
 
-   GFXVideoMode mode = mPlatformWindow->getVideoMode();
-   if ( dStricmp( LIGHTMGR->getId(), "ADVLM" ) == 0 && mode.antialiasLevel > 0 )   
+   if ( LIGHTMGR )
    {
-      const char *pref = Con::getVariable( "$pref::Video::mode" );
-      mode.parseFromString( pref );
-      mode.antialiasLevel = 0;
-      mPlatformWindow->setVideoMode(mode);
+      // Gross hack to make sure we don't end up with advanced lighting and msaa
+      // at the same time, which causes artifacts. At the same time we don't
+      // want to just throw the settings the user has chosen if the light manager
+      // changes at a later time.
 
-      Con::printf( "AntiAliasing has been disabled; it is not compatible with AdvancedLighting." );
-   }
-   else if ( dStricmp( LIGHTMGR->getId(), "BLM" ) == 0)
-   {
-      const char *pref = Con::getVariable( "$pref::Video::mode" );
-
-      U32 prefAA = dAtoi( StringUnit::getUnit(pref, 5, " ") );
-      if ( prefAA != mode.antialiasLevel )
+      GFXVideoMode mode = mPlatformWindow->getVideoMode();
+      if ( dStricmp( LIGHTMGR->getId(), "ADVLM" ) == 0 && mode.antialiasLevel > 0 )
       {
+         const char *pref = Con::getVariable( "$pref::Video::mode" );
          mode.parseFromString( pref );
+         mode.antialiasLevel = 0;
          mPlatformWindow->setVideoMode(mode);
 
-         Con::printf( "AntiAliasing has been enabled while running BasicLighting." );
+         Con::printf( "AntiAliasing has been disabled; it is not compatible with AdvancedLighting." );
+      }
+      else if ( dStricmp( LIGHTMGR->getId(), "BLM" ) == 0)
+      {
+         const char *pref = Con::getVariable( "$pref::Video::mode" );
+
+         U32 prefAA = dAtoi( StringUnit::getUnit(pref, 5, " ") );
+         if ( prefAA != mode.antialiasLevel )
+         {
+            mode.parseFromString( pref );
+            mPlatformWindow->setVideoMode(mode);
+
+            Con::printf( "AntiAliasing has been enabled while running BasicLighting." );
+         }
       }
    }
 
