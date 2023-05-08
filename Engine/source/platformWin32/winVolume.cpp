@@ -408,20 +408,20 @@ bool Win32File::open(AccessMode mode)
 
    struct Mode
    {
-      DWORD mode,share,open;
+      DWORD mode,open;
    } Modes[] =
    {
-      { GENERIC_READ,FILE_SHARE_READ,OPEN_EXISTING }, // Read
-      { GENERIC_WRITE,0,CREATE_ALWAYS },              // Write
-      { GENERIC_WRITE | GENERIC_READ,0,OPEN_ALWAYS }, // ReadWrite
-      { GENERIC_WRITE,0,OPEN_ALWAYS }                 // WriteAppend
+      { GENERIC_READ,OPEN_EXISTING },               // Read
+      { GENERIC_WRITE,CREATE_ALWAYS },              // Write
+      { GENERIC_WRITE | GENERIC_READ,OPEN_ALWAYS }, // ReadWrite
+      { GENERIC_WRITE,OPEN_ALWAYS }                 // WriteAppend
    };
 
    Mode& m = (mode == Read)? Modes[0]: (mode == Write)? Modes[1]:
          (mode == ReadWrite)? Modes[2]: Modes[3];
 
    mHandle = (void*)::CreateFileW(PathToOS(mName).utf16(),
-               m.mode, m.share,
+               m.mode, FILE_SHARE_READ,
                NULL, m.open,
                FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN,
                NULL);
