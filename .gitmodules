@@ -1,0 +1,4 @@
+[submodule "Engine/lib/libogg"]
+	path = Engine/lib/libogg
+	shallow = true
+	url = git@github.com:xiph/ogg.git
