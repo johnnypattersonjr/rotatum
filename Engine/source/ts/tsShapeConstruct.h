@@ -38,6 +38,7 @@
 #ifndef _COLLADA_UTILS_H_
 #include "ts/collada/colladaUtils.h"
 #endif
+#include "console/engineAPI.h"
 
 /// This class allows an artist to export their animations for the model
 /// into the .dsq format.  This class in particular matches up the model

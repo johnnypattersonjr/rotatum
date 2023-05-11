@@ -51,6 +51,7 @@ NvRemoveTjunctions.cpp : A code snippet to remove tjunctions from a triangle mes
 ** CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

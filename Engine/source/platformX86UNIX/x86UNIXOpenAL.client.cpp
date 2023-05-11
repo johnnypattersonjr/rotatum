@@ -22,6 +22,7 @@
 
 #include "platformX86UNIX/platformX86UNIX.h"
 #include "console/console.h"
+#include "core/strings/stringFunctions.h"
 
 #include <dlfcn.h>
 
