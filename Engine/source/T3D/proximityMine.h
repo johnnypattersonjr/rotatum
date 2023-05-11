@@ -73,7 +73,7 @@ protected:
    enum MaskBits {
       DeployedMask   = Parent::NextFreeMask,
       ExplosionMask  = Parent::NextFreeMask << 1,
-      NextFreeMask   = Parent::NextFreeMask << 2
+      // NextFreeMask   = Parent::NextFreeMask << 2
    };
 
    enum State

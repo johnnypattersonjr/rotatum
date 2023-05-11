@@ -159,7 +159,7 @@ protected:
 
    enum MaskBits {
       TurretStateMask   = Parent::NextFreeMask,
-      NextFreeMask      = Parent::NextFreeMask << 1
+      // NextFreeMask      = Parent::NextFreeMask << 1
    };
 
    struct TargetInfo
