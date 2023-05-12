@@ -498,8 +498,12 @@ extern void* dRealMalloc(dsize_t);
 extern void  dRealFree(void*);
 
 extern void *dMalloc_aligned(dsize_t in_size, int alignment);
-extern void dFree_aligned(void *);
+extern void  dFree_aligned(void *);
 
+extern void* dMemcpy(void *dst, const void *src, dsize_t size);
+extern void* dMemmove(void *dst, const void *src, dsize_t size);
+extern void* dMemset(void *dst, int c, dsize_t size);
+extern int   dMemcmp(const void *ptr1, const void *ptr2, dsize_t size);
 
 inline void dFree( const void* p )
 {
@@ -518,11 +522,6 @@ template<class T> void dCopyArray(T *dst, const T *src, dsize_t size)
 {
    dMemcpy(dst, src, size * sizeof(T));
 }
-
-extern void* dMemcpy(void *dst, const void *src, dsize_t size);
-extern void* dMemmove(void *dst, const void *src, dsize_t size);
-extern void* dMemset(void *dst, int c, dsize_t size);
-extern int   dMemcmp(const void *ptr1, const void *ptr2, dsize_t size);
 
 /// The dALIGN macro ensures the passed declaration is
 /// data aligned at 16 byte boundaries.
