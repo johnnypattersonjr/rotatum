@@ -34,7 +34,7 @@
 #include "materials/baseMatInstance.h"
 #include "scene/sceneManager.h"
 #include "scene/sceneRenderState.h"
-#include "scene/zones/SceneZoneSpace.h"
+#include "scene/zones/sceneZoneSpace.h"
 #include "lighting/lightManager.h"
 #include "math/mathUtils.h"
 #include "shaderGen/shaderGenVars.h"
