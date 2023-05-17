@@ -262,6 +262,7 @@ endif()
 target_compile_definitions(
 	${MODULE_NAME}
 	INTERFACE
+		TORQUE_COLLADA
 		TORQUE_SHADERGEN
 		TORQUE_UNICODE
 )
