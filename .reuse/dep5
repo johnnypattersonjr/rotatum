@@ -11,12 +11,6 @@ Copyright: Copyright (c) 2012 GarageGames, LLC
 License: MIT
 
 Files:
-	Templates/Empty/game/core/scripts/client/lighting/advanced/shadowViz.gui
-	Templates/Empty/game/core/unifiedShell/GamepadButtonsGui.gui
-	Templates/Empty/game/core/unifiedShell/MainMenuGui.gui
-	Templates/Empty/game/core/unifiedShell/ObjectPickerGui.gui
-	Templates/Empty/game/core/unifiedShell/OptionsGui.gui
-	Templates/Empty/game/tools/guiEditor/gui/guiEditor.ed.gui
 	Templates/Full/game/core/scripts/client/lighting/advanced/shadowViz.gui
 	Templates/Full/game/core/unifiedShell/GamepadButtonsGui.gui
 	Templates/Full/game/core/unifiedShell/MainMenuGui.gui
@@ -27,7 +21,6 @@ Copyright: Copyright (C) GarageGames.com, Inc.
 License: MIT
 
 Files:
-	Templates/Empty/game/tools/particleEditor/ParticleEditor.ed.gui
 	Templates/Full/game/tools/particleEditor/ParticleEditor.ed.gui
 Copyright: Copyright GarageGames, LLC 2011
 License: MIT
@@ -102,7 +95,6 @@ Copyright: Copyright (c) 2006, Creative Labs Inc. All rights reserved.
 License: BSD-3-Clause
 
 Files:
-	Templates/Empty/game/shaders/common/postFx/fxaa/Fxaa3_11.h
 	Templates/Full/game/shaders/common/postFx/fxaa/Fxaa3_11.h
 Copyright: COPYRIGHT (C) 2010, 2011 NVIDIA CORPORATION. ALL RIGHTS RESERVED.
 License: LicenseRef-Nvidia-Fxaa-3.11-sample
@@ -115,7 +107,6 @@ License: BSD-2-Clause
 Files:
 	.gitattributes
 	.gitignore
-	Templates/Empty/.gitignore
 	Templates/Full/.gitignore
 	Tools/dae2dts/.gitignore
 Copyright: Copyright (c) Johnny Patterson
@@ -130,7 +121,6 @@ Files:
 	Engine/source/CMakeLists.txt
 	Engine/source/*.cmake
 	Templates/CMakeLists.txt
-	Templates/Empty/CMakeLists.txt
 	Templates/Full/CMakeLists.txt
 	Tools/CMakeLists.txt
 	Tools/dae2dts/CMakeLists.txt
