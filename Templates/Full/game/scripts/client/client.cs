@@ -173,27 +173,3 @@ function clientCmdtoggleVehicleMap(%toggle)
       moveMap.push();
    }
 }
-
-// ----------------------------------------------------------------------------
-// Turret Support
-// ----------------------------------------------------------------------------
-
-// Call by the Turret class when a player mounts or unmounts it.
-// %turret = The turret that was mounted
-// %player = The player doing the mounting
-// %mounted = True if the turret was mounted, false if it was unmounted
-function turretMountCallback(%turret, %player, %mounted)
-{
-   //echo ( "\c4turretMountCallback -> " @ %mounted );
-
-   if (%mounted)
-   {
-      // Push the action map
-      turretMap.push();
-   }
-   else
-   {
-      // Pop the action map
-      turretMap.pop();
-   }
-}

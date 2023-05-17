@@ -53,9 +53,6 @@ exec("./vehicle.cs");
 exec("./vehicleWheeled.cs");
 exec("./cheetah.cs");
 
-// Load turret support scripts
-exec("./turret.cs");
-
 // Load our gametypes
 exec("./gameCore.cs"); // This is the 'core' of the gametype functionality.
 exec("./gameDM.cs"); // Overrides GameCore with DeathMatch functionality.

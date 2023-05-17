@@ -34,7 +34,6 @@ add_engine_src_dir(
 	T3D/gameBase
 	T3D/physics
 	T3D/sfx
-	T3D/turret
 	T3D/vehicles
 	terrain
 	ts

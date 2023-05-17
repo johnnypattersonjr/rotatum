@@ -1036,28 +1036,6 @@ function ItemData::create(%data)
    return %obj;
 }
 
-function TurretShapeData::create(%block)
-{
-   %obj = new TurretShape() {
-      dataBlock = %block;
-      static = true;
-      respawn = true;
-      parentGroup = EWCreatorWindow.objectGroup;
-   };
-   return %obj;
-}
-
-function AITurretShapeData::create(%block)
-{
-   %obj = new AITurretShape() {
-      dataBlock = %block;
-      static = true;
-      respawn = true;
-      parentGroup = EWCreatorWindow.objectGroup;
-   };
-   return %obj;
-}
-
 function WheeledVehicleData::create(%block)
 {
    %obj = new WheeledVehicle() {

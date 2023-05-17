@@ -56,7 +56,6 @@ addEngineSrcDir('T3D/physics');
 addEngineSrcDir('T3D/decal');
 addEngineSrcDir('T3D/sfx');
 addEngineSrcDir('T3D/gameBase');
-addEngineSrcDir('T3D/turret');
 
 global $TORQUE_HIFI_NET;
 if ( $TORQUE_HIFI_NET == true )

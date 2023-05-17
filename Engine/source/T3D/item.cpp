@@ -171,9 +171,7 @@ void ItemData::initPersistFields()
       "If set to true then only simple, server-side collision detection will be used.  This is often the case "
       "if the item is used for a pick up object, such as ammo.  If set to false then a full collision volume "
       "will be used as defined by the shape.  The default is true.\n"
-      "@note Only applies when using a physics library.\n"
-      "@see TurretShape and ProximityMine for examples that should set this to false to allow them to be "
-      "shot by projectiles.\n");
+      "@note Only applies when using a physics library.\n");
 
    Parent::initPersistFields();
 }

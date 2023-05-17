@@ -635,9 +635,6 @@ function GameCore::loadOut(%game, %player)
    %player.setInventory(ProxMine, %player.maxInventory(ProxMine));
    %player.addToWeaponCycle(ProxMine);
 
-   %player.setInventory(DeployableTurret, %player.maxInventory(DeployableTurret));
-   %player.addToWeaponCycle(DeployableTurret);
-   
    if (%player.getDatablock().mainWeapon.image !$= "")
    {
       %player.mountImage(%player.getDatablock().mainWeapon.image, 0);
@@ -878,17 +875,6 @@ function GameCore::spawnPlayer(%game, %client, %spawnPoint, %noControl)
    // future reference
    %player.client = %client;
    
-   // If the player's client has some owned turrets, make sure we let them
-   // know that we're a friend too.
-   if (%client.ownedTurrets)
-   {
-      for (%i=0; %i<%client.ownedTurrets.getCount(); %i++)
-      {
-         %turret = %client.ownedTurrets.getObject(%i);
-         %turret.addToIgnoreList(%player);
-      }
-   }
-
    // Player setup...
    if (%player.isMethod("setShapeName"))
       %player.setShapeName(%client.playerName);

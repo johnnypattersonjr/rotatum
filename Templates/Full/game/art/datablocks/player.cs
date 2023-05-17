@@ -669,8 +669,6 @@ datablock PlayerData(DefaultPlayerData)
 
    maxInv[ProxMine] = 5;
 
-   maxInv[DeployableTurret] = 5;
-
    // available skins (see materials.cs in model folder)
    availableSkins =  "base	DarkBlue	DarkGreen	LightGreen	Orange	Red	Teal	Violet	Yellow";
 };
