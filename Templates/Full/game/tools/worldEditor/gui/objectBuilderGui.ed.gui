@@ -1090,15 +1090,3 @@ function PhysicsShapeData::create( %datablock )
 
    return %obj;
 }
-
-function ProximityMineData::create( %datablock )
-{
-   %obj = new ProximityMine()
-   {
-      dataBlock = %dataBlock;
-      parentGroup = EWCreatorWindow.objectGroup;
-      static = true;    // mines created by the editor are static, and armed immediately
-   };
-
-   return %obj;
-}

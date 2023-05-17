@@ -632,9 +632,6 @@ function GameCore::loadOut(%game, %player)
    %player.setInventory(LurkerGrenadeAmmo, %player.maxInventory(LurkerGrenadeAmmo));
    %player.addToWeaponCycle(LurkerGrenadeLauncher);
 
-   %player.setInventory(ProxMine, %player.maxInventory(ProxMine));
-   %player.addToWeaponCycle(ProxMine);
-
    if (%player.getDatablock().mainWeapon.image !$= "")
    {
       %player.mountImage(%player.getDatablock().mainWeapon.image, 0);

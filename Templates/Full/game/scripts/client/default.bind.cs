@@ -493,7 +493,6 @@ moveMap.bindCmd(keyboard, "ctrl k", "commandToServer('suicide');", "");
 moveMap.bindCmd(keyboard, "1", "commandToServer('use',\"Ryder\");", "");
 moveMap.bindCmd(keyboard, "2", "commandToServer('use',\"Lurker\");", "");
 moveMap.bindCmd(keyboard, "3", "commandToServer('use',\"LurkerGrenadeLauncher\");", "");
-moveMap.bindCmd(keyboard, "4", "commandToServer('use',\"ProxMine\");", "");
 
 moveMap.bindCmd(keyboard, "r", "commandToServer('reloadWeapon');", "");
 

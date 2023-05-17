@@ -667,8 +667,6 @@ datablock PlayerData(DefaultPlayerData)
    maxInv[Ryder] = 1;
    maxInv[RyderClip] = 10;
 
-   maxInv[ProxMine] = 5;
-
    // available skins (see materials.cs in model folder)
    availableSkins =  "base	DarkBlue	DarkGreen	LightGreen	Orange	Red	Teal	Violet	Yellow";
 };

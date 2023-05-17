@@ -41,7 +41,6 @@ exec("./weapon.cs");
 exec("./rocketLauncher.cs");
 exec("./soldierGun.cs");
 exec("./grenadeLauncher.cs");
-exec("./proximityMine.cs");
 
 // Load our default player script
 exec("./player.cs");

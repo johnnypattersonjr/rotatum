@@ -46,7 +46,6 @@ exec("./weapons/grenade.cs");
 exec("./weapons/rocketLauncher.cs");
 exec("./weapons/Lurker.cs");
 exec("./weapons/Ryder.cs");
-exec("./weapons/ProxMine.cs");
 
 exec("./teleporter.cs");
 
