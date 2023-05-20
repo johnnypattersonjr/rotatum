@@ -435,6 +435,7 @@ public:
       }
 
       void setStringValue(const char *value);
+      friend class Dictionary;
    };
 
     struct HashTableData
