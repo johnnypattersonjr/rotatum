@@ -2424,7 +2424,7 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K ) >
    returnType class::name ## _callback args                                                                                                  \
    {                                                                                                                                         \
       if( cb ## class ## _ ## name ) {                                                                                                       \
-         _EngineCallbackHelper cbh( this, reinterpret_cast< const void* >( cb ## class ## _ ## name ) );                                     \
+         _EngineCallbackHelper cbh( this, reinterpret_cast< void* >( cb ## class ## _ ## name ) );                                           \
          return returnType( cbh.call< returnType > argNames );                                                                               \
       }                                                                                                                                      \
       if( engineAPI::gUseConsoleInterop )                                                                                                    \
@@ -2507,7 +2507,7 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K ) >
    returnType class::name ## _callback args                                                                                                  \
    {                                                                                                                                         \
       if( cb ## class ## _ ## name ) {                                                                                                       \
-         _EngineCallbackHelper cbh( this, reinterpret_cast< const void* >( cb ## class ## _ ## name ) );                                     \
+         _EngineCallbackHelper cbh( this, reinterpret_cast< void* >( cb ## class ## _ ## name ) ) .    ;                                     \
          return returnType( cbh.call< returnType > argNames );                                                                               \
       }                                                                                                                                      \
       return returnType();                                                                                                                   \
@@ -2520,11 +2520,11 @@ struct _EngineCallbackHelper
    protected:
     
       EngineObject* mThis;
-      const void* mFn;
+      void* mFn;
             
    public:
 
-      _EngineCallbackHelper( EngineObject* pThis, const void* fn )
+      _EngineCallbackHelper( EngineObject* pThis, void* fn )
          : mThis( pThis ),
            mFn( fn ) {}
       
