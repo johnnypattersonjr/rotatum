@@ -15,6 +15,22 @@ function(add_engine_src_dir target)
 			${ENGINE_DIR}/${dir}/*.h
 			${ENGINE_DIR}/${dir}/*.hpp
 		)
+		if(ENGINE_PLATFORM_MAC)
+			list(
+				APPEND dirs
+				${ENGINE_DIR}/${dir}/*.mm
+			)
+			file(
+				GLOB resource-files
+				LIST_DIRECTORIES TRUE
+				${ENGINE_DIR}/${dir}/*.nib
+			)
+			if(resource-files)
+				set_source_files_properties(${resource-files} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+				source_group("Resources" FILES ${resource-files})
+				target_sources(${target} INTERFACE ${resource-files})
+			endif()
+		endif()
 	endforeach()
 	file(
 		GLOB files

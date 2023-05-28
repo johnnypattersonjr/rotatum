@@ -23,6 +23,14 @@ if(ENGINE_PLATFORM_MAC)
 		${MODULE_NAME}
 		sfx/openal/mac
 	)
+
+	find_library(OPENAL_LIBRARY OpenAL REQUIRED)
+
+	target_link_libraries(
+		${MODULE_NAME}
+		INTERFACE
+			${OPENAL_LIBRARY}
+	)
 elseif(ENGINE_PLATFORM_WIN32)
 	add_engine_src_dir(
 		${MODULE_NAME}

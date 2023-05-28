@@ -94,6 +94,20 @@ elseif(ENGINE_PLATFORM_MAC)
 		shaderGen/glsl
 		windowManager/mac
 	)
+
+	find_library(AGL_LIBRARY AGL REQUIRED)
+	find_library(CARBON_LIBRARY Carbon REQUIRED)
+	find_library(COCOA_LIBRARY Cocoa REQUIRED)
+	find_library(OPENGL_LIBRARY OpenGL REQUIRED)
+
+	target_link_libraries(
+		${MODULE_NAME}
+		INTERFACE
+			${AGL_LIBRARY}
+			${CARBON_LIBRARY}
+			${COCOA_LIBRARY}
+			${OPENGL_LIBRARY}
+	)
 elseif(ENGINE_PLATFORM_WIN32)
 	add_engine_src_dir(
 		${MODULE_NAME}

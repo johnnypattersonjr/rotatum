@@ -20,6 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#if TORQUE_PLATFORM_WINDOWS
+
 #include "platformWin32/platformWin32.h"
 #include "gfx/gfxCubemap.h"
 #include "gfx/screenshot.h"
@@ -401,3 +403,5 @@ void GFXGLWindowTarget::_teardownCurrentMode()
 void GFXGLWindowTarget::_setupNewMode()
 {
 }
+
+#endif

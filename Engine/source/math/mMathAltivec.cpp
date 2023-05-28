@@ -23,12 +23,13 @@
 // This file is Mac specific.
 #if defined( __APPLE__ )
 
-#include <vecLib/vecLib.h>
 #include "math/mMathFn.h"
 #include "console/console.h"
 #include "platform/profiler.h"
 
 #if defined( __VEC__ )
+#include <vecLib/vecLib.h>
+
 
 // tests show BLAS to be about 4x slower than aligned altivec, 3x slower than unaligned altivec code below.
 

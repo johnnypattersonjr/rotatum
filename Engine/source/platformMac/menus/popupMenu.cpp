@@ -298,9 +298,10 @@ void PopupMenu::checkRadioItem(S32 firstPos, S32 lastPos, S32 checkPos)
 
 bool PopupMenu::isItemChecked(S32 pos)
 {
+   static const CharParameter kCheckMark = 18;
    CharParameter mark;
    GetItemMark(mData->mMenu, pos, &mark);
-   return (mark == checkMark);
+   return (mark == kCheckMark);
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -23,11 +23,16 @@
 #ifndef _MACVIEW_H_
 #define _MACVIEW_H_
 
+#include <Availability.h>
 #import <Cocoa/Cocoa.h>
 #include "windowManager/mac/macWindow.h"
 
 /// GGMacView handles displaying content and responding to user input.
+#ifdef __MAC_10_6
+@interface GGMacView : NSOpenGLView <NSApplicationDelegate, NSWindowDelegate>
+#else
 @interface GGMacView : NSOpenGLView
+#endif
 {
    MacWindow* mTorqueWindow;
    U32 mLastMods;

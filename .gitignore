@@ -1,3 +1,5 @@
+.DS_Store
 .vs*/
+*.app/
 *.sw*
 build*/

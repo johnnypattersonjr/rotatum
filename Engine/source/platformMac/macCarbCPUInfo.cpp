@@ -196,6 +196,7 @@ void Processor::init()
 			Platform::SystemInfo.processor.type = CPU_PowerPC_G3;
 			Platform::SystemInfo.processor.name = StringTable->insert("PowerPC G5");
 			break;
+      #ifdef CPUFAMILY_INTEL_614_
 		case CPUFAMILY_INTEL_6_14:
 			Platform::SystemInfo.processor.type = CPU_Intel_Core;
          if( ncpu == 2 )
@@ -203,6 +204,8 @@ void Processor::init()
          else
             Platform::SystemInfo.processor.name = StringTable->insert("Intel Core");
 			break;
+      #endif
+      #ifdef CPUFAMILY_INTEL_6_15
       #ifdef CPUFAMILY_INTEL_6_23
       case CPUFAMILY_INTEL_6_23:
       #endif
@@ -213,6 +216,7 @@ void Processor::init()
          else
             Platform::SystemInfo.processor.name = StringTable->insert("Intel Core 2 Duo");
 			break;
+      #endif
          
       #ifdef CPUFAMILY_INTEL_6_26
       case CPUFAMILY_INTEL_6_26:
