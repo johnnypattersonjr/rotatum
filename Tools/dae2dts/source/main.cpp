@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -72,14 +73,17 @@ Torque::Path makeFullPath( const char* path )
    return Torque::Path( String( tempBuf ) );
 }
 
-S32 TorqueMain( S32 argc, const char **argv )
+S32 TorqueInit( S32 argc, const char **argv )
 {
    S32 failed = 0;
 
    // Initialize the subsystems.
    StandardMainLoop::init();
    Con::setVariable( "Con::Prompt", "" );
+
+#ifdef TORQUE_OS_WIN32
    WindowsConsole->enable( true );
+#endif
 
    // install all drives for now until we have everything using the volume stuff
    Platform::FS::InstallFileSystems();
@@ -156,7 +160,7 @@ S32 TorqueMain( S32 argc, const char **argv )
    Resource<TSShape> shape = ResourceManager::get().load( srcPath );
    if ( !shape )
    {
-      Con::errorf( "Failed to convert DAE file: %s\n", srcPath.getFullPath() );
+      Con::errorf( "Failed to convert DAE file: %s\n", srcPath.getFullPath().c_str() );
       failed = 1;
    }
    else
@@ -215,6 +219,16 @@ S32 TorqueMain( S32 argc, const char **argv )
       }
    }
 
+   return failed;
+}
+
+bool TorqueTick()
+{
+   return false;
+}
+
+S32 TorqueShutdown( S32 exitCode )
+{
    // Clean everything up.
    StandardMainLoop::shutdown();
 
@@ -222,5 +236,5 @@ S32 TorqueMain( S32 argc, const char **argv )
    if( StandardMainLoop::requiresRestart() )
       Platform::restartInstance();
 
-   return failed;
+   return exitCode;
 }

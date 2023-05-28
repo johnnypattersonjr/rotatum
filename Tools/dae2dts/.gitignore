@@ -11,6 +11,7 @@
 *.pdb
 buildFiles/
 game/core/fonts/
+game/dae2dts
 game/shaders/procedural/
 banlist.cs
 config.cs
