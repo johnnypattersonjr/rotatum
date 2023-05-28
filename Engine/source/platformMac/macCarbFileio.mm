@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -598,7 +599,14 @@ StringTableEntry Platform::getExecutablePath()
          string = [[NSBundle mainBundle] bundlePath];
       
       string = [string stringByDeletingLastPathComponent];
-      AssertISV(isMainDotCsPresent(string), "Platform::getExecutablePath - Failed to find main.cs!");
+
+      if (!isMainDotCsPresent(string))
+      {
+         cwd = buf;
+         [pool release];
+         return cwd;
+      }
+
       cwd = dStrdup([string UTF8String]);
       chdir(cwd);
       [pool release];
