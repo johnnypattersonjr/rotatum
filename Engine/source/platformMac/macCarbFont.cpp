@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -45,16 +46,26 @@ PlatformFont *createPlatformFont(const char *name, U32 size, U32 charset /* = TG
 //------------------------------------------------------------------------------
 MacCarbFont::MacCarbFont()
 {
+#if MAC_USE_CORE_TEXT
+   mFont = NULL;
+#else
    mStyle   = NULL;
    mLayout  = NULL;
+#endif
+
    mColorSpace = NULL;
 }
 
 MacCarbFont::~MacCarbFont()
 {
+#if MAC_USE_CORE_TEXT
+   CFRelease(mFont);
+#else
    // apple docs say we should dispose the layout first.
    ATSUDisposeTextLayout(mLayout);
    ATSUDisposeStyle(mStyle);
+#endif
+
    CGColorSpaceRelease(mColorSpace);
 }
 
@@ -71,12 +82,14 @@ bool MacCarbFont::create( const char* name, U32 size, U32 charset)
    // But do we need it to translate encodings? hmm...
 
    CFStringRef       cfsName;
-   ATSUFontID        atsuFontID;
+   ATSFontMetrics    fontMetrics;
+
+#if !MAC_USE_CORE_TEXT
    ATSFontRef        atsFontRef;
+   ATSUFontID        atsuFontID;
    Fixed             atsuSize;
    ATSURGBAlphaColor black;
-   ATSFontMetrics    fontMetrics;
-   U32               scaledSize;
+#endif
    
    bool              isBold = false;
    bool              isItalic = false;
@@ -105,7 +118,34 @@ bool MacCarbFont::create( const char* name, U32 size, U32 charset)
    if(!cfsName)
       Con::errorf("Error: could not make a cfstring out of \"%s\" ",nameStr.c_str());
       
-   atsFontRef =  ATSFontFindFromName( cfsName, kATSOptionFlagsDefault);
+   size = mFloor(((double)size) * 72.0 / 96.0);
+   mSize = size;
+
+#if MAC_USE_CORE_TEXT
+   CTFontDescriptorRef fontDesc = CTFontDescriptorCreateWithNameAndSize(cfsName, size);
+   CTFontDescriptorRef lastFontDesc;
+
+   if (isBold)
+   {
+      lastFontDesc = fontDesc;
+      fontDesc = CTFontDescriptorCreateCopyWithSymbolicTraits(lastFontDesc, kCTFontBoldTrait, kCTFontBoldTrait);
+      CFRelease(lastFontDesc);
+   }
+
+   if (isItalic)
+   {
+      lastFontDesc = fontDesc;
+      fontDesc = CTFontDescriptorCreateCopyWithSymbolicTraits(lastFontDesc, kCTFontItalicTrait, kCTFontItalicTrait);
+      CFRelease(lastFontDesc);
+   }
+
+   mFont = CTFontCreateWithFontDescriptor(fontDesc, size, NULL);
+   CFRelease(fontDesc);
+
+   fontMetrics.ascent = CTFontGetAscent(mFont) / size;
+   fontMetrics.descent = CTFontGetDescent(mFont) / size * -1.0;
+#else
+   atsFontRef = ATSFontFindFromName( cfsName, kATSOptionFlagsDefault);
    atsuFontID = FMGetFontFromATSFontRef( atsFontRef);
 
    // make sure we found it. ATSFontFindFromName() appears to return 0 if it cant find anything. Apple docs contain no info on error returns.
@@ -115,13 +155,8 @@ bool MacCarbFont::create( const char* name, U32 size, U32 charset)
       return false;
    }
 
-   // adjust the size. win dpi = 96, mac dpi = 72. 72/96 = .75
-   // Interestingly enough, 0.75 is not what makes things the right size.
-   scaledSize = size - 2 - (int)((float)size * 0.1);
-   mSize = scaledSize;
-   
    // Set up the size and color. We send these to ATSUSetAttributes().
-   atsuSize = IntToFixed(scaledSize);
+   atsuSize = IntToFixed(size);
    black.red = black.green = black.blue = black.alpha = 1.0;
 
    // Three parrallel arrays for setting up font, size, and color attributes.
@@ -159,9 +194,11 @@ bool MacCarbFont::create( const char* name, U32 size, U32 charset)
    
    // get font metrics, save our baseline and height
    ATSFontGetHorizontalMetrics(atsFontRef, kATSOptionFlagsDefault, &fontMetrics);
-   mBaseline = scaledSize * fontMetrics.ascent;
-   mHeight   = scaledSize * ( fontMetrics.ascent - fontMetrics.descent + fontMetrics.leading ) + 1;
-   
+#endif
+
+   mBaseline = size * fontMetrics.ascent;
+   mHeight = size * (fontMetrics.ascent - fontMetrics.descent);
+
    // cache our grey color space, so we dont have to re create it every time.
    mColorSpace = CGColorSpaceCreateDeviceGray();
    
@@ -186,6 +223,13 @@ bool MacCarbFont::isValidChar( const UTF16 ch) const
    if( ch < 0x20 )
       return false;
 
+#if MAC_USE_CORE_TEXT
+   CGGlyph cgGlyphs[1] = { 0 };
+   UniChar chUniChar[1] = { ch };
+   if (!CTFontGetGlyphsForCharacters(mFont, chUniChar, cgGlyphs, 1))
+      return false;
+#endif
+
    return true;
 }
 
@@ -198,11 +242,9 @@ PlatformFont::CharInfo& MacCarbFont::getCharInfo(const UTF16 ch) const
 {
    // We use some static data here to avoid re allocating the same variable in a loop.
    // this func is primarily called by GFont::loadCharInfo(),
-   Rect                 imageRect;
-   CGContextRef         imageCtx;
-   U32                  bitmapDataSize;
-   ATSUTextMeasurement  tbefore, tafter, tascent, tdescent;
-   OSStatus             err;
+   Rect         imageRect;
+   CGContextRef imageCtx;
+   U32          bitmapDataSize;
 
    // 16 bit character buffer for the ATUSI calls.
    // -- hey... could we cache this at the class level, set style and loc *once*, 
@@ -213,11 +255,26 @@ PlatformFont::CharInfo& MacCarbFont::getCharInfo(const UTF16 ch) const
    // Declare and clear out the CharInfo that will be returned.
    static PlatformFont::CharInfo c;
    dMemset(&c, 0, sizeof(c));
-   
-   // prep values for GFont::addBitmap()
-   c.bitmapIndex = 0;
-   c.xOffset = 0;
-   c.yOffset = 0;
+
+#if MAC_USE_CORE_TEXT
+   CGRect cgImageRect;
+   CGGlyph cgGlyphs[1] = { 0 };
+   if (!CTFontGetGlyphsForCharacters(mFont, chUniChar, cgGlyphs, 1))
+      return c;
+
+   CTFontGetBoundingRectsForGlyphs(mFont, kCTFontOrientationDefault, cgGlyphs, &cgImageRect, 1);
+
+   imageRect.left = mFloor(cgImageRect.origin.x);
+   imageRect.right = mCeil(cgImageRect.origin.x + cgImageRect.size.width);
+   imageRect.top = mCeil(cgImageRect.origin.y); // Things look bettter with ceil instead of floor here for some reason.
+   imageRect.bottom = mCeil(cgImageRect.origin.y + cgImageRect.size.height);
+
+   CGSize cgAdvance;
+   CTFontGetAdvancesForGlyphs(mFont, kCTFontOrientationDefault, cgGlyphs, &cgAdvance, 1);
+   c.xIncrement = mCeil(cgAdvance.width);
+#else
+   ATSUTextMeasurement tbefore, tafter, tascent, tdescent;
+   OSStatus err;
 
    // put the text in the layout.
    // we've hardcoded a string length of 1 here, but this could work for longer strings... (hint hint)
@@ -232,12 +289,22 @@ PlatformFont::CharInfo& MacCarbFont::getCharInfo(const UTF16 ch) const
    // find out how big of a bitmap we'll need.
    // as a bonus, we also get the origin where we should draw, encoded in the Rect.
    ATSUMeasureTextImage( mLayout, 0, 1, 0, 0, &imageRect);
-   U32 xFudge = 2;
-   U32 yFudge = 1;
+#endif
+
+   int xFudge = 2;
+   int yFudge = 2;
+   int xoff = xFudge / 2;
+   int yoff = yFudge / 2;
+
    c.width  = imageRect.right - imageRect.left + xFudge; // add 2 because small fonts don't always have enough room
    c.height = imageRect.bottom - imageRect.top + yFudge;
-   c.xOrigin = imageRect.left; // dist x0 -> center line
-   c.yOrigin = -imageRect.top; // dist y0 -> base line
+   c.xOrigin = imageRect.left - xoff; // dist x0 -> center line
+
+#if MAC_USE_CORE_TEXT
+   c.yOrigin = imageRect.bottom + yoff; // dist y0 -> base line
+#else
+   c.yOrigin = -imageRect.top + yoff; // dist y0 -> base line
+#endif
    
    // kick out early if the character is undrawable
    if( c.width == xFudge || c.height == yFudge)
@@ -269,6 +336,12 @@ PlatformFont::CharInfo& MacCarbFont::getCharInfo(const UTF16 ch) const
    CGContextSetGrayFillColor( imageCtx, 1.0, 1.0);
    CGContextSetTextDrawingMode( imageCtx,  kCGTextFill);
    
+#if MAC_USE_CORE_TEXT
+   CGPoint positions[1];
+   positions[0].x = -imageRect.left + xoff;
+   positions[0].y = -imageRect.top + yoff;
+   CTFontDrawGlyphs(mFont, cgGlyphs, positions, 1, imageCtx);
+#else
    // tell ATSUI to substitute fonts as needed for missing glyphs
    ATSUSetTransientFontMatching(mLayout, true); 
 
@@ -282,22 +355,21 @@ PlatformFont::CharInfo& MacCarbFont::getCharInfo(const UTF16 ch) const
    ATSUSetLayoutControls( mLayout, 1, theTags, theSizes, theValues );
 
    // Draw the character!
-   int yoff = c.height < 3 ? 1 : 0; // kludge for 1 pixel high characters, such as '-' and '_'
-   int xoff = 1;
    err = ATSUDrawText( mLayout, 0, 1, IntToFixed(-imageRect.left + xoff), IntToFixed(imageRect.bottom + yoff ) );
-   CGContextRelease(imageCtx);
    
    if(err != noErr) {
       Con::errorf("Error: could not draw the character! Drawing a blank box.");
       dMemset(c.bitmapData,0x0F,bitmapDataSize);
    }
 
-
 #if TORQUE_DEBUG
 //   Con::printf("Font Metrics: Rect = %2i %2i %2i %2i  Char= %C, 0x%x  Size= %i, Baseline= %i, Height= %i",imageRect.top, imageRect.bottom, imageRect.left, imageRect.right,ch,ch, mSize,mBaseline, mHeight);
 //   Con::printf("Font Bounds:  left= %2i right= %2i  Char= %C, 0x%x  Size= %i",FixedToInt(tbefore), FixedToInt(tafter), ch,ch, mSize);
 #endif
-      
+#endif
+
+   CGContextRelease(imageCtx);
+
    return c;
 }
 
@@ -305,8 +377,11 @@ void PlatformFont::enumeratePlatformFonts( Vector< StringTableEntry >& fonts, UT
 {
    if( fontFamily )
    {
+#if MAC_USE_CORE_TEXT
+      AssertFatal(false, "Not implemented.");
+#else
       // Determine the font ID from the family name.
-      
+
       ATSUFontID fontID;
       if( ATSUFindFontFromName(
             fontFamily,
@@ -435,6 +510,7 @@ void PlatformFont::enumeratePlatformFonts( Vector< StringTableEntry >& fonts, UT
       }
       
       delete [] fontIDs;
+#endif
    }
 }
 

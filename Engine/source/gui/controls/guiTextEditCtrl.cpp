@@ -1415,11 +1415,6 @@ void GuiTextEditCtrl::drawText( const RectI &drawRect, bool isFocused )
          }
       }
       cursorStart.x = mTextOffset.x + cursorOffset;
-
-#ifdef TORQUE_OS_MAC
-      cursorStart.x += charWidth/2;
-#endif
-      
       cursorEnd.x = cursorStart.x;
 
       S32 cursorHeight = mProfile->mFont->getHeight();

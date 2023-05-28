@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,16 +22,27 @@
 //-----------------------------------------------------------------------------
 
 #include <ApplicationServices/ApplicationServices.h>
+#include <Availability.h>
 #include "platform/platformFont.h"
 
+#ifdef __MAC_10_8
+#define MAC_USE_CORE_TEXT 1
+#else
+#define MAC_USE_CORE_TEXT 0
+#endif
 
 class MacCarbFont : public PlatformFont
 {
 private:
+#if MAC_USE_CORE_TEXT
+   CTFontRef mFont;
+#else
    // Caches style, layout and colorspace data to speed up character drawing.
    // TODO: style colors
    ATSUStyle      mStyle;       
-   ATSUTextLayout mLayout;       
+   ATSUTextLayout mLayout;
+#endif
+
    CGColorSpaceRef mColorSpace;
    
    // Cache the baseline and height for the getter methods below.
