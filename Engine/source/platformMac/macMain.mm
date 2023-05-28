@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,18 +22,22 @@
 //-----------------------------------------------------------------------------
 
 #include <Cocoa/Cocoa.h>
-#include "app/mainLoop.h"
 #include "platform/platformInput.h"
 #include <IOKit/ps/IOPowerSources.h>
 #include <IOKit/ps/IOPSKeys.h>
 #include "console/console.h"
 #include "platform/threads/thread.h"
 
+extern S32 TorqueInit(S32 argc, const char **argv);
+extern bool TorqueTick();
+extern S32 TorqueShutdown(S32 exitCode);
+
 @interface MainLoopTimerHandler : NSObject
 {
    U32 argc;
    const char** argv;
    NSTimeInterval interval;
+   S32 exitCode;
 }
    +(id)startTimerWithintervalMs:(U32)intervalMs argc:(U32)_argc argv:(const char**)_argv;
    -(void)firstFire:(NSTimer*)theTimer;
@@ -41,29 +46,21 @@
 @implementation MainLoopTimerHandler
    -(void)firstFire:(NSTimer*)theTimer
    {
-      StandardMainLoop::init();
-      StandardMainLoop::handleCommandLine(argc, argv);
-      [NSTimer scheduledTimerWithTimeInterval:interval target:self selector:@selector(fireTimer:) userInfo:nil repeats:YES];
+      exitCode = TorqueInit(argc, argv);
+      if (!exitCode)
+         [NSTimer scheduledTimerWithTimeInterval:interval target:self selector:@selector(fireTimer:) userInfo:nil repeats:YES];
+      else
+         exitCode = TorqueShutdown(exitCode);
    }
    -(void)fireTimer:(NSTimer*)theTimer
    {
-      if(!StandardMainLoop::doMainLoop())
+      if(!TorqueTick())
       {
-         StandardMainLoop::shutdown();
+         exitCode = TorqueShutdown(exitCode);
          [theTimer invalidate];
          [NSApp setDelegate:nil];
          [NSApp terminate:self];
       }
-//      if(!mainLoop || !mainLoop->mainLoop())
-//      {
-//         // stop the timer from firing again
-//         if(mainLoop)
-//            mainLoop->shutdown();
-//            
-//         [theTimer invalidate];
-//         [NSApp setDelegate:nil];
-//         [NSApp terminate:self];
-//      }
    }
    +(id)startTimerWithintervalMs:(U32)intervalMs argc:(U32)_argc argv:(const char**)_argv
    {
@@ -83,6 +80,14 @@
 //-----------------------------------------------------------------------------
 S32 main(S32 argc, const char **argv)
 {   
+#ifdef DAE2DTS_TOOL
+   S32 exitCode = TorqueInit(argc, argv);
+
+   if (!exitCode)
+      while (TorqueTick());
+
+   return TorqueShutdown(exitCode);
+#else
    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
    // get command line and text file args, filter them
@@ -100,6 +105,7 @@ S32 main(S32 argc, const char **argv)
    [pool release];
 
    return appReturn;
+#endif
 }
 
 #pragma mark ---- Init funcs  ----

@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -115,9 +116,16 @@ void Platform::shutdown()
 }
 
 //------------------------------------------------------------------------------
-extern S32 TorqueMain(S32 argc, const char **argv);
+extern S32 TorqueInit(S32 argc, const char **argv);
+extern bool TorqueTick();
+extern S32 TorqueShutdown(S32 exitCode);
 
 int main(int argc, const char **argv)
 {
-   return TorqueMain(argc, argv);
+   S32 exitCode = TorqueInit(argc, argv);
+
+   if (!exitCode)
+      while (TorqueTick());
+
+   return TorqueShutdown(exitCode);
 }

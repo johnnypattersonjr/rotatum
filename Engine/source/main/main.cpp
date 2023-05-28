@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,7 +30,7 @@
 // This is build by default using the "StandardMainLoop" toolkit. Feel free
 // to bring code over directly as you need to modify or extend things. You
 // will need to merge against future changes to the SML code if you do this.
-S32 TorqueMain(S32 argc, const char **argv)
+S32 TorqueInit(S32 argc, const char **argv)
 {
    // Some handy debugging code:
    //   if (argc == 1) {
@@ -52,9 +53,16 @@ S32 TorqueMain(S32 argc, const char **argv)
       return 1;
    }
 
-   // Main loop
-   while(StandardMainLoop::doMainLoop());
+   return 0;
+}
 
+bool TorqueTick()
+{
+   return StandardMainLoop::doMainLoop();
+}
+
+S32 TorqueShutdown(S32 exitCode)
+{
    // Clean everything up.
    StandardMainLoop::shutdown();
 
@@ -62,6 +70,5 @@ S32 TorqueMain(S32 argc, const char **argv)
    if( StandardMainLoop::requiresRestart() )
       Platform::restartInstance();
 
-   // Return.
-   return 0;
+   return exitCode;
 }
