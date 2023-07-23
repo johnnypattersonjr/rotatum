@@ -24,7 +24,6 @@
 #include "app/game.h"
 
 #include "platform/platformTimer.h"
-#include "platform/platformRedBook.h"
 #include "platform/platformVolume.h"
 #include "platform/platformMemory.h"
 #include "platform/platformTimer.h"
@@ -244,7 +243,6 @@ void StandardMainLoop::init()
    Processor::init();
    Math::init();
    Platform::init();    // platform specific initialization
-   RedBook::init();
    Platform::initConsole();
    
    ThreadPool::GlobalThreadPool::createSingleton();
@@ -319,8 +317,6 @@ void StandardMainLoop::shutdown()
 #ifdef TORQUE_ENABLE_VFS
    closeEmbeddedVFSArchive();
 #endif
-
-   RedBook::destroy();
 
    Platform::shutdown();
    

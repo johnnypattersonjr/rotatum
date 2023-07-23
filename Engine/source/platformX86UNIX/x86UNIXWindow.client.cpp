@@ -70,8 +70,6 @@ static U32 lastTimeTick;
 static MRandomLCG sgPlatRandom;
 
 #ifndef DEDICATED
-extern void InstallRedBookDevices();
-extern void PollRedbookDevices();
 extern bool InitOpenGL();
 // This is called when some X client sends 
 // a selection event (e.g. SelectionRequest)
@@ -590,11 +588,6 @@ void Platform::process()
       // process input events
       PROFILE_START(XUX_InputProcess);
       Input::process();
-      PROFILE_END();
-
-      // poll redbook state
-      PROFILE_START(XUX_PollRedbookDevices);
-      PollRedbookDevices();
       PROFILE_END();
 
       // if we're not the foreground window, sleep for 1 ms

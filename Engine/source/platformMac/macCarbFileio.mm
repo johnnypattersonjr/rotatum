@@ -501,12 +501,6 @@ bool Platform::createPath(const char *file)
 }
 
 
-//-----------------------------------------------------------------------------
-bool Platform::cdFileExists(const char *filePath, const char *volumeName, S32 serialNum)
-{
-   return true;
-}
-
 #pragma mark ---- Directories ----
 //-----------------------------------------------------------------------------
 StringTableEntry Platform::getCurrentDirectory()

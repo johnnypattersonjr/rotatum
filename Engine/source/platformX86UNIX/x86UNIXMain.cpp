@@ -47,8 +47,6 @@ void Platform::init()
 
    Input::init();
 
-   //installRedBookDevices();
-
 #if 0
 #ifndef DEDICATED
    // if we're not dedicated do more initialization

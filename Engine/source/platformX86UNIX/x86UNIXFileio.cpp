@@ -889,13 +889,6 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
     return true;
  }
 
- // JMQ: Platform:cdFileExists in unimplemented
- //------------------------------------------------------------------------------
- // bool Platform::cdFileExists(const char *filePath, const char *volumeName,
- //    S32 serialNum)
- // {
- // }
-
  //-----------------------------------------------------------------------------
  bool Platform::dumpPath(const char *path, Vector<Platform::FileInfo> &fileVector, int depth)
  {

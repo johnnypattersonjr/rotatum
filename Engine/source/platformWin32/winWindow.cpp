@@ -40,8 +40,6 @@
 
 extern void createFontInit();
 extern void createFontShutdown();
-extern void installRedBookDevices();
-extern void handleRedBookCallback(U32, U32);
 
 static MRandomLCG sgPlatRandom;
 static bool sgQueueEvents;
@@ -260,8 +258,6 @@ void Platform::init()
       Input::init();
 
    InitInput();   // in case DirectInput falls through
-
-   installRedBookDevices();
 
    sgDoubleByteEnabled = GetSystemMetrics( SM_DBCSENABLED );
    sgQueueEvents = true;

@@ -218,7 +218,6 @@ namespace Platform
    void closeWindow();
 
    // File stuff
-   bool doCDCheck();
    StringTableEntry createPlatformFriendlyFilename(const char *filename);
    struct FileInfo
    {
@@ -226,7 +225,6 @@ namespace Platform
       const char* pFileName;
       U32 fileSize;
    };
-   bool cdFileExists(const char *filePath, const char *volumeName, S32 serialNum);
    void fileToLocalTime(const FileTime &ft, LocalTime *lt);
    /// compare file times returns < 0 if a is earlier than b, >0 if b is earlier than a
    S32 compareFileTimes(const FileTime &a, const FileTime &b);
