@@ -5,5 +5,13 @@
 cmake_minimum_required(VERSION 3.25)
 project(rotatum)
 
-add_subdirectory(Templates)
-add_subdirectory(Tools)
+option(BUILD_TEMPLATES "" ON)
+option(BUILD_TOOLS "" ON)
+
+if(BUILD_TEMPLATES)
+	add_subdirectory(Templates)
+endif()
+
+if(BUILD_TOOLS)
+	add_subdirectory(Tools)
+endif()
