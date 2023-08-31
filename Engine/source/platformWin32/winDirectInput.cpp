@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -567,7 +568,7 @@ bool DInputManager::rumble( const char *pDeviceName, float x, float y )
    }
 }
 
-void DInputManager::buildXInputEvent( U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, float fValue )
+void DInputManager::buildXInputEvent( U32 deviceInst, InputEventType objType, S32 objInst, U8 action, float fValue )
 {
    InputEventInfo newEvent;
 
@@ -594,11 +595,11 @@ inline void DInputManager::fireXInputConnectEvent( int controllerID, bool condit
 #ifdef LOG_INPUT
       Input::log( "EVENT (XInput): xinput%d CONNECT %s\n", controllerID, connected ? "make" : "break" );
 #endif
-      buildXInputEvent( controllerID, SI_BUTTON, XI_CONNECT, connected ? SI_MAKE : SI_BREAK, 0);
+      buildXInputEvent( controllerID, SI_BUTTON, XI_CONNECT, connected ? GLFW_PRESS : GLFW_RELEASE, 0);
    }
 }
 
-inline void DInputManager::fireXInputMoveEvent( int controllerID, bool condition, InputObjectInstances objInst, float fValue )
+inline void DInputManager::fireXInputMoveEvent( int controllerID, bool condition, S32 objInst, float fValue )
 {
    if ( mXInputStateReset || condition )
    {
@@ -621,7 +622,7 @@ inline void DInputManager::fireXInputMoveEvent( int controllerID, bool condition
    }
 }
 
-inline void DInputManager::fireXInputButtonEvent( int controllerID, bool forceFire, int button, InputObjectInstances objInst )
+inline void DInputManager::fireXInputButtonEvent( int controllerID, bool forceFire, int button, S32 objInst )
 {
    if ( mXInputStateReset || forceFire || ((mXInputStateNew[controllerID].state.Gamepad.wButtons & button) != (mXInputStateOld[controllerID].state.Gamepad.wButtons & button)) )
    {
@@ -650,8 +651,8 @@ inline void DInputManager::fireXInputButtonEvent( int controllerID, bool forceFi
 
       Input::log( "EVENT (XInput): xinput%d %s %s\n", controllerID, objName, ((mXInputStateNew[controllerID].state.Gamepad.wButtons & button) != 0) ? "make" : "break" );
 #endif
-      InputActionType action = ((mXInputStateNew[controllerID].state.Gamepad.wButtons & button) != 0) ? SI_MAKE : SI_BREAK;
-      buildXInputEvent( controllerID, SI_BUTTON, objInst, action, ( action == SI_MAKE ? 1 : 0 ) );
+      U8 action = ((mXInputStateNew[controllerID].state.Gamepad.wButtons & button) != 0) ? GLFW_PRESS : GLFW_RELEASE;
+      buildXInputEvent( controllerID, SI_BUTTON, objInst, action, ( action == GLFW_PRESS ? 1 : 0 ) );
    }
 }
 

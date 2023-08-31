@@ -48,25 +48,6 @@ MacWindowManager::~MacWindowManager()
    for(U32 i = 0; i < mWindowList.size(); i++)
       delete mWindowList[i];
    mWindowList.clear();
-   
-   CGReleaseDisplayFadeReservation(mFadeToken);
-}
-
-RectI MacWindowManager::getPrimaryDesktopArea()
-{
-   // Get the area of the main desktop that isn't taken by the dock or menu bar.
-   return convertCGRectToRectI([[NSScreen mainScreen] visibleFrame]);
-}
-
-void MacWindowManager::getMonitorRegions(Vector<RectI> &regions)
-{
-   // Populate a vector with all monitors and their extents in window space.
-   NSArray *screenList = [NSScreen screens];
-   for(U32 i = 0; i < [screenList count]; i++)
-   {
-      NSRect screenBounds = [[screenList objectAtIndex: i] frame];
-      regions.push_back(convertCGRectToRectI(screenBounds));
-   }
 }
 
 S32 MacWindowManager::getDesktopBitDepth()
@@ -128,40 +109,6 @@ PlatformWindow* MacWindowManager::getWindowById(WindowId zid)
    return NULL;
 }
 
-void MacWindowManager::lowerCurtain()
-{
-   // fade all displays.
-   CGError err;
-   err = CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &mFadeToken);
-   AssertWarn(!err, "MacWindowManager::lowerCurtain() could not get a token");
-   if(err) return;
-   
-   err = CGDisplayFade(mFadeToken, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, true);
-   AssertWarn(!err, "MacWindowManager::lowerCurtain() failed the fade");
-   if(err) return;
-   
-   // we do not release the token, because that will un-fade the screen!
-   // the token will last for 15 sec, and then the screen will un-fade regardless.
-   //CGReleaseDisplayFadeReservation(mFadeToken);
-}
-
-void MacWindowManager::raiseCurtain()
-{
-   // release the fade on all displays
-   CGError err;
-   err = CGDisplayFade(mFadeToken, 0.3, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, false);
-   AssertWarn(!err, "MacWindowManager::raiseCurtain() failed the fade");
-   
-   err = CGReleaseDisplayFadeReservation(mFadeToken);
-   AssertWarn(!err, "MacWindowManager::raiseCurtain() failed releasing the token");
-}
-
-
-void MacWindowManager::_processCmdLineArgs(const S32 argc, const char **argv)
-{
-   // TODO: accept command line args if necessary.
-}
-
 PlatformWindow *MacWindowManager::createWindow(GFXDevice *device, const GFXVideoMode &mode)
 {
    MacWindow* window = new MacWindow(getNextId(), getEngineProductString(), mode.resolution);
@@ -196,10 +143,6 @@ void MacWindowManager::_addWindow(MacWindow* window)
    for(U32 i = 0; i < mWindowList.size(); i++)
       AssertFatal(window != mWindowList[i], "MacWindowManager::_addWindow - Should not add a window more than once");
 #endif
-   if (mWindowList.size() > 0)
-      window->mNextWindow = mWindowList.last();
-   else
-      window->mNextWindow = NULL;
 
    mWindowList.push_back(window);
    window->mOwningWindowManager = this;

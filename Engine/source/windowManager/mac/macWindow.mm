@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -324,17 +325,6 @@ void MacWindow::show()
    appEvent.trigger(getWindowId(), GainFocus);
 }
 
-void MacWindow::close()
-{
-   [mCocoaWindow close];
-   appEvent.trigger(mWindowId, LoseFocus);
-   appEvent.trigger(mWindowId, WindowDestroy);
-   
-   mOwningWindowManager->_removeWindow(this);
-   
-   delete this;
-}
-
 void MacWindow::hide()
 {
    [mCocoaWindow orderOut:nil];
@@ -347,47 +337,17 @@ void MacWindow::setDisplay(CGDirectDisplayID display)
    mDisplayBounds = CGDisplayBounds(mDisplay);
 }
 
-PlatformWindow* MacWindow::getNextWindow() const
-{
-   return mNextWindow;
-}
-
-bool MacWindow::setSize(const Point2I &newSize)
+void MacWindow::setSize(const Point2I &size)
 {
    if (sSafariWindowInfo)
-      return true;
+      return;
       
-   NSSize newExtent = {newSize.x, newSize.y};
+   NSSize newExtent = {size.x, size.y};
    [mCocoaWindow setContentSize:newExtent];
    [mCocoaWindow center];
-   return true;
 }
 
-void MacWindow::setClientExtent( const Point2I newExtent )
-{
-   if(!mFullscreen)
-   {
-      // Set the Client Area Extent (Resolution) of this window
-      NSSize newSize = {newExtent.x, newExtent.y};
-      [mCocoaWindow setContentSize:newSize];
-   }
-   else
-   {
-      // In fullscreen we have to resize the monitor (it'll be good to change it back too...)
-      if(!mDefaultDisplayMode)
-         mDefaultDisplayMode = (NSDictionary*)CGDisplayCurrentMode(mDisplay);
-      
-      NSDictionary* newMode = (NSDictionary*)CGDisplayBestModeForParameters(mDisplay, 32, newExtent.x, newExtent.y, NULL);
-      Con::printf("Switching to new display mode... width: %i height: %i bpp: %i", 
-                  [[newMode valueForKey:@"Width"] intValue], [[newMode valueForKey:@"Height"] intValue], [[newMode valueForKey:@"BitsPerPixel"] intValue]); 
-      CGDisplaySwitchToMode(mDisplay, (CFDictionaryRef)newMode);
-      mDisplayBounds = CGDisplayBounds(mDisplay);
-      if(mDisplay == kCGDirectMainDisplay)
-         mMainDisplayBounds = mDisplayBounds;
-   }
-}
-
-const Point2I MacWindow::getClientExtent()
+Point2I MacWindow::getClientExtent() const
 {
    if(!mFullscreen)
    {
@@ -401,13 +361,7 @@ const Point2I MacWindow::getClientExtent()
    }
 }
 
-void MacWindow::setBounds( const RectI &newBounds )
-{
-   NSRect newFrame = NSMakeRect(newBounds.point.x, newBounds.point.y, newBounds.extent.x, newBounds.extent.y);
-   [mCocoaWindow setFrame:newFrame display:YES];
-}
-
-const RectI MacWindow::getBounds() const
+RectI MacWindow::getBounds() const
 {
    if(!mFullscreen)
    {
@@ -421,16 +375,16 @@ const RectI MacWindow::getBounds() const
    }
 }
 
-void MacWindow::setPosition( const Point2I newPosition )
+void MacWindow::setPosition(const Point2I &position)
 {
    NSScreen *screen = [mCocoaWindow screen];
    NSRect screenFrame = [screen frame];
 
-   NSPoint pos = {newPosition.x, newPosition.y + screenFrame.size.height};
+   NSPoint pos = {position.x, position.y + screenFrame.size.height};
    [mCocoaWindow setFrameTopLeftPoint: pos];
 }
 
-const Point2I MacWindow::getPosition()
+Point2I MacWindow::getPosition() const
 {
    NSScreen *screen = [mCocoaWindow screen];
    NSRect screenFrame = [screen frame];
@@ -444,34 +398,12 @@ void MacWindow::centerWindow()
    [mCocoaWindow center];
 }
 
-Point2I MacWindow::clientToScreen( const Point2I& pos )
-{
-   NSPoint p = { pos.x, pos.y };
-   
-   p = [ mCocoaWindow convertBaseToScreen: p ];
-   return Point2I( p.x, p.y );
-}
-
-Point2I MacWindow::screenToClient( const Point2I& pos )
-{
-   NSPoint p = { pos.x, pos.y };
-   
-   p = [ mCocoaWindow convertScreenToBase: p ];
-   return Point2I( p.x, p.y );
-}
-
-bool MacWindow::isFocused()
+bool MacWindow::isFocused() const
 {
    return [mCocoaWindow isKeyWindow];
 }
 
-bool MacWindow::isOpen()
-{
-   // Maybe check if _window != NULL ?
-   return true;
-}
-
-bool MacWindow::isVisible()
+bool MacWindow::isVisible() const
 {
    return !isMinimized() && ([mCocoaWindow isVisible] == YES);
 }
@@ -515,12 +447,12 @@ void MacWindow::restore()
    appEvent.trigger(getWindowId(), WindowShown);
 }
 
-bool MacWindow::isMinimized()
+bool MacWindow::isMinimized() const
 {
    return [mCocoaWindow isMiniaturized] == YES;
 }
 
-bool MacWindow::isMaximized()
+bool MacWindow::isMaximized() const
 {
    return false;
 }
@@ -534,11 +466,10 @@ void MacWindow::clearFocus()
    // TODO: find out if we can do anything correct here. We are instructed *not* to call [NSWindow resignKeyWindow], and we don't necessarily have another window to assign as key.
 }
 
-bool MacWindow::setCaption(const char* windowText)
+void MacWindow::setTitle(const char* title)
 {
-   mTitle = windowText;
+   mTitle = title;
    [mCocoaWindow setTitle:[NSString stringWithUTF8String:mTitle]];
-   return true;
 }
 
 void MacWindow::_doMouseLockNow()

@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -473,14 +474,14 @@ bool DInputDevice::enumerateObjects()
       if ( mObjInstance[i].guidType == GUID_Button )
       {
          mObjInfo[i].mType = SI_BUTTON;
-         mObjInfo[i].mInst = (InputObjectInstances)(KEY_BUTTON0 + buttonCount++);
+         mObjInfo[i].mInst = GLFW_MOUSE_BUTTON_1 + buttonCount++;
       }
       else if ( mObjInstance[i].guidType == GUID_POV )
       {
          // This is actually intentional - the POV handling code lower down
          // takes the instance number and converts everything to button events.
          mObjInfo[i].mType = SI_POV;
-         mObjInfo[i].mInst = (InputObjectInstances)povCount++;
+         mObjInfo[i].mInst = povCount++;
       }
       else if ( mObjInstance[i].guidType == GUID_XAxis )
       {
@@ -532,7 +533,7 @@ bool DInputDevice::enumerateObjects()
       else
       {
          mObjInfo[i].mType = SI_UNKNOWN;
-         mObjInfo[i].mInst = (InputObjectInstances)unknownCount++;
+         mObjInfo[i].mInst = unknownCount++;
       }
 
       // Set the device object's min and max values:
@@ -832,7 +833,7 @@ static void _Win32LogPOVInput(InputEventInfo &newEvent)
 {
 
    U32 inst = 0xffff;
-   const char* sstate = ( newEvent.action == SI_MAKE ) ? "pressed" : "released";
+   const char* sstate = ( newEvent.action == GLFW_PRESS ) ? "pressed" : "released";
    const char* dir = "";
    switch( newEvent.objInst )
    {
@@ -868,7 +869,7 @@ bool DInputDevice::buildEvent( DWORD offset, S32 newData, S32 oldData )
    newEvent.deviceInst  = mDeviceID;
    newEvent.objType     = objInfo.mType;
    newEvent.objInst     = objInfo.mInst;
-   newEvent.modifier    = (InputModifiers)0;
+   newEvent.modifier    = 0;
 
    switch ( newEvent.objType )
    {
@@ -937,14 +938,14 @@ bool DInputDevice::buildEvent( DWORD offset, S32 newData, S32 oldData )
          break;
 
       case SI_BUTTON:
-         newEvent.action   = ( newData & 0x80 ) ? SI_MAKE : SI_BREAK;
-         newEvent.fValue   = ( newEvent.action == SI_MAKE ) ? 1.0f : 0.0f;
+         newEvent.action   = ( newData & 0x80 ) ? GLFW_PRESS : GLFW_RELEASE;
+         newEvent.fValue   = ( newEvent.action == GLFW_PRESS ) ? 1.0f : 0.0f;
 
 #ifdef LOG_INPUT
-         if ( newEvent.action == SI_MAKE )
-            Input::log( "EVENT (DInput): %s button%d pressed.\n", mName, newEvent.objInst - KEY_BUTTON0 );
+         if ( newEvent.action == GLFW_PRESS )
+            Input::log( "EVENT (DInput): %s button%d pressed.\n", mName, newEvent.objInst - GLFW_MOUSE_BUTTON_1 );
          else
-            Input::log( "EVENT (DInput): %s button%d released.\n", mName, newEvent.objInst - KEY_BUTTON0 );
+            Input::log( "EVENT (DInput): %s button%d released.\n", mName, newEvent.objInst - GLFW_MOUSE_BUTTON_1 );
 #endif
 
          newEvent.postToSignal(Input::smInputEvent);
@@ -973,7 +974,7 @@ bool DInputDevice::buildEvent( DWORD offset, S32 newData, S32 oldData )
          {
             if ( clearkeys )
             {
-               newEvent.action = SI_BREAK;
+               newEvent.action = GLFW_RELEASE;
                newEvent.fValue = 0.0f;
                // post events for all buttons that need to be cleared.
                if( clearkeys & POV_up)
@@ -1005,7 +1006,7 @@ bool DInputDevice::buildEvent( DWORD offset, S32 newData, S32 oldData )
 
             if ( setkeys )
             {
-               newEvent.action = SI_MAKE;
+               newEvent.action = GLFW_PRESS;
                newEvent.fValue = 1.0f;
                // post events for all buttons that need to be set.
                if( setkeys & POV_up)
@@ -1152,112 +1153,112 @@ void DInputDevice::rumble(float x, float y)
 // internal key code (as defined in event.h).
 //
 //------------------------------------------------------------------------------
-InputObjectInstances DIK_to_Key( U8 dikCode )
+S32 DIK_to_Key( U8 dikCode )
 {
    switch ( dikCode )
    {
-      case DIK_ESCAPE:        return KEY_ESCAPE;
+      case DIK_ESCAPE:        return GLFW_KEY_ESCAPE;
 
-      case DIK_1:             return KEY_1;
-      case DIK_2:             return KEY_2;
-      case DIK_3:             return KEY_3;
-      case DIK_4:             return KEY_4;
-      case DIK_5:             return KEY_5;
-      case DIK_6:             return KEY_6;
-      case DIK_7:             return KEY_7;
-      case DIK_8:             return KEY_8;
-      case DIK_9:             return KEY_9;
-      case DIK_0:             return KEY_0;
+      case DIK_1:             return GLFW_KEY_1;
+      case DIK_2:             return GLFW_KEY_2;
+      case DIK_3:             return GLFW_KEY_3;
+      case DIK_4:             return GLFW_KEY_4;
+      case DIK_5:             return GLFW_KEY_5;
+      case DIK_6:             return GLFW_KEY_6;
+      case DIK_7:             return GLFW_KEY_7;
+      case DIK_8:             return GLFW_KEY_8;
+      case DIK_9:             return GLFW_KEY_9;
+      case DIK_0:             return GLFW_KEY_0;
 
-      case DIK_MINUS:         return KEY_MINUS;
-      case DIK_EQUALS:        return KEY_EQUALS;
-      case DIK_BACK:          return KEY_BACKSPACE;
-      case DIK_TAB:           return KEY_TAB;
+      case DIK_MINUS:         return GLFW_KEY_MINUS;
+      case DIK_EQUALS:        return GLFW_KEY_EQUAL;
+      case DIK_BACK:          return GLFW_KEY_BACKSPACE;
+      case DIK_TAB:           return GLFW_KEY_TAB;
 
-      case DIK_Q:             return KEY_Q;
-      case DIK_W:             return KEY_W;
-      case DIK_E:             return KEY_E;
-      case DIK_R:             return KEY_R;
-      case DIK_T:             return KEY_T;
-      case DIK_Y:             return KEY_Y;
-      case DIK_U:             return KEY_U;
-      case DIK_I:             return KEY_I;
-      case DIK_O:             return KEY_O;
-      case DIK_P:             return KEY_P;
+      case DIK_Q:             return GLFW_KEY_Q;
+      case DIK_W:             return GLFW_KEY_W;
+      case DIK_E:             return GLFW_KEY_E;
+      case DIK_R:             return GLFW_KEY_R;
+      case DIK_T:             return GLFW_KEY_T;
+      case DIK_Y:             return GLFW_KEY_Y;
+      case DIK_U:             return GLFW_KEY_U;
+      case DIK_I:             return GLFW_KEY_I;
+      case DIK_O:             return GLFW_KEY_O;
+      case DIK_P:             return GLFW_KEY_P;
 
-      case DIK_LBRACKET:      return KEY_LBRACKET;
-      case DIK_RBRACKET:      return KEY_RBRACKET;
-      case DIK_RETURN:        return KEY_RETURN;
-      case DIK_LCONTROL:      return KEY_LCONTROL;
+      case DIK_LBRACKET:      return GLFW_KEY_LEFT_BRACKET;
+      case DIK_RBRACKET:      return GLFW_KEY_RIGHT_BRACKET;
+      case DIK_RETURN:        return GLFW_KEY_ENTER;
+      case DIK_LCONTROL:      return GLFW_KEY_LEFT_CONTROL;
 
-      case DIK_A:             return KEY_A;
-      case DIK_S:             return KEY_S;
-      case DIK_D:             return KEY_D;
-      case DIK_F:             return KEY_F;
-      case DIK_G:             return KEY_G;
-      case DIK_H:             return KEY_H;
-      case DIK_J:             return KEY_J;
-      case DIK_K:             return KEY_K;
-      case DIK_L:             return KEY_L;
+      case DIK_A:             return GLFW_KEY_A;
+      case DIK_S:             return GLFW_KEY_S;
+      case DIK_D:             return GLFW_KEY_D;
+      case DIK_F:             return GLFW_KEY_F;
+      case DIK_G:             return GLFW_KEY_G;
+      case DIK_H:             return GLFW_KEY_H;
+      case DIK_J:             return GLFW_KEY_J;
+      case DIK_K:             return GLFW_KEY_K;
+      case DIK_L:             return GLFW_KEY_L;
 
-      case DIK_SEMICOLON:     return KEY_SEMICOLON;
-      case DIK_APOSTROPHE:    return KEY_APOSTROPHE;
-      case DIK_GRAVE:         return KEY_TILDE;
-      case DIK_LSHIFT:        return KEY_LSHIFT;
-      case DIK_BACKSLASH:     return KEY_BACKSLASH;
+      case DIK_SEMICOLON:     return GLFW_KEY_SEMICOLON;
+      case DIK_APOSTROPHE:    return GLFW_KEY_APOSTROPHE;
+      case DIK_GRAVE:         return GLFW_KEY_GRAVE_ACCENT;
+      case DIK_LSHIFT:        return GLFW_KEY_LEFT_SHIFT;
+      case DIK_BACKSLASH:     return GLFW_KEY_BACKSLASH;
 
-      case DIK_Z:             return KEY_Z;
-      case DIK_X:             return KEY_X;
-      case DIK_C:             return KEY_C;
-      case DIK_V:             return KEY_V;
-      case DIK_B:             return KEY_B;
-      case DIK_N:             return KEY_N;
-      case DIK_M:             return KEY_M;
+      case DIK_Z:             return GLFW_KEY_Z;
+      case DIK_X:             return GLFW_KEY_X;
+      case DIK_C:             return GLFW_KEY_C;
+      case DIK_V:             return GLFW_KEY_V;
+      case DIK_B:             return GLFW_KEY_B;
+      case DIK_N:             return GLFW_KEY_N;
+      case DIK_M:             return GLFW_KEY_M;
 
-      case DIK_COMMA:         return KEY_COMMA;
-      case DIK_PERIOD:        return KEY_PERIOD;
-      case DIK_SLASH:         return KEY_SLASH;
-      case DIK_RSHIFT:        return KEY_RSHIFT;
-      case DIK_MULTIPLY:      return KEY_MULTIPLY;
-      case DIK_LALT:          return KEY_LALT;
-      case DIK_SPACE:         return KEY_SPACE;
-      case DIK_CAPSLOCK:      return KEY_CAPSLOCK;
+      case DIK_COMMA:         return GLFW_KEY_COMMA;
+      case DIK_PERIOD:        return GLFW_KEY_PERIOD;
+      case DIK_SLASH:         return GLFW_KEY_SLASH;
+      case DIK_RSHIFT:        return GLFW_KEY_RIGHT_SHIFT;
+      case DIK_MULTIPLY:      return GLFW_KEY_KP_MULTIPLY;
+      case DIK_LALT:          return GLFW_KEY_LEFT_ALT;
+      case DIK_SPACE:         return GLFW_KEY_SPACE;
+      case DIK_CAPSLOCK:      return GLFW_KEY_CAPS_LOCK;
 
-      case DIK_F1:            return KEY_F1;
-      case DIK_F2:            return KEY_F2;
-      case DIK_F3:            return KEY_F3;
-      case DIK_F4:            return KEY_F4;
-      case DIK_F5:            return KEY_F5;
-      case DIK_F6:            return KEY_F6;
-      case DIK_F7:            return KEY_F7;
-      case DIK_F8:            return KEY_F8;
-      case DIK_F9:            return KEY_F9;
-      case DIK_F10:           return KEY_F10;
+      case DIK_F1:            return GLFW_KEY_F1;
+      case DIK_F2:            return GLFW_KEY_F2;
+      case DIK_F3:            return GLFW_KEY_F3;
+      case DIK_F4:            return GLFW_KEY_F4;
+      case DIK_F5:            return GLFW_KEY_F5;
+      case DIK_F6:            return GLFW_KEY_F6;
+      case DIK_F7:            return GLFW_KEY_F7;
+      case DIK_F8:            return GLFW_KEY_F8;
+      case DIK_F9:            return GLFW_KEY_F9;
+      case DIK_F10:           return GLFW_KEY_F10;
 
-      case DIK_NUMLOCK:       return KEY_NUMLOCK;
-      case DIK_SCROLL:        return KEY_SCROLLLOCK;
+      case DIK_NUMLOCK:       return GLFW_KEY_NUM_LOCK;
+      case DIK_SCROLL:        return GLFW_KEY_SCROLL_LOCK;
 
-      case DIK_NUMPAD7:       return KEY_NUMPAD7;
-      case DIK_NUMPAD8:       return KEY_NUMPAD8;
-      case DIK_NUMPAD9:       return KEY_NUMPAD9;
-      case DIK_SUBTRACT:      return KEY_SUBTRACT;
+      case DIK_NUMPAD7:       return GLFW_KEY_KP_7;
+      case DIK_NUMPAD8:       return GLFW_KEY_KP_8;
+      case DIK_NUMPAD9:       return GLFW_KEY_KP_9;
+      case DIK_SUBTRACT:      return GLFW_KEY_KP_SUBTRACT;
 
-      case DIK_NUMPAD4:       return KEY_NUMPAD4;
-      case DIK_NUMPAD5:       return KEY_NUMPAD5;
-      case DIK_NUMPAD6:       return KEY_NUMPAD6;
-      case DIK_ADD:           return KEY_ADD;
+      case DIK_NUMPAD4:       return GLFW_KEY_KP_4;
+      case DIK_NUMPAD5:       return GLFW_KEY_KP_5;
+      case DIK_NUMPAD6:       return GLFW_KEY_KP_6;
+      case DIK_ADD:           return GLFW_KEY_KP_ADD;
 
-      case DIK_NUMPAD1:       return KEY_NUMPAD1;
-      case DIK_NUMPAD2:       return KEY_NUMPAD2;
-      case DIK_NUMPAD3:       return KEY_NUMPAD3;
-      case DIK_NUMPAD0:       return KEY_NUMPAD0;
-      case DIK_DECIMAL:       return KEY_DECIMAL;
+      case DIK_NUMPAD1:       return GLFW_KEY_KP_1;
+      case DIK_NUMPAD2:       return GLFW_KEY_KP_2;
+      case DIK_NUMPAD3:       return GLFW_KEY_KP_3;
+      case DIK_NUMPAD0:       return GLFW_KEY_KP_0;
+      case DIK_DECIMAL:       return GLFW_KEY_KP_DECIMAL;
 
-      case DIK_F11:           return KEY_F11;
-      case DIK_F12:           return KEY_F12;
-      case DIK_F13:           return KEY_F13;
-      case DIK_F14:           return KEY_F14;
-      case DIK_F15:           return KEY_F15;
+      case DIK_F11:           return GLFW_KEY_F11;
+      case DIK_F12:           return GLFW_KEY_F12;
+      case DIK_F13:           return GLFW_KEY_F13;
+      case DIK_F14:           return GLFW_KEY_F14;
+      case DIK_F15:           return GLFW_KEY_F15;
 
       case DIK_KANA:          return KEY_NULL;
       case DIK_CONVERT:       return KEY_NULL;
@@ -1273,28 +1274,28 @@ InputObjectInstances DIK_to_Key( U8 dikCode )
       case DIK_AX:            return KEY_NULL;
       case DIK_UNLABELED:     return KEY_NULL;
 
-      case DIK_NUMPADENTER:   return KEY_NUMPADENTER;
-      case DIK_RCONTROL:      return KEY_RCONTROL;
+      case DIK_NUMPADENTER:   return GLFW_KEY_KP_ENTER;
+      case DIK_RCONTROL:      return GLFW_KEY_RIGHT_CONTROL;
       case DIK_NUMPADCOMMA:   return KEY_SEPARATOR;
-      case DIK_DIVIDE:        return KEY_DIVIDE;
-      case DIK_SYSRQ:         return KEY_PRINT;
-      case DIK_RALT:          return KEY_RALT;
-      case DIK_PAUSE:         return KEY_PAUSE;
+      case DIK_DIVIDE:        return GLFW_KEY_KP_DIVIDE;
+      case DIK_SYSRQ:         return GLFW_KEY_PRINT_SCREEN;
+      case DIK_RALT:          return GLFW_KEY_RIGHT_ALT;
+      case DIK_PAUSE:         return GLFW_KEY_PAUSE;
 
-      case DIK_HOME:          return KEY_HOME;
-      case DIK_UP:            return KEY_UP;
-      case DIK_PGUP:          return KEY_PAGE_UP;
-      case DIK_LEFT:          return KEY_LEFT;
-      case DIK_RIGHT:         return KEY_RIGHT;
-      case DIK_END:           return KEY_END;
-      case DIK_DOWN:          return KEY_DOWN;
-      case DIK_PGDN:          return KEY_PAGE_DOWN;
-      case DIK_INSERT:        return KEY_INSERT;
-      case DIK_DELETE:        return KEY_DELETE;
+      case DIK_HOME:          return GLFW_KEY_HOME;
+      case DIK_UP:            return GLFW_KEY_UP;
+      case DIK_PGUP:          return GLFW_KEY_PAGE_UP;
+      case DIK_LEFT:          return GLFW_KEY_LEFT;
+      case DIK_RIGHT:         return GLFW_KEY_RIGHT;
+      case DIK_END:           return GLFW_KEY_END;
+      case DIK_DOWN:          return GLFW_KEY_DOWN;
+      case DIK_PGDN:          return GLFW_KEY_PAGE_DOWN;
+      case DIK_INSERT:        return GLFW_KEY_INSERT;
+      case DIK_DELETE:        return GLFW_KEY_DELETE;
 
-      case DIK_LWIN:          return KEY_WIN_LWINDOW;
-      case DIK_RWIN:          return KEY_WIN_RWINDOW;
-      case DIK_APPS:          return KEY_WIN_APPS;
+      case DIK_LWIN:          return GLFW_KEY_LEFT_SUPER;
+      case DIK_RWIN:          return GLFW_KEY_RIGHT_SUPER;
+      case DIK_APPS:          return GLFW_KEY_MENU;
       case DIK_OEM_102:       return KEY_OEM_102;
    }
 
@@ -1311,136 +1312,136 @@ U8 Key_to_DIK( U16 keyCode )
 {
    switch ( keyCode )
    {
-      case KEY_BACKSPACE:     return DIK_BACK;
-      case KEY_TAB:           return DIK_TAB;
-      case KEY_RETURN:        return DIK_RETURN;
-      //KEY_CONTROL:
-      //KEY_ALT:
-      //KEY_SHIFT:
-      case KEY_PAUSE:         return DIK_PAUSE;
-      case KEY_CAPSLOCK:      return DIK_CAPSLOCK;
-      case KEY_ESCAPE:        return DIK_ESCAPE;
+      case GLFW_KEY_BACKSPACE:     return DIK_BACK;
+      case GLFW_KEY_TAB:           return DIK_TAB;
+      case GLFW_KEY_ENTER:         return DIK_RETURN;
+      //GLFW_MOD_CONTROL:
+      //GLFW_MOD_ALT:
+      //GLFW_MOD_SHIFT:
+      case GLFW_KEY_PAUSE:         return DIK_PAUSE;
+      case GLFW_KEY_CAPS_LOCK:     return DIK_CAPSLOCK;
+      case GLFW_KEY_ESCAPE:        return DIK_ESCAPE;
 
-      case KEY_SPACE:         return DIK_SPACE;
-      case KEY_PAGE_DOWN:     return DIK_PGDN;
-      case KEY_PAGE_UP:       return DIK_PGUP;
-      case KEY_END:           return DIK_END;
-      case KEY_HOME:          return DIK_HOME;
-      case KEY_LEFT:          return DIK_LEFT;
-      case KEY_UP:            return DIK_UP;
-      case KEY_RIGHT:         return DIK_RIGHT;
-      case KEY_DOWN:          return DIK_DOWN;
-      case KEY_PRINT:         return DIK_SYSRQ;
-      case KEY_INSERT:        return DIK_INSERT;
-      case KEY_DELETE:        return DIK_DELETE;
-      case KEY_HELP:          return 0;
+      case GLFW_KEY_SPACE:         return DIK_SPACE;
+      case GLFW_KEY_PAGE_DOWN:     return DIK_PGDN;
+      case GLFW_KEY_PAGE_UP:       return DIK_PGUP;
+      case GLFW_KEY_END:           return DIK_END;
+      case GLFW_KEY_HOME:          return DIK_HOME;
+      case GLFW_KEY_LEFT:          return DIK_LEFT;
+      case GLFW_KEY_UP:            return DIK_UP;
+      case GLFW_KEY_RIGHT:         return DIK_RIGHT;
+      case GLFW_KEY_DOWN:          return DIK_DOWN;
+      case GLFW_KEY_PRINT_SCREEN:  return DIK_SYSRQ;
+      case GLFW_KEY_INSERT:        return DIK_INSERT;
+      case GLFW_KEY_DELETE:        return DIK_DELETE;
+      case KEY_HELP:               return 0;
 
-      case KEY_0:             return DIK_0;
-      case KEY_1:             return DIK_1;
-      case KEY_2:             return DIK_2;
-      case KEY_3:             return DIK_3;
-      case KEY_4:             return DIK_4;
-      case KEY_5:             return DIK_5;
-      case KEY_6:             return DIK_6;
-      case KEY_7:             return DIK_7;
-      case KEY_8:             return DIK_8;
-      case KEY_9:             return DIK_9;
+      case GLFW_KEY_0:             return DIK_0;
+      case GLFW_KEY_1:             return DIK_1;
+      case GLFW_KEY_2:             return DIK_2;
+      case GLFW_KEY_3:             return DIK_3;
+      case GLFW_KEY_4:             return DIK_4;
+      case GLFW_KEY_5:             return DIK_5;
+      case GLFW_KEY_6:             return DIK_6;
+      case GLFW_KEY_7:             return DIK_7;
+      case GLFW_KEY_8:             return DIK_8;
+      case GLFW_KEY_9:             return DIK_9;
 
-      case KEY_A:             return DIK_A;
-      case KEY_B:             return DIK_B;
-      case KEY_C:             return DIK_C;
-      case KEY_D:             return DIK_D;
-      case KEY_E:             return DIK_E;
-      case KEY_F:             return DIK_F;
-      case KEY_G:             return DIK_G;
-      case KEY_H:             return DIK_H;
-      case KEY_I:             return DIK_I;
-      case KEY_J:             return DIK_J;
-      case KEY_K:             return DIK_K;
-      case KEY_L:             return DIK_L;
-      case KEY_M:             return DIK_M;
-      case KEY_N:             return DIK_N;
-      case KEY_O:             return DIK_O;
-      case KEY_P:             return DIK_P;
-      case KEY_Q:             return DIK_Q;
-      case KEY_R:             return DIK_R;
-      case KEY_S:             return DIK_S;
-      case KEY_T:             return DIK_T;
-      case KEY_U:             return DIK_U;
-      case KEY_V:             return DIK_V;
-      case KEY_W:             return DIK_W;
-      case KEY_X:             return DIK_X;
-      case KEY_Y:             return DIK_Y;
-      case KEY_Z:             return DIK_Z;
+      case GLFW_KEY_A:             return DIK_A;
+      case GLFW_KEY_B:             return DIK_B;
+      case GLFW_KEY_C:             return DIK_C;
+      case GLFW_KEY_D:             return DIK_D;
+      case GLFW_KEY_E:             return DIK_E;
+      case GLFW_KEY_F:             return DIK_F;
+      case GLFW_KEY_G:             return DIK_G;
+      case GLFW_KEY_H:             return DIK_H;
+      case GLFW_KEY_I:             return DIK_I;
+      case GLFW_KEY_J:             return DIK_J;
+      case GLFW_KEY_K:             return DIK_K;
+      case GLFW_KEY_L:             return DIK_L;
+      case GLFW_KEY_M:             return DIK_M;
+      case GLFW_KEY_N:             return DIK_N;
+      case GLFW_KEY_O:             return DIK_O;
+      case GLFW_KEY_P:             return DIK_P;
+      case GLFW_KEY_Q:             return DIK_Q;
+      case GLFW_KEY_R:             return DIK_R;
+      case GLFW_KEY_S:             return DIK_S;
+      case GLFW_KEY_T:             return DIK_T;
+      case GLFW_KEY_U:             return DIK_U;
+      case GLFW_KEY_V:             return DIK_V;
+      case GLFW_KEY_W:             return DIK_W;
+      case GLFW_KEY_X:             return DIK_X;
+      case GLFW_KEY_Y:             return DIK_Y;
+      case GLFW_KEY_Z:             return DIK_Z;
 
-      case KEY_TILDE:         return DIK_GRAVE;
-      case KEY_MINUS:         return DIK_MINUS;
-      case KEY_EQUALS:        return DIK_EQUALS;
-      case KEY_LBRACKET:      return DIK_LBRACKET;
-      case KEY_RBRACKET:      return DIK_RBRACKET;
-      case KEY_BACKSLASH:     return DIK_BACKSLASH;
-      case KEY_SEMICOLON:     return DIK_SEMICOLON;
-      case KEY_APOSTROPHE:    return DIK_APOSTROPHE;
-      case KEY_COMMA:         return DIK_COMMA;
-      case KEY_PERIOD:        return DIK_PERIOD;
-      case KEY_SLASH:         return DIK_SLASH;
+      case GLFW_KEY_GRAVE_ACCENT:  return DIK_GRAVE;
+      case GLFW_KEY_MINUS:         return DIK_MINUS;
+      case GLFW_KEY_EQUAL:         return DIK_EQUALS;
+      case GLFW_KEY_LEFT_BRACKET:  return DIK_LBRACKET;
+      case GLFW_KEY_RIGHT_BRACKET: return DIK_RBRACKET;
+      case GLFW_KEY_BACKSLASH:     return DIK_BACKSLASH;
+      case GLFW_KEY_SEMICOLON:     return DIK_SEMICOLON;
+      case GLFW_KEY_APOSTROPHE:    return DIK_APOSTROPHE;
+      case GLFW_KEY_COMMA:         return DIK_COMMA;
+      case GLFW_KEY_PERIOD:        return DIK_PERIOD;
+      case GLFW_KEY_SLASH:         return DIK_SLASH;
 
-      case KEY_NUMPAD0:       return DIK_NUMPAD0;
-      case KEY_NUMPAD1:       return DIK_NUMPAD1;
-      case KEY_NUMPAD2:       return DIK_NUMPAD2;
-      case KEY_NUMPAD3:       return DIK_NUMPAD3;
-      case KEY_NUMPAD4:       return DIK_NUMPAD4;
-      case KEY_NUMPAD5:       return DIK_NUMPAD5;
-      case KEY_NUMPAD6:       return DIK_NUMPAD6;
-      case KEY_NUMPAD7:       return DIK_NUMPAD7;
-      case KEY_NUMPAD8:       return DIK_NUMPAD8;
-      case KEY_NUMPAD9:       return DIK_NUMPAD9;
-      case KEY_MULTIPLY:      return DIK_MULTIPLY;
-      case KEY_ADD:           return DIK_ADD;
-      case KEY_SEPARATOR:     return DIK_NUMPADCOMMA;
-      case KEY_SUBTRACT:      return DIK_SUBTRACT;
-      case KEY_DECIMAL:       return DIK_DECIMAL;
-      case KEY_DIVIDE:        return DIK_DIVIDE;
-      case KEY_NUMPADENTER:   return DIK_NUMPADENTER;
+      case GLFW_KEY_KP_0:          return DIK_NUMPAD0;
+      case GLFW_KEY_KP_1:          return DIK_NUMPAD1;
+      case GLFW_KEY_KP_2:          return DIK_NUMPAD2;
+      case GLFW_KEY_KP_3:          return DIK_NUMPAD3;
+      case GLFW_KEY_KP_4:          return DIK_NUMPAD4;
+      case GLFW_KEY_KP_5:          return DIK_NUMPAD5;
+      case GLFW_KEY_KP_6:          return DIK_NUMPAD6;
+      case GLFW_KEY_KP_7:          return DIK_NUMPAD7;
+      case GLFW_KEY_KP_8:          return DIK_NUMPAD8;
+      case GLFW_KEY_KP_9:          return DIK_NUMPAD9;
+      case GLFW_KEY_KP_MULTIPLY:   return DIK_MULTIPLY;
+      case GLFW_KEY_KP_ADD:        return DIK_ADD;
+      case KEY_SEPARATOR:          return DIK_NUMPADCOMMA;
+      case GLFW_KEY_KP_SUBTRACT:   return DIK_SUBTRACT;
+      case GLFW_KEY_KP_DECIMAL:    return DIK_DECIMAL;
+      case GLFW_KEY_KP_DIVIDE:     return DIK_DIVIDE;
+      case GLFW_KEY_KP_ENTER:      return DIK_NUMPADENTER;
 
-      case KEY_F1:            return DIK_F1;
-      case KEY_F2:            return DIK_F2;
-      case KEY_F3:            return DIK_F3;
-      case KEY_F4:            return DIK_F4;
-      case KEY_F5:            return DIK_F5;
-      case KEY_F6:            return DIK_F6;
-      case KEY_F7:            return DIK_F7;
-      case KEY_F8:            return DIK_F8;
-      case KEY_F9:            return DIK_F9;
-      case KEY_F10:           return DIK_F10;
-      case KEY_F11:           return DIK_F11;
-      case KEY_F12:           return DIK_F12;
-      case KEY_F13:           return DIK_F13;
-      case KEY_F14:           return DIK_F14;
-      case KEY_F15:           return DIK_F15;
-      case KEY_F16:
-      case KEY_F17:
-      case KEY_F18:
-      case KEY_F19:
-      case KEY_F20:
-      case KEY_F21:
-      case KEY_F22:
-      case KEY_F23:
-      case KEY_F24:           return 0;
+      case GLFW_KEY_F1:            return DIK_F1;
+      case GLFW_KEY_F2:            return DIK_F2;
+      case GLFW_KEY_F3:            return DIK_F3;
+      case GLFW_KEY_F4:            return DIK_F4;
+      case GLFW_KEY_F5:            return DIK_F5;
+      case GLFW_KEY_F6:            return DIK_F6;
+      case GLFW_KEY_F7:            return DIK_F7;
+      case GLFW_KEY_F8:            return DIK_F8;
+      case GLFW_KEY_F9:            return DIK_F9;
+      case GLFW_KEY_F10:           return DIK_F10;
+      case GLFW_KEY_F11:           return DIK_F11;
+      case GLFW_KEY_F12:           return DIK_F12;
+      case GLFW_KEY_F13:           return DIK_F13;
+      case GLFW_KEY_F14:           return DIK_F14;
+      case GLFW_KEY_F15:           return DIK_F15;
+      case GLFW_KEY_F16:
+      case GLFW_KEY_F17:
+      case GLFW_KEY_F18:
+      case GLFW_KEY_F19:
+      case GLFW_KEY_F20:
+      case GLFW_KEY_F21:
+      case GLFW_KEY_F22:
+      case GLFW_KEY_F23:
+      case GLFW_KEY_F24:           return 0;
 
-      case KEY_NUMLOCK:       return DIK_NUMLOCK;
-      case KEY_SCROLLLOCK:    return DIK_SCROLL;
-      case KEY_LCONTROL:      return DIK_LCONTROL;
-      case KEY_RCONTROL:      return DIK_RCONTROL;
-      case KEY_LALT:          return DIK_LALT;
-      case KEY_RALT:          return DIK_RALT;
-      case KEY_LSHIFT:        return DIK_LSHIFT;
-      case KEY_RSHIFT:        return DIK_RSHIFT;
+      case GLFW_KEY_NUM_LOCK:      return DIK_NUMLOCK;
+      case GLFW_KEY_SCROLL_LOCK:   return DIK_SCROLL;
+      case GLFW_KEY_LEFT_CONTROL:  return DIK_LCONTROL;
+      case GLFW_KEY_RIGHT_CONTROL: return DIK_RCONTROL;
+      case GLFW_KEY_LEFT_ALT:      return DIK_LALT;
+      case GLFW_KEY_RIGHT_ALT:     return DIK_RALT;
+      case GLFW_KEY_LEFT_SHIFT:    return DIK_LSHIFT;
+      case GLFW_KEY_RIGHT_SHIFT:   return DIK_RSHIFT;
 
-      case KEY_WIN_LWINDOW:   return DIK_LWIN;
-      case KEY_WIN_RWINDOW:   return DIK_RWIN;
-      case KEY_WIN_APPS:      return DIK_APPS;
-      case KEY_OEM_102:       return DIK_OEM_102;
+      case GLFW_KEY_LEFT_SUPER:    return DIK_LWIN;
+      case GLFW_KEY_RIGHT_SUPER:   return DIK_RWIN;
+      case GLFW_KEY_MENU:          return DIK_APPS;
+      case KEY_OEM_102:            return DIK_OEM_102;
 
    };
 
@@ -1453,82 +1454,82 @@ const char* getKeyName( U16 key )
 {
    switch ( key )
    {
-      case KEY_BACKSPACE:     return "Backspace";
-      case KEY_TAB:           return "Tab";
-      case KEY_RETURN:        return "Return";
-      case KEY_PAUSE:         return "Pause";
-      case KEY_CAPSLOCK:      return "CapsLock";
-      case KEY_ESCAPE:        return "Esc";
+      case GLFW_KEY_BACKSPACE:     return "Backspace";
+      case GLFW_KEY_TAB:           return "Tab";
+      case GLFW_KEY_ENTER:         return "Return";
+      case GLFW_KEY_PAUSE:         return "Pause";
+      case GLFW_KEY_CAPS_LOCK:     return "CapsLock";
+      case GLFW_KEY_ESCAPE:        return "Esc";
 
-      case KEY_SPACE:         return "SpaceBar";
-      case KEY_PAGE_DOWN:     return "PageDown";
-      case KEY_PAGE_UP:       return "PageUp";
-      case KEY_END:           return "End";
-      case KEY_HOME:          return "Home";
-      case KEY_LEFT:          return "Left";
-      case KEY_UP:            return "Up";
-      case KEY_RIGHT:         return "Right";
-      case KEY_DOWN:          return "Down";
-      case KEY_PRINT:         return "PrintScreen";
-      case KEY_INSERT:        return "Insert";
-      case KEY_DELETE:        return "Delete";
-      case KEY_HELP:          return "Help";
+      case GLFW_KEY_SPACE:         return "SpaceBar";
+      case GLFW_KEY_PAGE_DOWN:     return "PageDown";
+      case GLFW_KEY_PAGE_UP:       return "PageUp";
+      case GLFW_KEY_END:           return "End";
+      case GLFW_KEY_HOME:          return "Home";
+      case GLFW_KEY_LEFT:          return "Left";
+      case GLFW_KEY_UP:            return "Up";
+      case GLFW_KEY_RIGHT:         return "Right";
+      case GLFW_KEY_DOWN:          return "Down";
+      case GLFW_KEY_PRINT_SCREEN:  return "PrintScreen";
+      case GLFW_KEY_INSERT:        return "Insert";
+      case GLFW_KEY_DELETE:        return "Delete";
+      case KEY_HELP:               return "Help";
 
-      case KEY_NUMPAD0:       return "Numpad 0";
-      case KEY_NUMPAD1:       return "Numpad 1";
-      case KEY_NUMPAD2:       return "Numpad 2";
-      case KEY_NUMPAD3:       return "Numpad 3";
-      case KEY_NUMPAD4:       return "Numpad 4";
-      case KEY_NUMPAD5:       return "Numpad 5";
-      case KEY_NUMPAD6:       return "Numpad 6";
-      case KEY_NUMPAD7:       return "Numpad 7";
-      case KEY_NUMPAD8:       return "Numpad 8";
-      case KEY_NUMPAD9:       return "Numpad 9";
-      case KEY_MULTIPLY:      return "Multiply";
-      case KEY_ADD:           return "Add";
-      case KEY_SEPARATOR:     return "Separator";
-      case KEY_SUBTRACT:      return "Subtract";
-      case KEY_DECIMAL:       return "Decimal";
-      case KEY_DIVIDE:        return "Divide";
-      case KEY_NUMPADENTER:   return "Numpad Enter";
+      case GLFW_KEY_KP_0:          return "Numpad 0";
+      case GLFW_KEY_KP_1:          return "Numpad 1";
+      case GLFW_KEY_KP_2:          return "Numpad 2";
+      case GLFW_KEY_KP_3:          return "Numpad 3";
+      case GLFW_KEY_KP_4:          return "Numpad 4";
+      case GLFW_KEY_KP_5:          return "Numpad 5";
+      case GLFW_KEY_KP_6:          return "Numpad 6";
+      case GLFW_KEY_KP_7:          return "Numpad 7";
+      case GLFW_KEY_KP_8:          return "Numpad 8";
+      case GLFW_KEY_KP_9:          return "Numpad 9";
+      case GLFW_KEY_KP_MULTIPLY:   return "Multiply";
+      case GLFW_KEY_KP_ADD:        return "Add";
+      case KEY_SEPARATOR:          return "Separator";
+      case GLFW_KEY_KP_SUBTRACT:   return "Subtract";
+      case GLFW_KEY_KP_DECIMAL:    return "Decimal";
+      case GLFW_KEY_KP_DIVIDE:     return "Divide";
+      case GLFW_KEY_KP_ENTER:      return "Numpad Enter";
 
-      case KEY_F1:            return "F1";
-      case KEY_F2:            return "F2";
-      case KEY_F3:            return "F3";
-      case KEY_F4:            return "F4";
-      case KEY_F5:            return "F5";
-      case KEY_F6:            return "F6";
-      case KEY_F7:            return "F7";
-      case KEY_F8:            return "F8";
-      case KEY_F9:            return "F9";
-      case KEY_F10:           return "F10";
-      case KEY_F11:           return "F11";
-      case KEY_F12:           return "F12";
-      case KEY_F13:           return "F13";
-      case KEY_F14:           return "F14";
-      case KEY_F15:           return "F15";
-      case KEY_F16:           return "F16";
-      case KEY_F17:           return "F17";
-      case KEY_F18:           return "F18";
-      case KEY_F19:           return "F19";
-      case KEY_F20:           return "F20";
-      case KEY_F21:           return "F21";
-      case KEY_F22:           return "F22";
-      case KEY_F23:           return "F23";
-      case KEY_F24:           return "F24";
+      case GLFW_KEY_F1:            return "F1";
+      case GLFW_KEY_F2:            return "F2";
+      case GLFW_KEY_F3:            return "F3";
+      case GLFW_KEY_F4:            return "F4";
+      case GLFW_KEY_F5:            return "F5";
+      case GLFW_KEY_F6:            return "F6";
+      case GLFW_KEY_F7:            return "F7";
+      case GLFW_KEY_F8:            return "F8";
+      case GLFW_KEY_F9:            return "F9";
+      case GLFW_KEY_F10:           return "F10";
+      case GLFW_KEY_F11:           return "F11";
+      case GLFW_KEY_F12:           return "F12";
+      case GLFW_KEY_F13:           return "F13";
+      case GLFW_KEY_F14:           return "F14";
+      case GLFW_KEY_F15:           return "F15";
+      case GLFW_KEY_F16:           return "F16";
+      case GLFW_KEY_F17:           return "F17";
+      case GLFW_KEY_F18:           return "F18";
+      case GLFW_KEY_F19:           return "F19";
+      case GLFW_KEY_F20:           return "F20";
+      case GLFW_KEY_F21:           return "F21";
+      case GLFW_KEY_F22:           return "F22";
+      case GLFW_KEY_F23:           return "F23";
+      case GLFW_KEY_F24:           return "F24";
 
-      case KEY_NUMLOCK:       return "NumLock";
-      case KEY_SCROLLLOCK:    return "ScrollLock";
-      case KEY_LCONTROL:      return "LCtrl";
-      case KEY_RCONTROL:      return "RCtrl";
-      case KEY_LALT:          return "LAlt";
-      case KEY_RALT:          return "RAlt";
-      case KEY_LSHIFT:        return "LShift";
-      case KEY_RSHIFT:        return "RShift";
+      case GLFW_KEY_NUM_LOCK:      return "NumLock";
+      case GLFW_KEY_SCROLL_LOCK:   return "ScrollLock";
+      case GLFW_KEY_LEFT_CONTROL:  return "LCtrl";
+      case GLFW_KEY_RIGHT_CONTROL: return "RCtrl";
+      case GLFW_KEY_LEFT_ALT:      return "LAlt";
+      case GLFW_KEY_RIGHT_ALT:     return "RAlt";
+      case GLFW_KEY_LEFT_SHIFT:    return "LShift";
+      case GLFW_KEY_RIGHT_SHIFT:   return "RShift";
 
-      case KEY_WIN_LWINDOW:   return "LWin";
-      case KEY_WIN_RWINDOW:   return "RWin";
-      case KEY_WIN_APPS:      return "Apps";
+      case GLFW_KEY_LEFT_SUPER:    return "LWin";
+      case GLFW_KEY_RIGHT_SUPER:   return "RWin";
+      case GLFW_KEY_MENU:          return "Apps";
    }
 
    static char returnString[5];

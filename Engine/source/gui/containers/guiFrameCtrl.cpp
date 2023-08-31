@@ -416,21 +416,6 @@ void GuiFrameSetCtrl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiE
    {
    case VERTICAL_DIVIDER:
       // change to left-right cursor
-      if(pRoot->mCursorChanged != PlatformCursorController::curResizeVert)
-      {
-         //*** We've already changed the cursor, so set it back before we change it again.
-         if(pRoot->mCursorChanged != -1)
-            pController->popCursor();
-
-         //*** Now change the cursor shape
-         pController->pushCursor(PlatformCursorController::curResizeVert);
-         pRoot->mCursorChanged = PlatformCursorController::curResizeVert;
-
-      }
-      break;
-
-   case HORIZONTAL_DIVIDER:
-      // change to up-down cursor
       if(pRoot->mCursorChanged != PlatformCursorController::curResizeHorz)
       {
          //*** We've already changed the cursor, so set it back before we change it again.
@@ -440,6 +425,21 @@ void GuiFrameSetCtrl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiE
          //*** Now change the cursor shape
          pController->pushCursor(PlatformCursorController::curResizeHorz);
          pRoot->mCursorChanged = PlatformCursorController::curResizeHorz;
+
+      }
+      break;
+
+   case HORIZONTAL_DIVIDER:
+      // change to up-down cursor
+      if(pRoot->mCursorChanged != PlatformCursorController::curResizeVert)
+      {
+         //*** We've already changed the cursor, so set it back before we change it again.
+         if(pRoot->mCursorChanged != -1)
+            pController->popCursor();
+
+         //*** Now change the cursor shape
+         pController->pushCursor(PlatformCursorController::curResizeVert);
+         pRoot->mCursorChanged = PlatformCursorController::curResizeVert;
       }
       break;
 

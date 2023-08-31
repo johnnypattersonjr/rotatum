@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -83,10 +84,10 @@ static U32 getMaskFromID(_FlagMap *map, S32 id)
 
 S32 Platform::messageBox(const UTF8 *title, const UTF8 *message, MBButtons buttons, MBIcons icon)
 {
-   PlatformWindow *pWindow = WindowManager->getFirstWindow();
+   Win32Window *pWindow = (Win32Window*)WindowManager->getFirstWindow();
 
    // Get us rendering while we're blocking.
-   winState.renderThreadBlocked = true;
+   pWindow->setRenderOnRefresh(true);
 
    // We don't keep a locked mouse or else we're going 
    // to end up possibly locking our mouse out of the 
@@ -117,7 +118,7 @@ S32 Platform::messageBox(const UTF8 *title, const UTF8 *message, MBButtons butto
 #endif
 
    // Dialog is gone.
-   winState.renderThreadBlocked = false;
+   pWindow->setRenderOnRefresh( false );
 
    if( cursorVisible == false )
       pWindow->setCursorVisible( false );

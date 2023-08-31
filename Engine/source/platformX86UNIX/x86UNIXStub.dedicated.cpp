@@ -89,9 +89,6 @@ bool Platform::setClipboard(const char *text) { return false; }
 void Platform::openFolder(const char *path) { }
 void Platform::openFile(const char *path) { }
 
-// window
-bool Platform::displaySplashWindow() { return false; }
-
 // font
 PlatformFont *createPlatformFont(const char *name, U32 size, U32 charset) { return NULL; }
 bool x86UNIXFont::create(const char *name, U32 size, U32 charset) { return false; }

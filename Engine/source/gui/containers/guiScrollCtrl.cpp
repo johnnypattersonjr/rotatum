@@ -651,27 +651,27 @@ bool GuiScrollCtrl::onKeyDown(const GuiEvent &event)
    {
       switch (event.keyCode)
       {
-         case KEY_RIGHT:
+         case GLFW_KEY_RIGHT:
             scrollByRegion(RightArrow);
             return true;
 
-         case KEY_LEFT:
+         case GLFW_KEY_LEFT:
             scrollByRegion(LeftArrow);
             return true;
 
-         case KEY_DOWN:
+         case GLFW_KEY_DOWN:
             scrollByRegion(DownArrow);
             return true;
 
-         case KEY_UP:
+         case GLFW_KEY_UP:
             scrollByRegion(UpArrow);
             return true;
 
-         case KEY_PAGE_UP:
+         case GLFW_KEY_PAGE_UP:
             scrollByRegion(UpPage);
             return true;
 
-         case KEY_PAGE_DOWN:
+         case GLFW_KEY_PAGE_DOWN:
             scrollByRegion(DownPage);
             return true;
             

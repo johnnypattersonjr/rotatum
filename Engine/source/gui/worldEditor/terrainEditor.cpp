@@ -1760,8 +1760,8 @@ bool TerrainEditor::onInputEvent(const InputEventInfo & event)
    if (  mRightMousePassThru && 
          event.deviceType == KeyboardDeviceType &&
          event.objType == SI_KEY &&
-         event.objInst == KEY_TAB && 
-         event.action == SI_MAKE )
+         event.objInst == GLFW_KEY_TAB &&
+         event.action == GLFW_PRESS )
    {
       if ( isMethod( "onToggleToolWindows" ) )
          Con::executef( this, "onToggleToolWindows" );

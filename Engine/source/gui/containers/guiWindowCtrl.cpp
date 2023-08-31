@@ -1236,7 +1236,7 @@ bool GuiWindowCtrl::onKeyDown(const GuiEvent &event)
    // If this control is a dead end, kill the event
    if ((! mVisible) || (! mActive) || (! mAwake)) return true;
 
-   if ((event.keyCode == KEY_TAB) && (event.modifier & SI_PRIMARY_CTRL))
+   if ((event.keyCode == GLFW_KEY_TAB) && (event.modifier & SI_PRIMARY_CTRL))
    {
       // Find the next sibling window, and select it
       GuiControl *parent = getParent();
@@ -1656,17 +1656,17 @@ void GuiWindowCtrl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEve
    else if( hitEdges & edgeBottom && hitEdges & edgeRight && mResizeHeight  )
       desiredCursor = PlatformCursorController::curResizeNWSE;
    else if( hitEdges & edgeBottom && mResizeHeight )
-      desiredCursor = PlatformCursorController::curResizeHorz;
+      desiredCursor = PlatformCursorController::curResizeVert;
    else if( hitEdges & edgeTop && hitEdges & edgeLeft && mResizeHeight )
       desiredCursor = PlatformCursorController::curResizeNWSE;
    else if( hitEdges & edgeTop && hitEdges & edgeRight && mResizeHeight )
       desiredCursor = PlatformCursorController::curResizeNESW;
    else if( hitEdges & edgeTop && mResizeHeight )
-      desiredCursor = PlatformCursorController::curResizeHorz;
+      desiredCursor = PlatformCursorController::curResizeVert;
    else if ( hitEdges & edgeLeft && mResizeWidth )
-      desiredCursor = PlatformCursorController::curResizeVert;
+      desiredCursor = PlatformCursorController::curResizeHorz;
    else if( hitEdges & edgeRight && mResizeWidth )
-      desiredCursor = PlatformCursorController::curResizeVert;
+      desiredCursor = PlatformCursorController::curResizeHorz;
    else
       desiredCursor = PlatformCursorController::curArrow;
 

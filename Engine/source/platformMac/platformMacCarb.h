@@ -117,7 +117,7 @@ void MacCarbFadeInWindow( WindowPtr window );
 void MacCarbFadeAndReleaseWindow( WindowPtr window );
 
 /// Translates a Mac keycode to a Torque keycode
-U8 TranslateOSKeyCode(U8 vcode);
+S32 TranslateOSKeyCode(U8 vcode);
 /// @}
 
 /// @name Misc Mac Plat constants

@@ -39,143 +39,143 @@ InputEvent     Input::smInputEvent;
 
 struct KeyCode
 {
-   U32      mKeyCode;
+   S32      mKeyCode;
    UniChar  mCharLower;
    UniChar  mCharUpper;
    
-   KeyCode( U32 keyCode )
+   KeyCode( S32 keyCode )
       : mKeyCode( keyCode ) {}
 };
 
 static KeyCode sOSToKeyCode[] =
 {
-   KEY_A, // 0x00
-   KEY_S, // 0x01
-   KEY_D, // 0x02
-   KEY_F, // 0x03
-   KEY_H, // 0x04
-   KEY_G, // 0x05
-   KEY_Z, // 0x06
-   KEY_X, // 0x07
-   KEY_C, // 0x08
-   KEY_V, // 0x09
+   GLFW_KEY_A, // 0x00
+   GLFW_KEY_S, // 0x01
+   GLFW_KEY_D, // 0x02
+   GLFW_KEY_F, // 0x03
+   GLFW_KEY_H, // 0x04
+   GLFW_KEY_G, // 0x05
+   GLFW_KEY_Z, // 0x06
+   GLFW_KEY_X, // 0x07
+   GLFW_KEY_C, // 0x08
+   GLFW_KEY_V, // 0x09
    0, // 0x0A
-   KEY_B, // 0x0B
-   KEY_Q, // 0x0C
-   KEY_W, // 0x0D
-   KEY_E, // 0x0E
-   KEY_R, // 0x0F
-   KEY_Y, // 0x10
-   KEY_T, // 0x11
-   KEY_1, // 0x12
-   KEY_2, // 0x13
-   KEY_3, // 0x14
-   KEY_4, // 0x15
-   KEY_6, // 0x16
-   KEY_5, // 0x17
-   KEY_EQUALS, // 0x18
-   KEY_9, // 0x19
-   KEY_7, // 0x1A
-   KEY_MINUS, // 0x1B
-   KEY_8, // 0x1C
-   KEY_0, // 0x1D
-   KEY_RBRACKET, // 0x1E
-   KEY_O, // 0x1F
-   KEY_U, // 0x20
-   KEY_LBRACKET, // 0x21
-   KEY_I, // 0x22
-   KEY_P, // 0x23
-   KEY_RETURN, // 0x24
-   KEY_L, // 0x25
-   KEY_J, // 0x26
-   KEY_APOSTROPHE, // 0x27
-   KEY_K, // 0x28
-   KEY_SEMICOLON, // 0x29
-   KEY_BACKSLASH, // 0x2A
-   KEY_COMMA, // 0x2B
-   KEY_SLASH, // 0x2C
-   KEY_N, // 0x2D
-   KEY_M, // 0x2E
-   KEY_PERIOD, // 0x2F
-   KEY_TAB, // 0x30
-   KEY_SPACE, // 0x31
-   KEY_TILDE, // 0x32
-   KEY_BACKSPACE, // 0x33
+   GLFW_KEY_B, // 0x0B
+   GLFW_KEY_Q, // 0x0C
+   GLFW_KEY_W, // 0x0D
+   GLFW_KEY_E, // 0x0E
+   GLFW_KEY_R, // 0x0F
+   GLFW_KEY_Y, // 0x10
+   GLFW_KEY_T, // 0x11
+   GLFW_KEY_1, // 0x12
+   GLFW_KEY_2, // 0x13
+   GLFW_KEY_3, // 0x14
+   GLFW_KEY_4, // 0x15
+   GLFW_KEY_6, // 0x16
+   GLFW_KEY_5, // 0x17
+   GLFW_KEY_EQUAL, // 0x18
+   GLFW_KEY_9, // 0x19
+   GLFW_KEY_7, // 0x1A
+   GLFW_KEY_MINUS, // 0x1B
+   GLFW_KEY_8, // 0x1C
+   GLFW_KEY_0, // 0x1D
+   GLFW_KEY_RIGHT_BRACKET, // 0x1E
+   GLFW_KEY_O, // 0x1F
+   GLFW_KEY_U, // 0x20
+   GLFW_KEY_LEFT_BRACKET, // 0x21
+   GLFW_KEY_I, // 0x22
+   GLFW_KEY_P, // 0x23
+   GLFW_KEY_ENTER, // 0x24
+   GLFW_KEY_L, // 0x25
+   GLFW_KEY_J, // 0x26
+   GLFW_KEY_APOSTROPHE, // 0x27
+   GLFW_KEY_K, // 0x28
+   GLFW_KEY_SEMICOLON, // 0x29
+   GLFW_KEY_BACKSLASH, // 0x2A
+   GLFW_KEY_COMMA, // 0x2B
+   GLFW_KEY_SLASH, // 0x2C
+   GLFW_KEY_N, // 0x2D
+   GLFW_KEY_M, // 0x2E
+   GLFW_KEY_PERIOD, // 0x2F
+   GLFW_KEY_TAB, // 0x30
+   GLFW_KEY_SPACE, // 0x31
+   GLFW_KEY_GRAVE_ACCENT, // 0x32
+   GLFW_KEY_BACKSPACE, // 0x33
    0, // 0x34
-   KEY_ESCAPE, // 0x35
-   KEY_RALT, // 0x36
-   KEY_LALT, // 0x37
-   KEY_LSHIFT, // 0x38
-   KEY_CAPSLOCK, // 0x39
-   KEY_MAC_LOPT, // 0x3A
-   KEY_LCONTROL, // 0x3B
-   KEY_RSHIFT, // 0x3C
-   KEY_MAC_ROPT, // 0x3D
-   KEY_RCONTROL, // 0x3E
+   GLFW_KEY_ESCAPE, // 0x35
+   GLFW_KEY_RIGHT_ALT, // 0x36
+   GLFW_KEY_LEFT_ALT, // 0x37
+   GLFW_KEY_LEFT_SHIFT, // 0x38
+   GLFW_KEY_CAPS_LOCK, // 0x39
+   GLFW_KEY_LEFT_ALT, // 0x3A
+   GLFW_KEY_LEFT_CONTROL, // 0x3B
+   GLFW_KEY_RIGHT_SHIFT, // 0x3C
+   GLFW_KEY_RIGHT_ALT, // 0x3D
+   GLFW_KEY_RIGHT_CONTROL, // 0x3E
    0, // 0x3F
    0, // 0x40
-   KEY_DECIMAL, // 0x41
+   GLFW_KEY_KP_DECIMAL, // 0x41
    0, // 0x42
-   KEY_MULTIPLY, // 0x43
+   GLFW_KEY_KP_MULTIPLY, // 0x43
    0, // 0x44
-   KEY_ADD, // 0x45
+   GLFW_KEY_KP_ADD, // 0x45
    0, // 0x46
-   KEY_NUMLOCK, // 0x47
+   GLFW_KEY_NUM_LOCK, // 0x47
    0, // 0x48
    0, // 0x49
    0, // 0x4A
-   KEY_DIVIDE, // 0x4B
-   KEY_NUMPADENTER, // 0x4C
+   GLFW_KEY_KP_DIVIDE, // 0x4B
+   GLFW_KEY_KP_ENTER, // 0x4C
    0, // 0x4D
-   KEY_SUBTRACT, // 0x4E
+   GLFW_KEY_KP_SUBTRACT, // 0x4E
    0, // 0x4F
    0, // 0x50
    KEY_SEPARATOR, // 0x51
-   KEY_NUMPAD0, // 0x52
-   KEY_NUMPAD1, // 0x53
-   KEY_NUMPAD2, // 0x54
-   KEY_NUMPAD3, // 0x55
-   KEY_NUMPAD4, // 0x56
-   KEY_NUMPAD5, // 0x57
-   KEY_NUMPAD6, // 0x58
-   KEY_NUMPAD7, // 0x59
+   GLFW_KEY_KP_0, // 0x52
+   GLFW_KEY_KP_1, // 0x53
+   GLFW_KEY_KP_2, // 0x54
+   GLFW_KEY_KP_3, // 0x55
+   GLFW_KEY_KP_4, // 0x56
+   GLFW_KEY_KP_5, // 0x57
+   GLFW_KEY_KP_6, // 0x58
+   GLFW_KEY_KP_7, // 0x59
    0, // 0x5A
-   KEY_NUMPAD8, // 0x5B
-   KEY_NUMPAD9, // 0x5C
+   GLFW_KEY_KP_8, // 0x5B
+   GLFW_KEY_KP_9, // 0x5C
    0, // 0x5D
    0, // 0x5E
    0, // 0x5F
-   KEY_F5, // 0x60
-   KEY_F6, // 0x61
-   KEY_F7, // 0x62
-   KEY_F3, // 0x63
-   KEY_F8, // 0x64
-   KEY_F9, // 0x65
+   GLFW_KEY_F5, // 0x60
+   GLFW_KEY_F6, // 0x61
+   GLFW_KEY_F7, // 0x62
+   GLFW_KEY_F3, // 0x63
+   GLFW_KEY_F8, // 0x64
+   GLFW_KEY_F9, // 0x65
    0, // 0x66
-   KEY_F11, // 0x67
+   GLFW_KEY_F11, // 0x67
    0, // 0x68
-   KEY_F13, // 0x69
-   KEY_F16, // 0x6A
-   KEY_F14, // 0x6B
+   GLFW_KEY_F13, // 0x69
+   GLFW_KEY_F16, // 0x6A
+   GLFW_KEY_F14, // 0x6B
    0, // 0x6C
-   KEY_F10, // 0x6D
+   GLFW_KEY_F10, // 0x6D
    0, // 0x6E
-   KEY_F12, // 0x6F
+   GLFW_KEY_F12, // 0x6F
    0, // 0x70
-   KEY_F15, // 0x71
-   KEY_INSERT, // 0x72
-   KEY_HOME, // 0x73
-   KEY_PAGE_UP, // 0x74
-   KEY_DELETE, // 0x75
-   KEY_F4, // 0x76
-   KEY_END, // 0x77
-   KEY_F2, // 0x78
-   KEY_PAGE_DOWN, // 0x79
-   KEY_F1, // 0x7A
-   KEY_LEFT, // 0x7B
-   KEY_RIGHT, // 0x7C
-   KEY_DOWN, // 0x7D
-   KEY_UP, // 0x7E
+   GLFW_KEY_F15, // 0x71
+   GLFW_KEY_INSERT, // 0x72
+   GLFW_KEY_HOME, // 0x73
+   GLFW_KEY_PAGE_UP, // 0x74
+   GLFW_KEY_DELETE, // 0x75
+   GLFW_KEY_F4, // 0x76
+   GLFW_KEY_END, // 0x77
+   GLFW_KEY_F2, // 0x78
+   GLFW_KEY_PAGE_DOWN, // 0x79
+   GLFW_KEY_F1, // 0x7A
+   GLFW_KEY_LEFT, // 0x7B
+   GLFW_KEY_RIGHT, // 0x7C
+   GLFW_KEY_DOWN, // 0x7D
+   GLFW_KEY_UP, // 0x7E
 };
 
 static Vector< U8 > sKeyCodeToOS( __FILE__, __LINE__ );
@@ -276,7 +276,7 @@ static void InitKeyCodeMapping()
    }
 }
 
-U8 TranslateOSKeyCode(U8 macKeycode)
+S32 TranslateOSKeyCode(U8 macKeycode)
 {
    AssertWarn(macKeycode < sizeof(sOSToKeyCode) / sizeof(sOSToKeyCode[0]), avar("TranslateOSKeyCode - could not translate code %i", macKeycode));
    if(macKeycode >= sizeof(sOSToKeyCode) / sizeof(sOSToKeyCode[0]))
@@ -285,7 +285,7 @@ U8 TranslateOSKeyCode(U8 macKeycode)
    return sOSToKeyCode[ macKeycode ].mKeyCode;
 }
 
-U8 TranslateKeyCodeToOS( U8 keycode )
+U8 TranslateKeyCodeToOS(S32 keycode)
 {
    return sKeyCodeToOS[ keycode ];
 }

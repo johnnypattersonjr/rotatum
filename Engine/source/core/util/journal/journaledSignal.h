@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -246,30 +247,6 @@ public:
 
 //-----------------------------------------------------------------------------
 // Common event callbacks definitions
-enum InputModifier {
-   IM_LALT     = (1 << 1),
-   IM_RALT     = (1 << 2),
-   IM_LSHIFT   = (1 << 3),
-   IM_RSHIFT   = (1 << 4),
-   IM_LCTRL    = (1 << 5),
-   IM_RCTRL    = (1 << 6),
-   IM_LOPT     = (1 << 7),
-   IM_ROPT     = (1 << 8),
-   IM_ALT      = IM_LALT | IM_RALT,
-   IM_SHIFT    = IM_LSHIFT | IM_RSHIFT,
-   IM_CTRL     = IM_LCTRL | IM_RCTRL,
-   IM_OPT      = IM_LOPT | IM_ROPT,
-};
-
-enum InputAction {
-   IA_MAKE     = (1 << 0),
-   IA_BREAK    = (1 << 1),
-   IA_REPEAT   = (1 << 2),
-   IA_MOVE     = (1 << 3),
-   IA_DELTA    = (1 << 4),
-   IA_BUTTON   = (1 << 5),
-};
-
 enum ApplicationMessage {
    Quit,
    WindowOpen,          ///< Window opened
@@ -284,7 +261,6 @@ enum ApplicationMessage {
    DisplayChange,       ///< Desktop Display mode has changed
    GainScreen,          ///< Window will acquire lock on the full screen
    LoseScreen,          ///< Window has released lock on the full screen
-   Timer,
 };
 
 typedef U32 WindowId;
@@ -292,26 +268,26 @@ typedef U32 WindowId;
 /// void event()
 typedef JournaledSignal<void()> IdleEvent;
 
-/// void event(WindowId,U32 modifier,S32 x,S32 y, bool isRelative)
-typedef JournaledSignal<void(WindowId,U32,S32,S32,bool)> MouseEvent;
+/// void event(WindowId,U8 modifier,S32 x,S32 y, bool isRelative)
+typedef JournaledSignal<void(WindowId,U8,S32,S32,bool)> MouseEvent;
 
-/// void event(WindowId,U32 modifier,S32 wheelDeltaX, S32 wheelDeltaY)
-typedef JournaledSignal<void(WindowId,U32,S32,S32)> MouseWheelEvent;
+/// void event(WindowId,U8 modifier,S32 wheelDeltaX, S32 wheelDeltaY)
+typedef JournaledSignal<void(WindowId,U8,S32,S32)> MouseWheelEvent;
 
-/// void event(WindowId,U32 modifier,U32 action,U16 key)
-typedef JournaledSignal<void(WindowId,U32,U32,U16)> KeyEvent;
+/// void event(WindowId,U8 modifier,U32 action,U16 key)
+typedef JournaledSignal<void(WindowId,U8,U32,U16)> KeyEvent;
 
-/// void event(WindowId,U32 modifier,U16 key)
-typedef JournaledSignal<void(WindowId,U32,U16)> CharEvent;
+/// void event(WindowId,U8 modifier,U16 key)
+typedef JournaledSignal<void(WindowId,U8,U16)> CharEvent;
 
-/// void event(WindowId,U32 modifier,U32 action,U16 button)
-typedef JournaledSignal<void(WindowId,U32,U32,U16)> ButtonEvent;
+/// void event(WindowId,U8 modifier,U32 action,U16 button)
+typedef JournaledSignal<void(WindowId,U8,U32,U16)> ButtonEvent;
 
-/// void event(WindowId,U32 modifier,U32 action,U32 axis,F32 value)
-typedef JournaledSignal<void(WindowId,U32,U32,U32,F32)> LinearEvent;
+/// void event(WindowId,U8 modifier,U32 action,U32 axis,F32 value)
+typedef JournaledSignal<void(WindowId,U8,U32,U32,F32)> LinearEvent;
 
-/// void event(WindowId,U32 modifier,F32 value)
-typedef JournaledSignal<void(WindowId,U32,F32)> PovEvent;
+/// void event(WindowId,U8 modifier,F32 value)
+typedef JournaledSignal<void(WindowId,U8,F32)> PovEvent;
 
 /// void event(WindowId,InputAppMessage)
 typedef JournaledSignal<void(WindowId,S32)> AppEvent;

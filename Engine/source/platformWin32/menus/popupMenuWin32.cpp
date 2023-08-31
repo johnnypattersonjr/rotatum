@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -563,11 +564,11 @@ void PopupMenu::showPopup(GuiCanvas *owner, S32 x /* = -1 */, S32 y /* = -1 */)
       ClientToScreen(hWindow, &p);
    }
 
-   winState.renderThreadBlocked = true;
+   pWindow->setRenderOnRefresh(true);
    U32 opt = (int)TrackPopupMenu(mData->mMenu, TPM_NONOTIFY|TPM_RETURNCMD, p.x, p.y, 0, hWindow, NULL);
    if(opt > 0)
       handleSelect(opt, NULL);
-   winState.renderThreadBlocked = false;
+   pWindow->setRenderOnRefresh(false);
 }
 
 //////////////////////////////////////////////////////////////////////////

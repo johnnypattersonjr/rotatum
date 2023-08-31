@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,9 +27,6 @@
 #include "component/interfaces/IProcessInput.h"
 
 
-extern InputModifiers convertModifierBits(const U32 in);
-
-
 //-----------------------------------------------------------------------------
 // Constructor/Destructor
 //-----------------------------------------------------------------------------
@@ -42,9 +40,6 @@ WindowInputGenerator::WindowInputGenerator( PlatformWindow *window ) :
                                              mFocused(false)
 {
    AssertFatal(mWindow, "NULL PlatformWindow on WindowInputGenerator creation");
-
-   if (mWindow->getOffscreenRender())
-      mFocused = true;
 
    mWindow->appEvent.notify(this, &WindowInputGenerator::handleAppEvent);
    mWindow->mouseEvent.notify(this, &WindowInputGenerator::handleMouseMove);
@@ -78,11 +73,11 @@ WindowInputGenerator::~WindowInputGenerator()
 //-----------------------------------------------------------------------------
 void WindowInputGenerator::generateInputEvent( InputEventInfo &inputEvent )
 {
-   if( !mInputController || !mFocused )
+   if( !mInputController )
       return;
 
    // Give the ActionMap first shot.
-   if (ActionMap::handleEventGlobal(&inputEvent))
+   if (ActionMap::handleEventGlobal(&inputEvent) && mFocused)
       return;
 
    if( mInputController->processInputEvent( inputEvent ) )
@@ -90,16 +85,16 @@ void WindowInputGenerator::generateInputEvent( InputEventInfo &inputEvent )
 
    // If we get here we failed to process it with anything prior... so let
    // the ActionMap handle it.
-   ActionMap::handleEvent(&inputEvent);
-
+   if (mFocused)
+      ActionMap::handleEvent(&inputEvent);
 }
 
 //-----------------------------------------------------------------------------
 // Mouse Events
 //-----------------------------------------------------------------------------
-void WindowInputGenerator::handleMouseMove( WindowId did, U32 modifier, S32 x, S32 y, bool isRelative )
+void WindowInputGenerator::handleMouseMove( WindowId did, U8 modifier, S32 x, S32 y, bool isRelative )
 {
-   if( !mInputController || !mFocused )
+   if( !mInputController )
       return;
 
    // jddTODO : Clean this up
@@ -116,7 +111,7 @@ void WindowInputGenerator::handleMouseMove( WindowId did, U32 modifier, S32 x, S
    event.deviceType = MouseDeviceType;
    event.deviceInst = 0;
    event.objType    = SI_AXIS;
-   event.modifier   = convertModifierBits(modifier);
+   event.modifier   = modifier;
    event.ascii      = 0;
 
    // Generate delta movement along each axis
@@ -168,8 +163,8 @@ void WindowInputGenerator::handleMouseMove( WindowId did, U32 modifier, S32 x, S
       {
          mNotifyPosition = false;
 
-         // We use SI_MAKE to signify that the position is being set, not relatively moved.
-         event.action     = SI_MAKE;
+         // We use GLFW_PRESS to signify that the position is being set, not relatively moved.
+         event.action     = GLFW_PRESS;
 
          // X Axis
          event.objInst    = SI_XAXIS;
@@ -192,34 +187,34 @@ void WindowInputGenerator::handleMouseMove( WindowId did, U32 modifier, S32 x, S
    }
 }
 
-void WindowInputGenerator::handleMouseButton( WindowId did, U32 modifiers, U32 action, U16 button )
+void WindowInputGenerator::handleMouseButton( WindowId did, U8 modifiers, U32 action, U16 button )
 {
-   if( !mInputController || !mFocused )
+   if( !mInputController )
       return;
 
    InputEventInfo event;
    event.deviceType = MouseDeviceType;
    event.deviceInst = 0;
    event.objType    = SI_BUTTON;
-   event.objInst    = (InputObjectInstances)(KEY_BUTTON0 + button);
-   event.modifier   = convertModifierBits(modifiers);
+   event.objInst    = GLFW_MOUSE_BUTTON_1 + button;
+   event.modifier   = modifiers;
    event.ascii      = 0;
-   event.action     = (action==IA_MAKE) ? SI_MAKE : SI_BREAK;
-   event.fValue     = (action==IA_MAKE) ? 1.0 : 0.0;
+   event.action     = (action==GLFW_PRESS) ? GLFW_PRESS : GLFW_RELEASE;
+   event.fValue     = (action==GLFW_PRESS) ? 1.0 : 0.0;
 
    generateInputEvent(event);
 }
 
-void WindowInputGenerator::handleMouseWheel( WindowId did, U32 modifiers, S32 wheelDeltaX, S32 wheelDeltaY )
+void WindowInputGenerator::handleMouseWheel( WindowId did, U8 modifiers, S32 wheelDeltaX, S32 wheelDeltaY )
 {
-   if( !mInputController || !mFocused )
+   if( !mInputController )
       return;
 
    InputEventInfo event;
    event.deviceType = MouseDeviceType;
    event.deviceInst = 0;
    event.objType    = SI_AXIS;
-   event.modifier   = convertModifierBits(modifiers);
+   event.modifier   = modifiers;
    event.ascii      = 0;
    event.action     = SI_MOVE;
 
@@ -242,7 +237,7 @@ void WindowInputGenerator::handleMouseWheel( WindowId did, U32 modifiers, S32 wh
 //-----------------------------------------------------------------------------
 // Key/Character Input
 //-----------------------------------------------------------------------------
-void WindowInputGenerator::handleCharInput( WindowId did, U32 modifier, U16 key )
+void WindowInputGenerator::handleCharInput( WindowId did, U8 modifier, U16 key )
 {
    if( !mInputController || !mFocused )
       return;
@@ -252,19 +247,19 @@ void WindowInputGenerator::handleCharInput( WindowId did, U32 modifier, U16 key 
    event.deviceInst  = 0;
    event.objType     = SI_KEY;
    event.objInst     = KEY_NULL;
-   event.modifier    = convertModifierBits(modifier);
+   event.modifier    = modifier;
    event.ascii       = key;
-   event.action      = SI_MAKE;
+   event.action      = GLFW_PRESS;
    event.fValue      = 1.0;
    generateInputEvent(event);
 
-   event.action = SI_BREAK;
+   event.action = GLFW_RELEASE;
    event.fValue = 0.f;
    generateInputEvent(event);
 }
 
 
-void WindowInputGenerator::handleKeyboard( WindowId did, U32 modifier, U32 action, U16 key )
+void WindowInputGenerator::handleKeyboard( WindowId did, U8 modifier, U32 action, U16 key )
 {
    if( !mInputController || !mFocused )
       return;
@@ -273,24 +268,24 @@ void WindowInputGenerator::handleKeyboard( WindowId did, U32 modifier, U32 actio
    event.deviceType  = KeyboardDeviceType;
    event.deviceInst  = 0;
    event.objType     = SI_KEY;
-   event.objInst     = (InputObjectInstances)key;
-   event.modifier    = convertModifierBits(modifier);
+   event.objInst     = key;
+   event.modifier    = modifier;
    event.ascii       = 0;
 
    switch(action)
    {
-   case IA_MAKE:
-      event.action = SI_MAKE;
+   case GLFW_PRESS:
+      event.action = GLFW_PRESS;
       event.fValue = 1.f;
       break;
 
-   case IA_REPEAT:
-      event.action = SI_REPEAT;
+   case GLFW_REPEAT:
+      event.action = GLFW_REPEAT;
       event.fValue = 1.f;
       break;
 
-   case IA_BREAK:
-      event.action = SI_BREAK;
+   case GLFW_RELEASE:
+      event.action = GLFW_RELEASE;
       event.fValue = 0.f;
       break;
 
@@ -319,9 +314,9 @@ void WindowInputGenerator::handleInputEvent( U32 deviceInst,F32 fValue, U16 devi
    event.deviceType  = (InputDeviceTypes)deviceType;
    event.objType     = (InputEventType)objType;
    event.ascii       = ascii;
-   event.objInst     = (InputObjectInstances)objInst;
-   event.action      = (InputActionType)action;
-   event.modifier    = (InputModifiers)modifier;
+   event.objInst     = objInst;
+   event.action      = action;
+   event.modifier    = modifier;
    
    generateInputEvent(event);
 }
@@ -343,17 +338,13 @@ void WindowInputGenerator::handleAppEvent( WindowId did, S32 event )
       mNotifyPosition = true;
       mFocused = true;
    }
-
-   // always focused with offscreen rendering
-   if (mWindow->getOffscreenRender())
-      mFocused = true;
 }
 
 //-----------------------------------------------------------------------------
 // Character Input Mapping
 //-----------------------------------------------------------------------------
 
-bool WindowInputGenerator::wantAsKeyboardEvent( U32 modifiers, U32 keyCode )
+bool WindowInputGenerator::wantAsKeyboardEvent( U8 modifiers, U32 keyCode )
 {
    // Disallow translation on keys that are bound in the global action map.
    

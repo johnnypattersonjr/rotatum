@@ -642,10 +642,10 @@ bool GuiConvexEditorCtrl::onKeyDown( const GuiEvent &evt )
 
    switch ( evt.keyCode )
    {
-   case KEY_ESCAPE:
+   case GLFW_KEY_ESCAPE:
       handled = handleEscape();      
       break;   
-   case KEY_A:
+   case GLFW_KEY_A:
       if ( evt.modifier & SI_ALT )
       {
          GizmoAlignment align = mGizmo->getProfile()->alignment;
@@ -656,7 +656,7 @@ bool GuiConvexEditorCtrl::onKeyDown( const GuiEvent &evt )
          handled = true;
       }
       break;
-   case KEY_LCONTROL:
+   case GLFW_KEY_LEFT_CONTROL:
       //mCtrlDown = true;
       break;  
    default:
@@ -672,7 +672,7 @@ bool GuiConvexEditorCtrl::onKeyUp( const GuiEvent &evt )
 
    switch ( evt.keyCode )
    {      
-   case KEY_LCONTROL:
+   case GLFW_KEY_LEFT_CONTROL:
       //mCtrlDown = false;
       break;   
    default:
@@ -724,9 +724,9 @@ void GuiConvexEditorCtrl::updateGizmo()
 
    U8 keys = Input::getModifierKeys();
 
-   mCtrlDown = keys & ( SI_LCTRL | SI_LSHIFT );
+   mCtrlDown = keys & ( SI_CTRL | SI_SHIFT );
 
-   bool altDown = keys & ( SI_LALT );
+   bool altDown = keys & ( SI_ALT );
 
    if ( altDown )
    {

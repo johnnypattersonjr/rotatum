@@ -1470,12 +1470,12 @@ bool GuiMenuTextListCtrl::onKeyDown(const GuiEvent &event)
    //see if the key down is a <return> or not
    if ( event.modifier == 0 )
    {
-      if ( event.keyCode == KEY_RETURN )
+      if ( event.keyCode == GLFW_KEY_ENTER )
       {
          mMenuBarCtrl->closeMenu();
          return true;
       }
-      else if ( event.keyCode == KEY_ESCAPE )
+      else if ( event.keyCode == GLFW_KEY_ESCAPE )
       {
          mSelectedCell.set( -1, -1 );
          mMenuBarCtrl->closeMenu();

@@ -105,7 +105,6 @@ struct GFXVideoMode
    U32 bitDepth;
    U32 refreshRate;
    bool fullScreen;
-   bool wideScreen;
    // When this is returned from GFX, it's the max, otherwise it's the desired AA level.
    U32 antialiasLevel;
 
@@ -118,8 +117,6 @@ struct GFXVideoMode
       if( otherMode.bitDepth != bitDepth )
          return false;
       if( otherMode.refreshRate != refreshRate )
-         return false;
-      if( otherMode.wideScreen != wideScreen )
          return false;
       if( otherMode.antialiasLevel != antialiasLevel)
          return false;

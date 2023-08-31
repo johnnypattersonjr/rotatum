@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -157,6 +158,6 @@ inline U8 DInputDevice::getDeviceID()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-InputObjectInstances DIK_to_Key( U8 dikCode );
+S32 DIK_to_Key( U8 dikCode );
 U8  Key_to_DIK( U16 keyCode );
 #endif // _H_WINDINPUTDEVICE_

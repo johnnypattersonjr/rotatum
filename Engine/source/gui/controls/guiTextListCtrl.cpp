@@ -462,40 +462,40 @@ bool GuiTextListCtrl::onKeyDown( const GuiEvent &event )
    S32 yDelta = 0;
    switch( event.keyCode )
    {
-   case KEY_RETURN:
+   case GLFW_KEY_ENTER:
       execAltConsoleCallback();
       break;
-   case KEY_LEFT:
-   case KEY_UP:
+   case GLFW_KEY_LEFT:
+   case GLFW_KEY_UP:
       if ( mSelectedCell.y > 0 )
       {
          mSelectedCell.y--;
          yDelta = -mCellSize.y;
    }
       break;
-   case KEY_DOWN:
-   case KEY_RIGHT:
+   case GLFW_KEY_DOWN:
+   case GLFW_KEY_RIGHT:
       if ( mSelectedCell.y < ( mList.size() - 1 ) )
    {
          mSelectedCell.y++;
          yDelta = mCellSize.y;
    }
       break;
-   case KEY_HOME:
+   case GLFW_KEY_HOME:
       if ( mList.size() )
       {
          mSelectedCell.y = 0;
          yDelta = -(mCellSize.y * mList.size() + 1 );
       }
       break;
-   case KEY_END:
+   case GLFW_KEY_END:
       if ( mList.size() )
    {
          mSelectedCell.y = mList.size() - 1;
          yDelta = (mCellSize.y * mList.size() + 1 );
       }
       break;
-   case KEY_DELETE:
+   case GLFW_KEY_DELETE:
       if ( mSelectedCell.y >= 0 && mSelectedCell.y < mList.size() )
       onDeleteKey_callback(Con::getIntArg( mList[mSelectedCell.y].id ) );
       break;

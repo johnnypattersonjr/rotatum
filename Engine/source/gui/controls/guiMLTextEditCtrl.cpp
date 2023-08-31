@@ -148,8 +148,8 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
       switch(event.keyCode)
       {
 			//copy/cut
-         case KEY_C:
-         case KEY_X:
+         case GLFW_KEY_C:
+         case GLFW_KEY_X:
 			{
 				//make sure we actually have something selected
 				if (mSelectionActive)
@@ -157,7 +157,7 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
 		         copyToClipboard(mSelectionStart, mSelectionEnd);
 
 					//if we're cutting, also delete the selection
-					if (event.keyCode == KEY_X)
+					if (event.keyCode == GLFW_KEY_X)
 					{
 			         mSelectionActive = false;
 			         deleteChars(mSelectionStart, mSelectionEnd);
@@ -170,7 +170,7 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
 			}
 
 			//paste
-         case KEY_V:
+         case GLFW_KEY_V:
 			{
 				const char *clipBuf = Platform::getClipboard();
 				if (dStrlen(clipBuf) > 0)
@@ -196,7 +196,7 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
    {
       switch ( event.keyCode )
       {
-         case KEY_TAB:
+         case GLFW_KEY_TAB:
             return( Parent::onKeyDown( event ) );
          default:
             break;
@@ -207,7 +207,7 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
       switch (event.keyCode)
       {
          // Escape:
-         case KEY_ESCAPE:
+         case GLFW_KEY_ESCAPE:
             if ( mEscapeCommand[0] )
             {
                Con::evaluate( mEscapeCommand );
@@ -216,23 +216,23 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
             return( Parent::onKeyDown( event ) );
 
          // Deletion
-         case KEY_BACKSPACE:
-         case KEY_DELETE:
+         case GLFW_KEY_BACKSPACE:
+         case GLFW_KEY_DELETE:
             handleDeleteKeys(event);
             return true;
 
          // Cursor movement
-         case KEY_LEFT:
-         case KEY_RIGHT:
-         case KEY_UP:
-         case KEY_DOWN:
-         case KEY_HOME:
-         case KEY_END:
+         case GLFW_KEY_LEFT:
+         case GLFW_KEY_RIGHT:
+         case GLFW_KEY_UP:
+         case GLFW_KEY_DOWN:
+         case GLFW_KEY_HOME:
+         case GLFW_KEY_END:
             handleMoveKeys(event);
             return true;
 
          // Special chars...
-         case KEY_TAB:
+         case GLFW_KEY_TAB:
             // insert 3 spaces
             if (mSelectionActive == true)
             {
@@ -243,7 +243,7 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
             insertChars( "\t", 1, mCursorPosition );
             return true;
 
-         case KEY_RETURN:
+         case GLFW_KEY_ENTER:
             // insert carriage return
             if (mSelectionActive == true)
             {
@@ -311,7 +311,7 @@ void GuiMLTextEditCtrl::handleDeleteKeys(const GuiEvent& event)
    {
       switch ( event.keyCode )
       {
-         case KEY_BACKSPACE:
+         case GLFW_KEY_BACKSPACE:
             if (mCursorPosition != 0)
             {
                // delete one character left
@@ -320,7 +320,7 @@ void GuiMLTextEditCtrl::handleDeleteKeys(const GuiEvent& event)
             }
             break;
 
-         case KEY_DELETE:
+         case GLFW_KEY_DELETE:
             if (mCursorPosition != mTextBuffer.length())
             {
                // delete one character right
@@ -346,7 +346,7 @@ void GuiMLTextEditCtrl::handleMoveKeys(const GuiEvent& event)
 
    switch ( event.keyCode )
    {
-      case KEY_LEFT:
+      case GLFW_KEY_LEFT:
          mVertMoveAnchorValid = false;
          // move one left
          if ( mCursorPosition != 0 )
@@ -356,7 +356,7 @@ void GuiMLTextEditCtrl::handleMoveKeys(const GuiEvent& event)
          }
          break;
 
-      case KEY_RIGHT:
+      case GLFW_KEY_RIGHT:
          mVertMoveAnchorValid = false;
          // move one right
          if ( mCursorPosition != mTextBuffer.length() )
@@ -366,8 +366,8 @@ void GuiMLTextEditCtrl::handleMoveKeys(const GuiEvent& event)
          }
          break;
 
-      case KEY_UP:
-      case KEY_DOWN:
+      case GLFW_KEY_UP:
+      case GLFW_KEY_DOWN:
       {
          Line* walk;
          for ( walk = mLineList; walk->next; walk = walk->next )
@@ -379,7 +379,7 @@ void GuiMLTextEditCtrl::handleMoveKeys(const GuiEvent& event)
          if ( !walk )
             return;
 
-         if ( event.keyCode == KEY_UP )
+         if ( event.keyCode == GLFW_KEY_UP )
          {
             if ( walk == mLineList )
                return;
@@ -403,7 +403,7 @@ void GuiMLTextEditCtrl::handleMoveKeys(const GuiEvent& event)
          newPos.x = mVertMoveAnchor;
 
          // Set the new y-position:
-         if (event.keyCode == KEY_UP)
+         if (event.keyCode == GLFW_KEY_UP)
             newPos.y--;
          else
             newPos.y += (walk->height + 1);
@@ -413,8 +413,8 @@ void GuiMLTextEditCtrl::handleMoveKeys(const GuiEvent& event)
          break;
       }
 
-      case KEY_HOME:
-      case KEY_END:
+      case GLFW_KEY_HOME:
+      case GLFW_KEY_END:
       {
          mVertMoveAnchorValid = false;
          Line* walk;
@@ -426,7 +426,7 @@ void GuiMLTextEditCtrl::handleMoveKeys(const GuiEvent& event)
 
          if (walk)
          {
-            if (event.keyCode == KEY_HOME)
+            if (event.keyCode == GLFW_KEY_HOME)
             {
                //place the cursor at the beginning of the first atom if there is one
                if (walk->atomList)

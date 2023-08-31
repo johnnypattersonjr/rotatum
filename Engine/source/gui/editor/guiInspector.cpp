@@ -145,7 +145,7 @@ void GuiInspector::getCursor( GuiCursor *&cursor, bool &showCursor, const GuiEve
    if( !pRoot )
       return;
 
-   S32 desiredCursor = mOverDivider ? PlatformCursorController::curResizeVert : PlatformCursorController::curArrow;
+   S32 desiredCursor = mOverDivider ? PlatformCursorController::curResizeHorz : PlatformCursorController::curArrow;
 
    // Bail if we're already at the desired cursor
    if ( pRoot->mCursorChanged == desiredCursor )

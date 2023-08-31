@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,42 +31,9 @@
 
 using namespace UnitTesting;
 
-CreateUnitTest(TestWinMgrQueries, "WindowManager/BasicQueries")
-{
-   void run()
-   {
-      PlatformWindowManager *pwm = CreatePlatformWindowManager();
-
-      // Check out the primary desktop area...
-      RectI primary = pwm->getPrimaryDesktopArea();
-
-      Con::printf("Primary desktop area is (%d,%d) (%d,%d)",
-         primary.point.x, primary.point.y, primary.extent.x, primary.extent.y);
-
-      test(primary.isValidRect(), "Got some sort of invalid rect from the window manager!");
-
-      // Now try to get info about all the monitors.
-      Vector<RectI> monitorRects;
-      pwm->getMonitorRegions(monitorRects);
-
-      test(monitorRects.size() > 0, "Should get at least one monitor rect back from getMonitorRegions!");
-
-      // This test is here just to detect overflow/runaway situations. -- BJG
-      test(monitorRects.size() < 64, "Either something's wrong, or you have a lot of monitors...");
-
-      for(S32 i=0; i<monitorRects.size(); i++)
-      {
-         Con::printf(" Monitor #%d region is (%d,%d) (%d,%d)", i,
-            monitorRects[i].point.x, monitorRects[i].point.y, monitorRects[i].extent.x, monitorRects[i].extent.y);
-
-         test(monitorRects[i].isValidRect(), "Got an invalid rect for this monitor - no good.");
-      }
-   }
-};
-
 CreateInteractiveTest(TestWinMgrCreate, "WindowManager/CreateAWindow")
 {
-   void handleMouseEvent(WindowId,U32,S32 x,S32 y, bool isRelative)
+   void handleMouseEvent(WindowId,U8,S32 x,S32 y, bool isRelative)
    {
       Con::printf("Mouse at %d, %d %s", x, y, isRelative ? "(relative)" : "(absolute)");
    }
@@ -462,10 +430,10 @@ CreateInteractiveTest(GFXTestFullscreenToggle, "GFX/TestFullscreenToggle")
       Platform::sleep(10);
    }
 
-   void handleButtonEvent(WindowId did,U32 modifier,U32 action,U16 button)
+   void handleButtonEvent(WindowId did,U8 modifier,U32 action,U16 button)
    {
       // Only respond to button down
-      if(action != IA_MAKE)
+      if(action != GLFW_PRESS)
          return;
 
       // Get the window...

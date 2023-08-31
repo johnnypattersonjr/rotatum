@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,8 +30,8 @@
 
 #include <SDL/SDL_events.h>
 
-#define NUM_KEYS ( KEY_OEM_102 + 1 )
-#define KEY_FIRST KEY_ESCAPE
+#define NUM_KEYS ( KEY_LAST + 1 )
+#define KEY_FIRST 0
 
 struct AsciiData
 {
@@ -157,7 +158,7 @@ class UInputManager : public InputManager
       bool mActive;
 
       // Device state variables
-      S32 mModifierKeys;
+      U8 mModifierKeys;
       bool mKeyboardState[256];
       bool mMouseButtonState[3];
 

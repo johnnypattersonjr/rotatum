@@ -374,7 +374,7 @@ bool GuiButtonBaseCtrl::onKeyDown(const GuiEvent &event)
       return true;
 
    //see if the key down is a return or space or not
-   if ((event.keyCode == KEY_RETURN || event.keyCode == KEY_SPACE)
+   if ((event.keyCode == GLFW_KEY_ENTER || event.keyCode == GLFW_KEY_SPACE)
        && event.modifier == 0)
    {
 	   if ( mProfile->mSoundButtonDown )
@@ -396,7 +396,7 @@ bool GuiButtonBaseCtrl::onKeyUp(const GuiEvent &event)
 
    //see if the key down is a return or space or not
    if (mDepressed &&
-      (event.keyCode == KEY_RETURN || event.keyCode == KEY_SPACE) &&
+      (event.keyCode == GLFW_KEY_ENTER || event.keyCode == GLFW_KEY_SPACE) &&
       event.modifier == 0)
    {
       onAction();

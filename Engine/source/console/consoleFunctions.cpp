@@ -1579,17 +1579,6 @@ DefineEngineFunction( gotoWebPage, void, ( const char* address ),,
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction( displaySplashWindow, bool, (),,
-   "Display a startup splash window suitable for showing while the engine still starts up.\n\n"
-   "@note This is currently only implemented on Windows.\n\n"
-   "@return True if the splash window could be successfully initialized.\n\n"
-   "@ingroup Platform" )
-{
-   return Platform::displaySplashWindow();
-}
-
-//-----------------------------------------------------------------------------
-
 DefineEngineFunction( countBits, S32, ( S32 v ),,
    "Count the number of bits that are set in the given 32 bit integer.\n"
    "@param v An integer value.\n\n"

@@ -104,12 +104,12 @@ static bool isModifierKey( U16 keyCode )
 {
    switch ( keyCode )
    {
-      case KEY_LCONTROL:
-      case KEY_RCONTROL:
-      case KEY_LALT:
-      case KEY_RALT:
-      case KEY_LSHIFT:
-      case KEY_RSHIFT:
+      case GLFW_KEY_LEFT_CONTROL:
+      case GLFW_KEY_RIGHT_CONTROL:
+      case GLFW_KEY_LEFT_ALT:
+      case GLFW_KEY_RIGHT_ALT:
+      case GLFW_KEY_LEFT_SHIFT:
+      case GLFW_KEY_RIGHT_SHIFT:
          return( true );
    }
 
@@ -128,7 +128,7 @@ IMPLEMENT_CALLBACK( GuiInputCtrl, onInputEvent, void, (const char* device, const
 bool GuiInputCtrl::onInputEvent( const InputEventInfo &event )
 {
    // TODO - add POV support...
-   if ( event.action == SI_MAKE )
+   if ( event.action == GLFW_PRESS )
    {
       if ( event.objType == SI_BUTTON
         || event.objType == SI_POV
@@ -146,7 +146,7 @@ bool GuiInputCtrl::onInputEvent( const InputEventInfo &event )
          return( true );
       }
    }
-   else if ( event.action == SI_BREAK )
+   else if ( event.action == GLFW_RELEASE )
    {
       if ( ( event.objType == SI_KEY ) && isModifierKey( event.objInst ) )
       {

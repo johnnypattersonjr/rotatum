@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -85,10 +86,10 @@ class DInputManager : public InputManager
       void unacquire( U8 deviceType, U8 deviceID );
 
       // XInput worker functions
-      void buildXInputEvent( U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, float fValue );
+      void buildXInputEvent( U32 deviceInst, InputEventType objType, S32 objInst, U8 action, float fValue );
       void fireXInputConnectEvent( int controllerID, bool condition, bool connected );
-      void fireXInputMoveEvent( int controllerID, bool condition, InputObjectInstances objInst, float fValue );
-      void fireXInputButtonEvent( int controllerID, bool forceFire, int button, InputObjectInstances objInst );
+      void fireXInputMoveEvent( int controllerID, bool condition, S32 objInst, float fValue );
+      void fireXInputButtonEvent( int controllerID, bool forceFire, int button, S32 objInst );
       void processXInput();
 
    public:

@@ -875,7 +875,7 @@ void GuiRiverEditorCtrl::on3DMouseLeave(const Gui3DMouseEvent & event)
 
 bool GuiRiverEditorCtrl::onKeyDown(const GuiEvent& event)
 {
-	if( event.keyCode == KEY_RETURN && mMode == mAddNodeMode )
+	if( event.keyCode == GLFW_KEY_ENTER && mMode == mAddNodeMode )
    {
 		// Delete the node attached to the cursor.
 		deleteSelectedNode();

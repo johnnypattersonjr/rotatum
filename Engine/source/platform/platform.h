@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -329,9 +330,6 @@ namespace Platform
    // Web page launch function:
    bool openWebBrowser( const char* webAddress );
 
-   // display Splash Window
-   bool displaySplashWindow( );
-
    void openFolder( const char* path );
 
    // Open file at the OS level, according to registered file-types.
@@ -361,17 +359,17 @@ namespace Platform
          andModifierMask = 0;
       }
 
-      /// The key code to ignore, e.g. KEY_TAB. If this and the other
+      /// The key code to ignore, e.g. GLFW_KEY_TAB. If this and the other
       /// conditions match, ignore the key.
       S32 key;
 
       /// if(modifiers | orModifierMask) and the other conditions match,
       /// ignore the key.
-      U32 orModifierMask;
+      U8 orModifierMask;
 
       /// if((modifiers & andModifierMask) == andModifierMask) and the
       /// other conditions match, ignore the key stroke.
-      U32 andModifierMask;
+      U8 andModifierMask;
 
       /// Based on the values above, determine if a given input event
       /// matchs this exclusion rule.

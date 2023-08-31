@@ -355,22 +355,7 @@ void GFXPCD3D9Device::init( const GFXVideoMode &mode, PlatformWindow *window /* 
       // Vertex processing was changed from MIXED to HARDWARE because of the switch to a pure D3D device.
 
       // Set up device flags from our compile flags.
-      U32 deviceFlags = 0;
-      deviceFlags = D3DCREATE_HARDWARE_VERTEXPROCESSING;
-
-      // Currently, offscreen rendering is only used by WPF apps and we need to create with D3DCREATE_MULTITHREAD for it
-      // In all other cases, you can do better by locking/creating resources in the primary thread
-      // and passing them to worker threads.
-      if (window->getOffscreenRender())
-      {
-         deviceFlags |= D3DCREATE_MULTITHREADED;
-         d3dpp.Windowed = TRUE;
-         d3dpp.BackBufferHeight = 1;
-         d3dpp.BackBufferWidth = 1;
-         d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-         d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
-         d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
-      }
+      U32 deviceFlags = D3DCREATE_HARDWARE_VERTEXPROCESSING;
 
       // DirectX will switch the floating poing control word to single precision
       // and disable exceptions by default.  There are a few issues with this...

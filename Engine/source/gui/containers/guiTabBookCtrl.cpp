@@ -865,7 +865,7 @@ bool GuiTabBookCtrl::onKeyDown(const GuiEvent &event)
 {
    // Tab      = Next Page
    // Ctrl-Tab = Previous Page
-   if( 0 && event.keyCode == KEY_TAB )
+   if( 0 && event.keyCode == GLFW_KEY_TAB )
    {
       if( event.modifier & SI_PRIMARY_CTRL )
          selectPrevPage();

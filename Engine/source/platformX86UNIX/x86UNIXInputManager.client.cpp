@@ -146,92 +146,92 @@ void InitKeyMaps()
    
    // set up the X to Torque key map
    // stuff
-   MapKey(SDLK_BACKSPACE, KEY_BACKSPACE, XK_BackSpace);
-   MapKey(SDLK_TAB, KEY_TAB, XK_Tab);
-   MapKey(SDLK_RETURN, KEY_RETURN, XK_Return);
-   MapKey(SDLK_PAUSE, KEY_PAUSE, XK_Pause);
-   MapKey(SDLK_CAPSLOCK, KEY_CAPSLOCK, XK_Caps_Lock);
-   MapKey(SDLK_ESCAPE, KEY_ESCAPE, XK_Escape);
+   MapKey(SDLK_BACKSPACE, GLFW_KEY_BACKSPACE, XK_BackSpace);
+   MapKey(SDLK_TAB, GLFW_KEY_TAB, XK_Tab);
+   MapKey(SDLK_RETURN, GLFW_KEY_ENTER, XK_Return);
+   MapKey(SDLK_PAUSE, GLFW_KEY_PAUSE, XK_Pause);
+   MapKey(SDLK_CAPSLOCK, GLFW_KEY_CAPS_LOCK, XK_Caps_Lock);
+   MapKey(SDLK_ESCAPE, GLFW_KEY_ESCAPE, XK_Escape);
 
    // more stuff
-   MapKey(SDLK_SPACE, KEY_SPACE, XK_space);
-   MapKey(SDLK_PAGEDOWN, KEY_PAGE_DOWN, XK_Page_Down);
-   MapKey(SDLK_PAGEUP, KEY_PAGE_UP, XK_Page_Up);
-   MapKey(SDLK_END, KEY_END, XK_End);
-   MapKey(SDLK_HOME, KEY_HOME, XK_Home);
-   MapKey(SDLK_LEFT, KEY_LEFT, XK_Left);
-   MapKey(SDLK_UP, KEY_UP, XK_Up);
-   MapKey(SDLK_RIGHT, KEY_RIGHT, XK_Right);
-   MapKey(SDLK_DOWN, KEY_DOWN, XK_Down);
-   MapKey(SDLK_PRINT, KEY_PRINT, XK_Print);
-   MapKey(SDLK_INSERT, KEY_INSERT, XK_Insert);
-   MapKey(SDLK_DELETE, KEY_DELETE, XK_Delete);
+   MapKey(SDLK_SPACE, GLFW_KEY_SPACE, XK_space);
+   MapKey(SDLK_PAGEDOWN, GLFW_KEY_PAGE_DOWN, XK_Page_Down);
+   MapKey(SDLK_PAGEUP, GLFW_KEY_PAGE_UP, XK_Page_Up);
+   MapKey(SDLK_END, GLFW_KEY_END, XK_End);
+   MapKey(SDLK_HOME, GLFW_KEY_HOME, XK_Home);
+   MapKey(SDLK_LEFT, GLFW_KEY_LEFT, XK_Left);
+   MapKey(SDLK_UP, GLFW_KEY_UP, XK_Up);
+   MapKey(SDLK_RIGHT, GLFW_KEY_RIGHT, XK_Right);
+   MapKey(SDLK_DOWN, GLFW_KEY_DOWN, XK_Down);
+   MapKey(SDLK_PRINT, GLFW_KEY_PRINT_SCREEN, XK_Print);
+   MapKey(SDLK_INSERT, GLFW_KEY_INSERT, XK_Insert);
+   MapKey(SDLK_DELETE, GLFW_KEY_DELETE, XK_Delete);
    
    S32 keysym;
    S32 tkeycode;
    KeySym xkey;
    // main numeric keys
-   for (keysym = SDLK_0, tkeycode = KEY_0, xkey = XK_0;
+   for (keysym = SDLK_0, tkeycode = GLFW_KEY_0, xkey = XK_0;
         keysym <= SDLK_9; 
         ++keysym, ++tkeycode, ++xkey)
       MapKey(static_cast<SDLKey>(keysym), tkeycode, xkey);
    
    // lowercase letters
-   for (keysym = SDLK_a, tkeycode = KEY_A, xkey = XK_a; 
+   for (keysym = SDLK_a, tkeycode = GLFW_KEY_A, xkey = XK_a;
         keysym <= SDLK_z; 
         ++keysym, ++tkeycode, ++xkey)
       MapKey(static_cast<SDLKey>(keysym), tkeycode, xkey);
 
    // various punctuation
-   MapKey('|', KEY_TILDE, XK_grave);
-   MapKey(SDLK_BACKQUOTE, KEY_TILDE, XK_grave);
-   MapKey(SDLK_MINUS, KEY_MINUS, XK_minus);
-   MapKey(SDLK_EQUALS, KEY_EQUALS, XK_equal);
-   MapKey(SDLK_LEFTBRACKET, KEY_LBRACKET, XK_bracketleft);
-   MapKey('{', KEY_LBRACKET, XK_bracketleft);
-   MapKey(SDLK_RIGHTBRACKET, KEY_RBRACKET, XK_bracketright);
-   MapKey('}', KEY_RBRACKET, XK_bracketright);
-   MapKey(SDLK_BACKSLASH, KEY_BACKSLASH, XK_backslash);
-   MapKey(SDLK_SEMICOLON, KEY_SEMICOLON, XK_semicolon);
-   MapKey(SDLK_QUOTE, KEY_APOSTROPHE, XK_apostrophe);
-   MapKey(SDLK_COMMA, KEY_COMMA, XK_comma);
-   MapKey(SDLK_PERIOD, KEY_PERIOD, XK_period);
-   MapKey(SDLK_SLASH, KEY_SLASH, XK_slash); 
+   MapKey('|', GLFW_KEY_GRAVE_ACCENT, XK_grave);
+   MapKey(SDLK_BACKQUOTE, GLFW_KEY_GRAVE_ACCENT, XK_grave);
+   MapKey(SDLK_MINUS, GLFW_KEY_MINUS, XK_minus);
+   MapKey(SDLK_EQUALS, GLFW_KEY_EQUAL, XK_equal);
+   MapKey(SDLK_LEFTBRACKET, GLFW_KEY_LEFT_BRACKET, XK_bracketleft);
+   MapKey('{', GLFW_KEY_LEFT_BRACKET, XK_bracketleft);
+   MapKey(SDLK_RIGHTBRACKET, GLFW_KEY_RIGHT_BRACKET, XK_bracketright);
+   MapKey('}', GLFW_KEY_RIGHT_BRACKET, XK_bracketright);
+   MapKey(SDLK_BACKSLASH, GLFW_KEY_BACKSLASH, XK_backslash);
+   MapKey(SDLK_SEMICOLON, GLFW_KEY_SEMICOLON, XK_semicolon);
+   MapKey(SDLK_QUOTE, GLFW_KEY_APOSTROPHE, XK_apostrophe);
+   MapKey(SDLK_COMMA, GLFW_KEY_COMMA, XK_comma);
+   MapKey(SDLK_PERIOD, GLFW_KEY_PERIOD, XK_period);
+   MapKey(SDLK_SLASH, GLFW_KEY_SLASH, XK_slash);
 
    // numpad numbers
-   for (keysym = SDLK_KP0, tkeycode = KEY_NUMPAD0, xkey = XK_KP_0; 
+   for (keysym = SDLK_KP0, tkeycode = GLFW_KEY_KP_0, xkey = XK_KP_0;
         keysym <= SDLK_KP9; 
         ++keysym, ++tkeycode, ++xkey)
       MapKey(static_cast<SDLKey>(keysym), tkeycode, xkey);
 
    // other numpad stuff
-   MapKey(SDLK_KP_MULTIPLY, KEY_MULTIPLY, XK_KP_Multiply);
-   MapKey(SDLK_KP_PLUS, KEY_ADD, XK_KP_Add);
+   MapKey(SDLK_KP_MULTIPLY, GLFW_KEY_KP_MULTIPLY, XK_KP_Multiply);
+   MapKey(SDLK_KP_PLUS, GLFW_KEY_KP_ADD, XK_KP_Add);
    MapKey(SDLK_KP_EQUALS, KEY_SEPARATOR, XK_KP_Separator);
-   MapKey(SDLK_KP_MINUS, KEY_SUBTRACT, XK_KP_Subtract);
-   MapKey(SDLK_KP_PERIOD, KEY_DECIMAL, XK_KP_Decimal);
-   MapKey(SDLK_KP_DIVIDE, KEY_DIVIDE, XK_KP_Divide);
-   MapKey(SDLK_KP_ENTER, KEY_NUMPADENTER, XK_KP_Enter);
+   MapKey(SDLK_KP_MINUS, GLFW_KEY_KP_SUBTRACT, XK_KP_Subtract);
+   MapKey(SDLK_KP_PERIOD, GLFW_KEY_KP_DECIMAL, XK_KP_Decimal);
+   MapKey(SDLK_KP_DIVIDE, GLFW_KEY_KP_DIVIDE, XK_KP_Divide);
+   MapKey(SDLK_KP_ENTER, GLFW_KEY_KP_ENTER, XK_KP_Enter);
 
    // F keys
-   for (keysym = SDLK_F1, tkeycode = KEY_F1, xkey = XK_F1; 
+   for (keysym = SDLK_F1, tkeycode = GLFW_KEY_F1, xkey = XK_F1;
         keysym <= SDLK_F15; 
         ++keysym, ++tkeycode, ++xkey)
       MapKey(static_cast<SDLKey>(keysym), tkeycode, xkey);
 
    // various modifiers
-   MapKey(SDLK_NUMLOCK, KEY_NUMLOCK, XK_Num_Lock);
-   MapKey(SDLK_SCROLLOCK, KEY_SCROLLLOCK, XK_Scroll_Lock);
-   MapKey(SDLK_LCTRL, KEY_LCONTROL, XK_Control_L);
-   MapKey(SDLK_RCTRL, KEY_RCONTROL, XK_Control_R);
-   MapKey(SDLK_LALT, KEY_LALT, XK_Alt_L);
-   MapKey(SDLK_RALT, KEY_RALT, XK_Alt_R);
-   MapKey(313, KEY_RALT, XK_Alt_R);   
-   MapKey(SDLK_LSHIFT, KEY_LSHIFT, XK_Shift_L);
-   MapKey(SDLK_RSHIFT, KEY_RSHIFT, XK_Shift_R);
-   MapKey(SDLK_LSUPER, KEY_WIN_LWINDOW, 0);
-   MapKey(SDLK_RSUPER, KEY_WIN_RWINDOW, 0);
-   MapKey(SDLK_MENU, KEY_WIN_APPS, 0);
+   MapKey(SDLK_NUMLOCK, GLFW_KEY_NUM_LOCK, XK_Num_Lock);
+   MapKey(SDLK_SCROLLOCK, GLFW_KEY_SCROLL_LOCK, XK_Scroll_Lock);
+   MapKey(SDLK_LCTRL, GLFW_KEY_LEFT_CONTROL, XK_Control_L);
+   MapKey(SDLK_RCTRL, GLFW_KEY_RIGHT_CONTROL, XK_Control_R);
+   MapKey(SDLK_LALT, GLFW_KEY_LEFT_ALT, XK_Alt_L);
+   MapKey(SDLK_RALT, GLFW_KEY_RIGHT_ALT, XK_Alt_R);
+   MapKey(313, GLFW_KEY_RIGHT_ALT, XK_Alt_R);
+   MapKey(SDLK_LSHIFT, GLFW_KEY_LEFT_SHIFT, XK_Shift_L);
+   MapKey(SDLK_RSHIFT, GLFW_KEY_RIGHT_SHIFT, XK_Shift_R);
+   MapKey(SDLK_LSUPER, GLFW_KEY_LEFT_SUPER, 0);
+   MapKey(SDLK_RSUPER, GLFW_KEY_RIGHT_SUPER, 0);
+   MapKey(SDLK_MENU, GLFW_KEY_MENU, 0);
    MapKey(SDLK_MODE, KEY_OEM_102, 0);
 
    keyMapsInitialized = true;
@@ -256,7 +256,7 @@ U8 TranslateSDLKeytoTKey(SDLKey keysym)
 
 //------------------------------------------------------------------------------
 // this shouldn't be used, use TranslateSDLKeytoTKey instead
-U8 TranslateOSKeyCode(U8 vcode)
+S32 TranslateOSKeyCode(U8 vcode)
 {
    Con::printf("WARNING: TranslateOSKeyCode is not supported in unix");
    return 0;
@@ -407,7 +407,7 @@ void UInputManager::resetKeyboardState()
          event.deviceType = KeyboardDeviceType;
          event.objType = SI_KEY;
          event.objInst = i;
-         event.action = SI_BREAK;
+         event.action = GLFW_RELEASE;
          event.fValue = 0.0;
          Game->postEvent(event);
       }
@@ -427,16 +427,16 @@ void UInputManager::resetMouseState()
    {
       if (mMouseButtonState[i])
       {
-         // add KEY_BUTTON0 to the index to get the real
+         // add GLFW_MOUSE_BUTTON_1 to the index to get the real
          // button ID
-         S32 buttonID = i + KEY_BUTTON0;
+         S32 buttonID = i + GLFW_MOUSE_BUTTON_1;
          InputEvent event;
         
          event.deviceInst = 0;
          event.deviceType = MouseDeviceType;
          event.objType = SI_BUTTON;
          event.objInst = buttonID;
-         event.action = SI_BREAK;
+         event.action = GLFW_RELEASE;
          event.fValue = 0.0;
          Game->postEvent(event);
       }
@@ -581,8 +581,8 @@ void UInputManager::joyButtonEvent(const SDL_Event& event)
 void UInputManager::joyButtonEvent(U8 deviceID, U8 buttonNum, bool pressed)
 
 {
-   S32 action = pressed ? SI_MAKE : SI_BREAK;
-   S32 objInst = buttonNum + KEY_BUTTON0;
+   S32 action = pressed ? GLFW_PRESS : GLFW_RELEASE;
+   S32 objInst = buttonNum + GLFW_MOUSE_BUTTON_1;
 
    InputEvent ievent;
 
@@ -593,7 +593,7 @@ void UInputManager::joyButtonEvent(U8 deviceID, U8 buttonNum, bool pressed)
    ievent.objType = SI_BUTTON;
    ievent.objInst = objInst;
    ievent.action = action;
-   ievent.fValue = (action == SI_MAKE) ? 1.0 : 0.0;
+   ievent.fValue = (action == GLFW_PRESS) ? 1.0 : 0.0;
 
    Game->postEvent(ievent);
 #ifdef LOG_INPUT
@@ -623,7 +623,7 @@ void UInputManager::joyHatEvent(U8 deviceID, U8 hatNum,
    ievent.objType = SI_POV;
 
    // first break any positions that are no longer valid
-   ievent.action = SI_BREAK;
+   ievent.action = GLFW_RELEASE;
    ievent.fValue = 0.0;
 
    if (prevHatState & SDL_HAT_UP && !(currHatState & SDL_HAT_UP))
@@ -660,7 +660,7 @@ void UInputManager::joyHatEvent(U8 deviceID, U8 hatNum,
    }
 
    // now do the make events
-   ievent.action = SI_MAKE;
+   ievent.action = GLFW_PRESS;
    ievent.fValue = 1.0;
 
    if (!(prevHatState & SDL_HAT_UP) && currHatState & SDL_HAT_UP)
@@ -755,7 +755,7 @@ void UInputManager::joyAxisEvent(U8 deviceID, U8 axisNum, S16 axisValue)
 //------------------------------------------------------------------------------
 void UInputManager::mouseButtonEvent(const SDL_Event& event)
 {
-   S32 action = (event.type == SDL_MOUSEBUTTONDOWN) ? SI_MAKE : SI_BREAK;
+   S32 action = (event.type == SDL_MOUSEBUTTONDOWN) ? GLFW_PRESS : GLFW_RELEASE;
    S32 objInst = -1;
    // JMQTODO: support wheel delta like windows version?
    // JMQTODO: make this value configurable?
@@ -765,13 +765,13 @@ void UInputManager::mouseButtonEvent(const SDL_Event& event)
    switch (event.button.button)
    {
       case SDL_BUTTON_LEFT:
-         objInst = KEY_BUTTON0;
+         objInst = GLFW_MOUSE_BUTTON_1;
          break;
       case SDL_BUTTON_RIGHT:
-         objInst = KEY_BUTTON1;
+         objInst = GLFW_MOUSE_BUTTON_2;
          break;
       case SDL_BUTTON_MIDDLE:
-         objInst = KEY_BUTTON2;
+         objInst = GLFW_MOUSE_BUTTON_3;
          break;
       case Button4:
          wheel = true;
@@ -797,7 +797,7 @@ void UInputManager::mouseButtonEvent(const SDL_Event& event)
    {
       // SDL generates a button press/release for each wheel move,
       // so ignore breaks to translate those into a single event
-      if (action == SI_BREAK)
+      if (action == GLFW_RELEASE)
          return;
       ievent.objType = SI_ZAXIS;
       ievent.objInst = 0;
@@ -814,18 +814,18 @@ void UInputManager::mouseButtonEvent(const SDL_Event& event)
    }
    else // regular button
    {
-      S32 buttonID = (objInst - KEY_BUTTON0);
+      S32 buttonID = (objInst - GLFW_MOUSE_BUTTON_1);
       if (buttonID < 3)
-         mMouseButtonState[buttonID] = ( action == SI_MAKE ) ? true : false;
+         mMouseButtonState[buttonID] = ( action == GLFW_PRESS ) ? true : false;
 
       ievent.objType = SI_BUTTON;
       ievent.objInst = objInst;
       ievent.action = action;
-      ievent.fValue = (action == SI_MAKE) ? 1.0 : 0.0;
+      ievent.fValue = (action == GLFW_PRESS) ? 1.0 : 0.0;
 #ifdef LOG_INPUT
       Input::log( "EVENT (Input): mouse button%d %s. MODS:%c%c%c\n",
          buttonID,
-         action == SI_MAKE ? "pressed" : "released",
+         action == GLFW_PRESS ? "pressed" : "released",
          ( mModifierKeys & SI_SHIFT ? 'S' : '.' ), 
          ( mModifierKeys & SI_CTRL ? 'C' : '.' ), 
          ( mModifierKeys & SI_ALT ? 'A' : '.' ));
@@ -840,82 +840,82 @@ const char* getKeyName( U16 key )
 {
    switch ( key )
    {
-      case KEY_BACKSPACE:     return "Backspace";
-      case KEY_TAB:           return "Tab";
-      case KEY_RETURN:        return "Return";
-      case KEY_PAUSE:         return "Pause";
-      case KEY_CAPSLOCK:      return "CapsLock";
-      case KEY_ESCAPE:        return "Esc";
+      case GLFW_KEY_BACKSPACE:     return "Backspace";
+      case GLFW_KEY_TAB:           return "Tab";
+      case GLFW_KEY_ENTER:         return "Return";
+      case GLFW_KEY_PAUSE:         return "Pause";
+      case GLFW_KEY_CAPS_LOCK:     return "CapsLock";
+      case GLFW_KEY_ESCAPE:        return "Esc";
 
-      case KEY_SPACE:         return "SpaceBar";
-      case KEY_PAGE_DOWN:     return "PageDown";
-      case KEY_PAGE_UP:       return "PageUp";
-      case KEY_END:           return "End";
-      case KEY_HOME:          return "Home";
-      case KEY_LEFT:          return "Left";
-      case KEY_UP:            return "Up";
-      case KEY_RIGHT:         return "Right";
-      case KEY_DOWN:          return "Down";
-      case KEY_PRINT:         return "PrintScreen";
-      case KEY_INSERT:        return "Insert";
-      case KEY_DELETE:        return "Delete";
-      case KEY_HELP:          return "Help";
+      case GLFW_KEY_SPACE:         return "SpaceBar";
+      case GLFW_KEY_PAGE_DOWN:     return "PageDown";
+      case GLFW_KEY_PAGE_UP:       return "PageUp";
+      case GLFW_KEY_END:           return "End";
+      case GLFW_KEY_HOME:          return "Home";
+      case GLFW_KEY_LEFT:          return "Left";
+      case GLFW_KEY_UP:            return "Up";
+      case GLFW_KEY_RIGHT:         return "Right";
+      case GLFW_KEY_DOWN:          return "Down";
+      case GLFW_KEY_PRINT_SCREEN:  return "PrintScreen";
+      case GLFW_KEY_INSERT:        return "Insert";
+      case GLFW_KEY_DELETE:        return "Delete";
+      case KEY_HELP:               return "Help";
 
-      case KEY_NUMPAD0:       return "Numpad 0";
-      case KEY_NUMPAD1:       return "Numpad 1";
-      case KEY_NUMPAD2:       return "Numpad 2";
-      case KEY_NUMPAD3:       return "Numpad 3";
-      case KEY_NUMPAD4:       return "Numpad 4";
-      case KEY_NUMPAD5:       return "Numpad 5";
-      case KEY_NUMPAD6:       return "Numpad 6";
-      case KEY_NUMPAD7:       return "Numpad 7";
-      case KEY_NUMPAD8:       return "Numpad 8";
-      case KEY_NUMPAD9:       return "Numpad 9";
-      case KEY_MULTIPLY:      return "Multiply";
-      case KEY_ADD:           return "Add";
-      case KEY_SEPARATOR:     return "Separator";
-      case KEY_SUBTRACT:      return "Subtract";
-      case KEY_DECIMAL:       return "Decimal";
-      case KEY_DIVIDE:        return "Divide";
-      case KEY_NUMPADENTER:   return "Numpad Enter";
+      case GLFW_KEY_KP_0:          return "Numpad 0";
+      case GLFW_KEY_KP_1:          return "Numpad 1";
+      case GLFW_KEY_KP_2:          return "Numpad 2";
+      case GLFW_KEY_KP_3:          return "Numpad 3";
+      case GLFW_KEY_KP_4:          return "Numpad 4";
+      case GLFW_KEY_KP_5:          return "Numpad 5";
+      case GLFW_KEY_KP_6:          return "Numpad 6";
+      case GLFW_KEY_KP_7:          return "Numpad 7";
+      case GLFW_KEY_KP_8:          return "Numpad 8";
+      case GLFW_KEY_KP_9:          return "Numpad 9";
+      case GLFW_KEY_KP_MULTIPLY:   return "Multiply";
+      case GLFW_KEY_KP_ADD:        return "Add";
+      case KEY_SEPARATOR:          return "Separator";
+      case GLFW_KEY_KP_SUBTRACT:   return "Subtract";
+      case GLFW_KEY_KP_DECIMAL:    return "Decimal";
+      case GLFW_KEY_KP_DIVIDE:     return "Divide";
+      case GLFW_KEY_KP_ENTER:      return "Numpad Enter";
 
-      case KEY_F1:            return "F1";
-      case KEY_F2:            return "F2";
-      case KEY_F3:            return "F3";
-      case KEY_F4:            return "F4";
-      case KEY_F5:            return "F5";
-      case KEY_F6:            return "F6";
-      case KEY_F7:            return "F7";
-      case KEY_F8:            return "F8";
-      case KEY_F9:            return "F9";
-      case KEY_F10:           return "F10";
-      case KEY_F11:           return "F11";
-      case KEY_F12:           return "F12";
-      case KEY_F13:           return "F13";
-      case KEY_F14:           return "F14";
-      case KEY_F15:           return "F15";
-      case KEY_F16:           return "F16";
-      case KEY_F17:           return "F17";
-      case KEY_F18:           return "F18";
-      case KEY_F19:           return "F19";
-      case KEY_F20:           return "F20";
-      case KEY_F21:           return "F21";
-      case KEY_F22:           return "F22";
-      case KEY_F23:           return "F23";
-      case KEY_F24:           return "F24";
+      case GLFW_KEY_F1:            return "F1";
+      case GLFW_KEY_F2:            return "F2";
+      case GLFW_KEY_F3:            return "F3";
+      case GLFW_KEY_F4:            return "F4";
+      case GLFW_KEY_F5:            return "F5";
+      case GLFW_KEY_F6:            return "F6";
+      case GLFW_KEY_F7:            return "F7";
+      case GLFW_KEY_F8:            return "F8";
+      case GLFW_KEY_F9:            return "F9";
+      case GLFW_KEY_F10:           return "F10";
+      case GLFW_KEY_F11:           return "F11";
+      case GLFW_KEY_F12:           return "F12";
+      case GLFW_KEY_F13:           return "F13";
+      case GLFW_KEY_F14:           return "F14";
+      case GLFW_KEY_F15:           return "F15";
+      case GLFW_KEY_F16:           return "F16";
+      case GLFW_KEY_F17:           return "F17";
+      case GLFW_KEY_F18:           return "F18";
+      case GLFW_KEY_F19:           return "F19";
+      case GLFW_KEY_F20:           return "F20";
+      case GLFW_KEY_F21:           return "F21";
+      case GLFW_KEY_F22:           return "F22";
+      case GLFW_KEY_F23:           return "F23";
+      case GLFW_KEY_F24:           return "F24";
 
-      case KEY_NUMLOCK:       return "NumLock";
-      case KEY_SCROLLLOCK:    return "ScrollLock";
-      case KEY_LCONTROL:      return "LCtrl";
-      case KEY_RCONTROL:      return "RCtrl";
-      case KEY_LALT:          return "LAlt";
-      case KEY_RALT:          return "RAlt";
-      case KEY_LSHIFT:        return "LShift";
-      case KEY_RSHIFT:        return "RShift";
+      case GLFW_KEY_NUM_LOCK:      return "NumLock";
+      case GLFW_KEY_SCROLL_LOCK:   return "ScrollLock";
+      case GLFW_KEY_LEFT_CONTROL:  return "LCtrl";
+      case GLFW_KEY_RIGHT_CONTROL: return "RCtrl";
+      case GLFW_KEY_LEFT_ALT:      return "LAlt";
+      case GLFW_KEY_RIGHT_ALT:     return "RAlt";
+      case GLFW_KEY_LEFT_SHIFT:    return "LShift";
+      case GLFW_KEY_RIGHT_SHIFT:   return "RShift";
 
-      case KEY_WIN_LWINDOW:   return "LWin";
-      case KEY_WIN_RWINDOW:   return "RWin";
-      case KEY_WIN_APPS:      return "Apps";
+      case GLFW_KEY_LEFT_SUPER:    return "LWin";
+      case GLFW_KEY_RIGHT_SUPER:   return "RWin";
+      case GLFW_KEY_MENU:          return "Apps";
    }
 
    static char returnString[5];
@@ -927,7 +927,7 @@ const char* getKeyName( U16 key )
 //------------------------------------------------------------------------------
 void UInputManager::keyEvent(const SDL_Event& event)
 {
-   S32 action = (event.type == SDL_KEYDOWN) ? SI_MAKE : SI_BREAK;
+   S32 action = (event.type == SDL_KEYDOWN) ? GLFW_PRESS : GLFW_RELEASE;
    InputEvent ievent;
 
    ievent.deviceInst = 0;
@@ -936,28 +936,28 @@ void UInputManager::keyEvent(const SDL_Event& event)
    ievent.objInst = TranslateSDLKeytoTKey(event.key.keysym.sym);
    // if the action is a make but this key is already pressed, 
    // count it as a repeat
-   if (action == SI_MAKE && mKeyboardState[ievent.objInst])
-      action = SI_REPEAT;
+   if (action == GLFW_PRESS && mKeyboardState[ievent.objInst])
+      action = GLFW_REPEAT;
    ievent.action = action;
-   ievent.fValue = (action == SI_MAKE || action == SI_REPEAT) ? 1.0 : 0.0;
+   ievent.fValue = (action == GLFW_PRESS || action == GLFW_REPEAT) ? 1.0 : 0.0;
 
    processKeyEvent(ievent);
    Game->postEvent(ievent);
 
 #if 0
-   if (ievent.action == SI_MAKE)
+   if (ievent.action == GLFW_PRESS)
       dPrintf("key event: : %s key pressed. MODS:%c%c%c\n",
          getKeyName(ievent.objInst),
          ( mModifierKeys & SI_SHIFT ? 'S' : '.' ), 
          ( mModifierKeys & SI_CTRL ? 'C' : '.' ), 
          ( mModifierKeys & SI_ALT ? 'A' : '.' ));
-   else if (ievent.action == SI_REPEAT)
+   else if (ievent.action == GLFW_REPEAT)
       dPrintf("key event: : %s key repeated. MODS:%c%c%c\n",
          getKeyName(ievent.objInst),
          ( mModifierKeys & SI_SHIFT ? 'S' : '.' ), 
          ( mModifierKeys & SI_CTRL ? 'C' : '.' ), 
          ( mModifierKeys & SI_ALT ? 'A' : '.' ));
-   else if (ievent.action == SI_BREAK)
+   else if (ievent.action == GLFW_RELEASE)
       dPrintf("key event: : %s key released. MODS:%c%c%c\n",
          getKeyName(ievent.objInst),
          ( mModifierKeys & SI_SHIFT ? 'S' : '.' ), 
@@ -970,7 +970,7 @@ void UInputManager::keyEvent(const SDL_Event& event)
 #ifdef LOG_INPUT
    Input::log( "EVENT (Input): %s key %s. MODS:%c%c%c\n",
       getKeyName(ievent.objInst),
-      action == SI_MAKE ? "pressed" : "released",
+      action == GLFW_PRESS ? "pressed" : "released",
       ( mModifierKeys & SI_SHIFT ? 'S' : '.' ), 
       ( mModifierKeys & SI_CTRL ? 'C' : '.' ), 
       ( mModifierKeys & SI_ALT ? 'A' : '.' ));
@@ -987,39 +987,39 @@ bool UInputManager::processKeyEvent( InputEvent &event )
    bool modKey = false;
    U8 keyCode = event.objInst;
 
-   if ( event.action == SI_MAKE || event.action == SI_REPEAT)
+   if ( event.action == GLFW_PRESS || event.action == GLFW_REPEAT)
    {
       // Maintain the key structure:
       mKeyboardState[keyCode] = true;
 
       switch ( event.objInst )
       {
-         case KEY_LSHIFT:
+         case GLFW_KEY_LEFT_SHIFT:
             mModifierKeys |= SI_LSHIFT;
             modKey = true;
             break;
 
-         case KEY_RSHIFT:
+         case GLFW_KEY_RIGHT_SHIFT:
             mModifierKeys |= SI_RSHIFT;
             modKey = true;
             break;
 
-         case KEY_LCONTROL:
+         case GLFW_KEY_LEFT_CONTROL:
             mModifierKeys |= SI_LCTRL;
             modKey = true;
             break;
 
-         case KEY_RCONTROL:
+         case GLFW_KEY_RIGHT_CONTROL:
             mModifierKeys |= SI_RCTRL;
             modKey = true;
             break;
 
-         case KEY_LALT:
+         case GLFW_KEY_LEFT_ALT:
             mModifierKeys |= SI_LALT;
             modKey = true;
             break;
 
-         case KEY_RALT:
+         case GLFW_KEY_RIGHT_ALT:
             mModifierKeys |= SI_RALT;
             modKey = true;
             break;
@@ -1032,32 +1032,32 @@ bool UInputManager::processKeyEvent( InputEvent &event )
 
       switch ( event.objInst )
       {
-         case KEY_LSHIFT:
+         case GLFW_KEY_LEFT_SHIFT:
             mModifierKeys &= ~SI_LSHIFT;
             modKey = true;
             break;
 
-         case KEY_RSHIFT:
+         case GLFW_KEY_RIGHT_SHIFT:
             mModifierKeys &= ~SI_RSHIFT;
             modKey = true;
             break;
 
-         case KEY_LCONTROL:
+         case GLFW_KEY_LEFT_CONTROL:
             mModifierKeys &= ~SI_LCTRL;
             modKey = true;
             break;
 
-         case KEY_RCONTROL:
+         case GLFW_KEY_RIGHT_CONTROL:
             mModifierKeys &= ~SI_RCTRL;
             modKey = true;
             break;
 
-         case KEY_LALT:
+         case GLFW_KEY_LEFT_ALT:
             mModifierKeys &= ~SI_LALT;
             modKey = true;
             break;
 
-         case KEY_RALT:
+         case GLFW_KEY_RIGHT_ALT:
             mModifierKeys &= ~SI_RALT;
             modKey = true;
             break;

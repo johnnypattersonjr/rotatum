@@ -37,22 +37,11 @@
 #include "core/strings/unicode.h"
 #include "gui/core/guiCanvas.h"
 
-
 extern void createFontInit();
 extern void createFontShutdown();
 
 static MRandomLCG sgPlatRandom;
 static bool sgQueueEvents;
-
-// is keyboard input a standard (non-changing) VK keycode
-#define dIsStandardVK(c) (((0x08 <= (c)) && ((c) <= 0x12)) || \
-                          ((c) == 0x1b) ||                    \
-                          ((0x20 <= (c)) && ((c) <= 0x2e)) || \
-                          ((0x30 <= (c)) && ((c) <= 0x39)) || \
-                          ((0x41 <= (c)) && ((c) <= 0x5a)) || \
-                          ((0x70 <= (c)) && ((c) <= 0x7B)))
-
-extern InputObjectInstances DIK_to_Key( U8 dikCode );
 
 // static helper variables
 static HANDLE gMutexHandle = NULL;

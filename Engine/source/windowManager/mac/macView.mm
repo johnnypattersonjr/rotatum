@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -36,31 +37,28 @@
 static bool smApplicationInactive = false;
 
 
-extern InputModifiers convertModifierBits( const U32 in );
-
-
-inline U32 NSModifiersToTorqueModifiers( NSUInteger mods )
+inline U8 NSModifiersToTorqueModifiers( NSUInteger mods )
 {
-   U32 torqueMods = 0;
+   U8 torqueMods = 0;
    
    if( mods & NX_DEVICELSHIFTKEYMASK )
-      torqueMods |= IM_LSHIFT;
+      torqueMods |= SI_LSHIFT;
    if( mods & NX_DEVICERSHIFTKEYMASK )
-      torqueMods |= IM_RSHIFT;
+      torqueMods |= SI_RSHIFT;
    if( mods & NX_DEVICELALTKEYMASK )
-      torqueMods |= IM_LOPT;
+      torqueMods |= SI_MAC_LOPT;
    if( mods & NX_DEVICERALTKEYMASK )
-      torqueMods |= IM_ROPT;
+      torqueMods |= SI_MAC_ROPT;
    if( mods & NX_DEVICELCTLKEYMASK )
-      torqueMods |= IM_LCTRL;
+      torqueMods |= SI_LCTRL;
    if( mods & NX_DEVICERCTLKEYMASK )
-      torqueMods |= IM_RCTRL;
+      torqueMods |= SI_RCTRL;
    if( mods & NX_DEVICELCMDKEYMASK )
-      torqueMods |= IM_LALT;
+      torqueMods |= SI_LALT;
    if( mods & NX_DEVICERCMDKEYMASK )
-      torqueMods |= IM_RALT;
+      torqueMods |= SI_RALT;
       
-   Input::setModifierKeys( convertModifierBits( torqueMods ) );
+   Input::setModifierKeys( torqueMods );
       
    return torqueMods;
 }
@@ -87,27 +85,27 @@ inline U32 NSModifiersToTorqueModifiers( NSUInteger mods )
 
    //  ?set left sibling of anything that the mac says some sibling is down, but that we don't see as down?
    
-   U32 torqueMod = 0;
+   U8 torqueMod = 0;
    switch(torqueKey)
    {
-      case KEY_LSHIFT:     torqueMod = IM_LSHIFT;    break;
-      case KEY_RSHIFT:     torqueMod = IM_RSHIFT;    break;
-      case KEY_LCONTROL:   torqueMod = IM_LCTRL;     break;
-      case KEY_RCONTROL:   torqueMod = IM_RCTRL;     break;
-      case KEY_MAC_LOPT:   torqueMod = IM_LOPT;  break;
-      case KEY_MAC_ROPT:   torqueMod = IM_ROPT;  break;
-      case KEY_LALT:       torqueMod = IM_LALT;      break;
-      case KEY_RALT:       torqueMod = IM_RALT;      break;
+      case GLFW_KEY_LEFT_SHIFT:    torqueMod = SI_LSHIFT;    break;
+      case GLFW_KEY_RIGHT_SHIFT:   torqueMod = SI_RSHIFT;    break;
+      case GLFW_KEY_LEFT_CONTROL:  torqueMod = SI_LCTRL;     break;
+      case GLFW_KEY_RIGHT_CONTROL: torqueMod = SI_RCTRL;     break;
+      case GLFW_KEY_LEFT_ALT:      torqueMod = SI_MAC_LOPT;  break;
+      case GLFW_KEY_RIGHT_ALT:     torqueMod = SI_MAC_ROPT;  break;
+      case GLFW_KEY_LEFT_ALT:      torqueMod = SI_LALT;      break;
+      case GLFW_KEY_RIGHT_ALT:     torqueMod = SI_RALT;      break;
    };
    
    // flip the mod that we got an event for
-   U32 newMods = mLastMods ^ torqueMod;
+   U8 newMods = mLastMods ^ torqueMod;
    
    // clear left and right if mac thinks both are up.
-   if( !(macMods & NSShiftKeyMask))       newMods &= ~IM_LSHIFT, newMods &= ~IM_RSHIFT;
-   if( !(macMods & NSControlKeyMask))     newMods &= ~IM_LCTRL, newMods &= ~IM_RCTRL;
-   if( !(macMods & NSAlternateKeyMask))   newMods &= ~IM_LOPT, newMods &= ~IM_ROPT;
-   if( !(macMods & NSCommandKeyMask))     newMods &= ~IM_LALT, newMods &= ~IM_RALT;
+   if( !(macMods & NSShiftKeyMask))       newMods &= ~SI_SHIFT;
+   if( !(macMods & NSControlKeyMask))     newMods &= ~SI_CTRL;
+   if( !(macMods & NSAlternateKeyMask))   newMods &= ~SI_MAC_OPT;
+   if( !(macMods & NSCommandKeyMask))     newMods &= ~SI_ALT;
    
    // Generate keyUp/Down event (allows us to use modifier keys for actions)
    mLastMods = 0;
@@ -115,7 +113,7 @@ inline U32 NSModifiersToTorqueModifiers( NSUInteger mods )
    
    mLastMods = newMods;
    
-   Input::setModifierKeys( convertModifierBits( mLastMods ) );
+   Input::setModifierKeys( mLastMods );
 }
 
 - (Point2I)viewCoordsToTorqueCoords:(NSPoint)mousePoint
@@ -159,7 +157,7 @@ inline U32 NSModifiersToTorqueModifiers( NSUInteger mods )
 {
    Point2I eventLocation = [self viewCoordsToTorqueCoords: [theEvent locationInWindow]];
    U16 buttonNumber = [theEvent buttonNumber];  
-   U32 action  = isMouseDown ? SI_MAKE : SI_BREAK;
+   U32 action  = isMouseDown ? GLFW_PRESS : GLFW_RELEASE;
 
    // If the event location is negative then it occurred in the structure region (e.g. title bar, resize corner), and we don't want
    // to lock the mouse/drop into fullscreen for that.
@@ -252,7 +250,7 @@ inline U32 NSModifiersToTorqueModifiers( NSUInteger mods )
 
 - (void)flagsChanged:(NSEvent *)theEvent
 {
-   U32 torqueKeyCode = TranslateOSKeyCode([theEvent keyCode]);
+   S32 torqueKeyCode = TranslateOSKeyCode([theEvent keyCode]);
    U32 macMods = [theEvent modifierFlags];
    [self trackModState:torqueKeyCode withMacMods:macMods event:theEvent];
 }
@@ -265,8 +263,8 @@ inline U32 NSModifiersToTorqueModifiers( NSUInteger mods )
    
    if(    mTorqueWindow->getKeyboardTranslation()
        && !mTorqueWindow->shouldNotTranslate(
-               convertModifierBits( NSModifiersToTorqueModifiers( [ theEvent modifierFlags ] ) ),
-               ( InputObjectInstances ) TranslateOSKeyCode( [ theEvent keyCode ] ) ) )
+               NSModifiersToTorqueModifiers( [ theEvent modifierFlags ] ),
+               TranslateOSKeyCode( [ theEvent keyCode ] ) ) )
    {
       mHandledAsCharEvent = false;
       [ self interpretKeyEvents: [ NSArray arrayWithObject: theEvent ] ];
@@ -289,11 +287,11 @@ inline U32 NSModifiersToTorqueModifiers( NSUInteger mods )
 {
    U32 action;
    if([theEvent type] != NSFlagsChanged)
-      action = isKeyDown ? ([theEvent isARepeat] ? SI_REPEAT : SI_MAKE) : SI_BREAK;
+      action = isKeyDown ? ([theEvent isARepeat] ? GLFW_REPEAT : GLFW_PRESS) : GLFW_RELEASE;
    else
-      action = isKeyDown ? SI_MAKE : SI_BREAK;
+      action = isKeyDown ? GLFW_PRESS : GLFW_RELEASE;
    
-   U32 torqueKeyCode = TranslateOSKeyCode([theEvent keyCode]);
+   S32 torqueKeyCode = TranslateOSKeyCode([theEvent keyCode]);
    mLastMods = NSModifiersToTorqueModifiers( [ theEvent modifierFlags ] );
 
    mTorqueWindow->keyEvent.trigger(mTorqueWindow->getWindowId(), mLastMods, action, torqueKeyCode);

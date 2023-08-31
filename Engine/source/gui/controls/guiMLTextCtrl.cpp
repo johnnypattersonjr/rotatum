@@ -724,7 +724,7 @@ bool GuiMLTextCtrl::onKeyDown(const GuiEvent& event)
       switch(event.keyCode)
       {
          //copy
-         case KEY_C:
+         case GLFW_KEY_C:
          {
             //make sure we actually have something selected
             if (mSelectionActive)

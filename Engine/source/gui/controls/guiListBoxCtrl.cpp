@@ -1233,7 +1233,7 @@ void GuiListBoxCtrl::onMouseUp( const GuiEvent& event )
 
 bool GuiListBoxCtrl::onKeyDown( const GuiEvent &event )
 {
-   if ( event.keyCode == KEY_DELETE )
+   if ( event.keyCode == GLFW_KEY_DELETE )
    {
       onDeleteKey_callback();
       return true;

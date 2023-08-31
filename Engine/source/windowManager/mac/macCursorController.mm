@@ -101,15 +101,11 @@ void MacCursorController::setCursorShape(U32 cursorID)
       case PlatformCursorController::curArrow:
          [[NSCursor arrowCursor] set];
          break;
-      case PlatformCursorController::curWait:
-         // hack: black-sheep carbon call
-         SetThemeCursor(kThemeWatchCursor);
-         break;
       case PlatformCursorController::curPlus:
          [[NSCursor crosshairCursor] set];
          break;
       case PlatformCursorController::curResizeVert:
-         [[NSCursor resizeLeftRightCursor] set];
+         [[NSCursor resizeUpDownCursor] set];
          break;
       case PlatformCursorController::curIBeam:
          [[NSCursor IBeamCursor] set];
@@ -125,7 +121,7 @@ void MacCursorController::setCursorShape(U32 cursorID)
          [[TorqueCursors resizeNWSE] set];
          break;
       case PlatformCursorController::curResizeHorz:
-         [[NSCursor resizeUpDownCursor] set];
+         [[NSCursor resizeLeftRightCursor] set];
       break;
    }
 }

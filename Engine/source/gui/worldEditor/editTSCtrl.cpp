@@ -621,7 +621,7 @@ bool EditTSCtrl::onInputEvent(const InputEventInfo & event)
 {
 
    if(mRightMousePassThru && event.deviceType == MouseDeviceType &&
-      event.objInst == KEY_BUTTON1 && event.action == SI_BREAK)
+      event.objInst == GLFW_MOUSE_BUTTON_2 && event.action == GLFW_RELEASE)
    {
       // if the right mouse pass thru is enabled,
       // we want to reactivate mouse on a right mouse button up
@@ -649,7 +649,7 @@ bool EditTSCtrl::onInputEvent(const InputEventInfo & event)
    }
 
    if(mMiddleMousePassThru && event.deviceType == MouseDeviceType &&
-      event.objInst == KEY_BUTTON2 && event.action == SI_BREAK)
+      event.objInst == GLFW_MOUSE_BUTTON_3 && event.action == GLFW_RELEASE)
    {
       // if the middle mouse pass thru is enabled,
       // we want to reactivate mouse on a middle mouse button up

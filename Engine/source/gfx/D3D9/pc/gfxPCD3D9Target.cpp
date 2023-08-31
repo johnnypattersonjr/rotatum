@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -477,7 +478,10 @@ void GFXPCD3D9WindowTarget::resetMode()
       if ( backbufferSize == getSize() && 
            ppFullscreen == mode.fullScreen &&
            ppAntiAliaseLevel == mode.antialiasLevel )
-         return;   
+      {
+         mWindow->setSuppressReset(false);
+         return;
+      }
    }
 
    // So, the video mode has changed - if we're an additional swap chain

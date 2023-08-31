@@ -518,9 +518,9 @@ void GuiSplitContainer::getCursor( GuiCursor *&cursor, bool &showCursor, const G
 
    // Figure out which cursor we want if we need one
    if ( mOrientation == Horizontal )
-      desiredCursor = PlatformCursorController::curResizeHorz;
-   else if ( mOrientation == Vertical )
       desiredCursor = PlatformCursorController::curResizeVert;
+   else if ( mOrientation == Vertical )
+      desiredCursor = PlatformCursorController::curResizeHorz;
 
    PlatformWindow *platformWindow = static_cast<GuiCanvas*>(getRoot())->getPlatformWindow();
    AssertFatal( platformWindow != NULL,"GuiControl without owning platform window!  This should not be possible." );

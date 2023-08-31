@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -71,9 +72,6 @@ protected:
 	/// When this is true, resizing is locked
 	bool mResizeLocked;
 
-   /// Is Idle?
-   bool mIsBackground;
-
    /// Cursor Controller for this Window
    PlatformCursorController *mCursorController;
    
@@ -86,13 +84,9 @@ protected:
    /// Suppress device resets
    bool mSuppressReset;
 
-   /// Offscreen Render
-   bool mOffscreenRender;
-
    /// Protected constructor so that the win
    PlatformWindow()
    {
-      mIsBackground = false; // This could be toggled to true to prefer performance.
       mMinimumSize.set(0,0);
 		mLockedSize.set(0,0);
 		mResizeLocked = false;
@@ -102,8 +96,6 @@ protected:
       // This controller maps window input (Mouse/Keyboard) to a generic input consumer
       mWindowInputGenerator = new WindowInputGenerator( this );
       mSuppressReset = false;
-
-      mOffscreenRender = false;
    }
 
 public:
@@ -146,13 +138,7 @@ public:
 
    /// Get our current video mode - if the window has been resized, it will
    /// reflect this.
-   virtual const GFXVideoMode &getVideoMode()=0;
-
-   /// If we're fullscreen, this function returns us to desktop mode.
-   ///
-   /// This will be either the last mode that we had that was not
-   /// fullscreen, or the equivalent mode, windowed.
-   virtual bool clearFullscreen()=0;
+   virtual const GFXVideoMode &getVideoMode() const=0;
 
    /// @return true if this window is fullscreen, false otherwise.
    virtual bool isFullscreen()=0;
@@ -160,42 +146,21 @@ public:
    /// Acquire the entire screen
    void setFullscreen(const bool fullscreen);
 
-   /// Set Idle State (Background)
-   /// 
-   /// This is called to put a window into idle state, which causes it's 
-   /// rendering priority to be toned down to prefer performance
-   virtual void setBackground( bool val ) { mIsBackground = val; };
-
-   /// Get Idle State (Background)
-   ///
-   /// This is called to poll the window as to it's idle state.  
-   virtual bool getBackground() { return mIsBackground; };
-
-   /// Set whether this window is intended for offscreen rendering
-   /// An offscreen window will never be shown or lose focus
-   virtual void setOffscreenRender(bool val ) { mOffscreenRender = val; };
-
-   /// Set whether this window is intended for offscreen rendering
-   ///
-   /// This is called to poll the window as to it's idle state.  
-   virtual bool getOffscreenRender() { return mOffscreenRender; };
-
-
    /// Set Focused State (Foreground)
    ///
    /// Claim OS input focus for this window
    virtual void setFocus() { }
    /// @}
 
-   /// @name Caption
+   /// @name Title
    ///
    /// @{
 
-   /// Set the window's caption.
-   virtual bool setCaption(const char *cap)=0;
+   /// Set the window's title.
+   virtual void setTitle(const char *title) = 0;
 
-   /// Get the window's caption.
-   virtual const char *getCaption()=0;
+   /// Get the window's title.
+   virtual const char *getTitle() const = 0;
 
    /// @}
 
@@ -216,9 +181,6 @@ public:
    /// Show the window on screen
    virtual void show()=0;
 
-   /// Destroy the window on screen
-   virtual void close()=0;
-
    /// Restore the window from a Maximized or Minimized state
    virtual void restore()=0;
 
@@ -234,11 +196,8 @@ public:
    /// borders or other non-client elements.
    /// @{
 
-   /// Set the Client Area Extent (Resolution) of this window
-   virtual void setClientExtent( const Point2I newExtent ) = 0;
-
    /// Get the Client Area Extent (Resolution) of this window
-   virtual const Point2I getClientExtent() = 0;
+   virtual Point2I getClientExtent() const = 0;
 
    /// @}
    /// The bounds of a Window are defined as the entire area occupied by 
@@ -247,11 +206,8 @@ public:
    /// 
    /// @{
 
-   /// Resize the window to have some new bounds.
-   virtual void setBounds( const RectI &newBounds ) = 0;
-
    /// Get the position and size (fullscreen windows are always at (0,0)).
-   virtual const RectI getBounds() const = 0;
+   virtual RectI getBounds() const = 0;
 
    /// @}
    /// The Position of a window is always in relation to the very upper left 
@@ -262,49 +218,35 @@ public:
    /// @{
 
    /// Set the position of this window
-   virtual void setPosition( const Point2I newPosition ) = 0;
+   virtual void setPosition(const Point2I &position) = 0;
 
    /// Get the position of this window
-   virtual const Point2I getPosition() = 0;
+   virtual Point2I getPosition() const = 0;
 
    virtual void centerWindow() {};
 
    /// Resize the window to have a new size (but be in the same position).
-   virtual bool setSize(const Point2I &newSize)=0;
+   virtual void setSize(const Point2I &size) = 0;
 
    /// @}
    
-   /// @name Coordinate Space Conversion
-   /// @{
-
-   /// Convert the coordinate given in this window space to screen coordinates.
-   virtual Point2I clientToScreen( const Point2I& point ) = 0;
-   
-   /// Convert the given screen coordinates to coordinates in this window space.
-   virtual Point2I screenToClient( const Point2I& point ) = 0;
-   
-   /// @}
-
    /// @name Windowed state
    ///
    /// This is only really meaningful if the window is not fullscreen.
    ///
    /// @{
 
-   /// Returns true if the window is instantiated in the OS.
-   virtual bool isOpen() = 0;
-
    /// Returns true if the window is visible.
-   virtual bool isVisible() = 0;
+   virtual bool isVisible() const = 0;
 
    /// Returns true if the window has input focus
-   virtual bool isFocused() = 0;
+   virtual bool isFocused() const = 0;
 
    /// Returns true if the window is minimized
-   virtual bool isMinimized() = 0;
+   virtual bool isMinimized() const = 0;
 
    /// Returns true if the window is maximized
-   virtual bool isMaximized() = 0;
+   virtual bool isMaximized() const = 0;
    
    /// @name Keyboard Translation
    ///
@@ -328,7 +270,7 @@ public:
    }
    
    /// Returns true if the given keypress event should not be translated.
-   virtual bool shouldNotTranslate( U32 modifiers, U32 keyCode ) const;
+   virtual bool shouldNotTranslate( U8 modifiers, U32 keyCode ) const;
    
    /// @}
 
@@ -455,8 +397,6 @@ public:
    virtual bool shouldLockMouse() const = 0;
 
    /// @}
-
-   virtual PlatformWindow * getNextWindow() const = 0;
 
    /// @name Event Handlers
    ///

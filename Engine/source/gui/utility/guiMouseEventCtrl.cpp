@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -307,15 +308,10 @@ void GuiMouseEventCtrl::initPersistFields()
 
    Parent::initPersistFields();
 
-   Con::setIntVariable("$EventModifier::LSHIFT",      SI_LSHIFT);
-   Con::setIntVariable("$EventModifier::RSHIFT",      SI_RSHIFT);
    Con::setIntVariable("$EventModifier::SHIFT",       SI_SHIFT);
-   Con::setIntVariable("$EventModifier::LCTRL",       SI_LCTRL);
-   Con::setIntVariable("$EventModifier::RCTRL",       SI_RCTRL);
    Con::setIntVariable("$EventModifier::CTRL",        SI_CTRL);
-   Con::setIntVariable("$EventModifier::LALT",        SI_LALT);
-   Con::setIntVariable("$EventModifier::RALT",        SI_RALT);
    Con::setIntVariable("$EventModifier::ALT",         SI_ALT);
+   Con::setIntVariable("$EventModifier::SUPER",       GLFW_MOD_SUPER);
 }
 
 //------------------------------------------------------------------------------

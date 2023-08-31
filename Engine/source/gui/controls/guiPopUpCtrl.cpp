@@ -138,12 +138,12 @@ bool GuiPopupTextListCtrl::onKeyDown(const GuiEvent &event)
    //see if the key down is a <return> or not
    if ( event.modifier == 0 )
    {
-      if ( event.keyCode == KEY_RETURN )
+      if ( event.keyCode == GLFW_KEY_ENTER )
       {
          mPopUpCtrl->closePopUp();
          return true;
       }
-      else if ( event.keyCode == KEY_ESCAPE )
+      else if ( event.keyCode == GLFW_KEY_ESCAPE )
       {
          mSelectedCell.set( -1, -1 );
          mPopUpCtrl->closePopUp();
@@ -1193,7 +1193,7 @@ bool GuiPopUpMenuCtrl::onKeyDown(const GuiEvent &event)
       return false;
 
    //see if the key down is a <return> or not
-   if ( event.keyCode == KEY_RETURN && event.modifier == 0 )
+   if ( event.keyCode == GLFW_KEY_ENTER && event.modifier == 0 )
    {
       onAction();
       return true;

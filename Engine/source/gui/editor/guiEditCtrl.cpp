@@ -233,8 +233,8 @@ bool GuiEditCtrl::onKeyDown(const GuiEvent &event)
    {
       switch(event.keyCode)
       {
-         case KEY_BACKSPACE:
-         case KEY_DELETE:
+         case GLFW_KEY_BACKSPACE:
+         case GLFW_KEY_DELETE:
             deleteSelection();
             onDelete_callback();
             return true;
@@ -2346,9 +2346,9 @@ void GuiEditCtrl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent
          else if (  ( mSizingMode == ( sizingBottom | sizingLeft ) ) || ( mSizingMode == ( sizingTop | sizingRight ) ) )
             desiredCursor = PlatformCursorController::curResizeNESW;
          else if ( mSizingMode == sizingLeft || mSizingMode == sizingRight ) 
-            desiredCursor = PlatformCursorController::curResizeVert;
-         else if (mSizingMode == sizingTop || mSizingMode == sizingBottom )
             desiredCursor = PlatformCursorController::curResizeHorz;
+         else if (mSizingMode == sizingTop || mSizingMode == sizingBottom )
+            desiredCursor = PlatformCursorController::curResizeVert;
       }
       else
       {
@@ -2358,9 +2358,9 @@ void GuiEditCtrl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent
          else if ( ( sizeMode == ( sizingBottom | sizingLeft ) ) || ( sizeMode == ( sizingTop | sizingRight ) ) )
             desiredCursor = PlatformCursorController::curResizeNESW;
          else if (sizeMode == sizingLeft || sizeMode == sizingRight )
-            desiredCursor = PlatformCursorController::curResizeVert;
-         else if (sizeMode == sizingTop || sizeMode == sizingBottom )
             desiredCursor = PlatformCursorController::curResizeHorz;
+         else if (sizeMode == sizingTop || sizeMode == sizingBottom )
+            desiredCursor = PlatformCursorController::curResizeVert;
       }
    }
    

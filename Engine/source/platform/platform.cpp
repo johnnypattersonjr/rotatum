@@ -93,7 +93,7 @@ const bool Platform::checkKeyboardInputExclusion(const InputEventInfo *info)
       // Alt-tab
       {
          KeyboardInputExclusion kie;
-         kie.key = KEY_TAB;
+         kie.key = GLFW_KEY_TAB;
          kie.andModifierMask = SI_ALT;
          addKeyboardInputExclusion(kie);
       }

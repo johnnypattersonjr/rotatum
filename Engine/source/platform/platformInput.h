@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,8 +31,8 @@
 #include "platform/event.h"
 
 //------------------------------------------------------------------------------
-U8 TranslateOSKeyCode( U8 vcode );
-U8 TranslateKeyCodeToOS(U8 keycode);
+S32 TranslateOSKeyCode(U8 vcode);
+U8 TranslateKeyCodeToOS(S32 keycode);
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -43,9 +44,9 @@ protected:
 public:
    struct ObjInfo
    {
-      InputEventType      mType;
-      InputObjectInstances  mInst;
-      S32   mMin, mMax;
+      InputEventType mType;
+      S32 mInst;
+      S32 mMin, mMax;
    };
 
    inline const char* getDeviceName()

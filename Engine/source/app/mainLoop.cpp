@@ -364,10 +364,6 @@ void StandardMainLoop::preShutdown()
 
 bool StandardMainLoop::handleCommandLine( S32 argc, const char **argv )
 {
-   // Allow the window manager to process command line inputs; this is
-   // done to let web plugin functionality happen in a fairly transparent way.
-   PlatformWindowManager::get()->processCmdLineArgs(argc, argv);
-
    Process::handleCommandLine( argc, argv );
 
    // Set up the command line args for the console scripts...

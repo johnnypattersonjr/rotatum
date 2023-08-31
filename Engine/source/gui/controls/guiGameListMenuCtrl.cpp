@@ -472,38 +472,38 @@ bool GuiGameListMenuCtrl::onKeyDown(const GuiEvent &event)
 {
    switch (event.keyCode)
    {
-      case KEY_UP:
+      case GLFW_KEY_UP:
          changeRow(-1);
          return true;
 
-      case KEY_DOWN:
+      case GLFW_KEY_DOWN:
          changeRow(1);
          return true;
 
-      case KEY_A:
-      case KEY_RETURN:
-      case KEY_NUMPADENTER:
-      case KEY_SPACE:
+      case GLFW_KEY_A:
+      case GLFW_KEY_ENTER:
+      case GLFW_KEY_KP_ENTER:
+      case GLFW_KEY_SPACE:
       case XI_A:
       case XI_START:
          doScriptCommand(mCallbackOnA);
          return true;
 
-      case KEY_B:
-      case KEY_ESCAPE:
-      case KEY_BACKSPACE:
-      case KEY_DELETE:
+      case GLFW_KEY_B:
+      case GLFW_KEY_ESCAPE:
+      case GLFW_KEY_BACKSPACE:
+      case GLFW_KEY_DELETE:
       case XI_B:
       case XI_BACK:
          doScriptCommand(mCallbackOnB);
          return true;
 
-      case KEY_X:
+      case GLFW_KEY_X:
       case XI_X:
          doScriptCommand(mCallbackOnX);
          return true;
 
-      case KEY_Y:
+      case GLFW_KEY_Y:
       case XI_Y:
          doScriptCommand(mCallbackOnY);
          return true;

@@ -28,7 +28,6 @@ GFXVideoMode::GFXVideoMode()
    bitDepth = 32;
    fullScreen = false;
    refreshRate = 60;
-   wideScreen = false;
    resolution.set(800,600);
    antialiasLevel = 0;
 }

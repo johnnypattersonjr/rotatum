@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -163,7 +164,7 @@ protected:
       GuiControl *ctrl;
       U32 index;
       U32 keyCode;
-      U32 modifier;
+      U8 modifier;
    };
    Vector <AccKeyMap> mAcceleratorMap;
 
@@ -412,7 +413,7 @@ public:
    /// @param   index
    /// @param   keyCode    Key code.
    /// @param   modifier   Shift, ctrl, etc.
-   virtual void addAcceleratorKey(GuiControl *ctrl, U32 index, U32 keyCode, U32 modifier);
+   virtual void addAcceleratorKey(GuiControl *ctrl, U32 index, U32 keyCode, U8 modifier);
 
    /// Sets the first responder.
    /// @param   firstResponder    Control to designate as first responder

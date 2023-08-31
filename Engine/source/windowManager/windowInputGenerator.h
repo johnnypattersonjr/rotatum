@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -52,11 +53,11 @@ class WindowInputGenerator
       F32             mPixelsPerMickey;
 
       // Event Handlers
-      void handleMouseButton(WindowId did, U32 modifier,  U32 action, U16 button);
-      void handleMouseWheel (WindowId did, U32 modifier,  S32 wheelDeltaX, S32 wheelDeltaY);
-      void handleMouseMove  (WindowId did, U32 modifier,  S32 x,      S32 y, bool isRelative);
-      void handleKeyboard   (WindowId did, U32 modifier,  U32 action, U16 key);
-      void handleCharInput  (WindowId did, U32 modifier,  U16 key);
+      void handleMouseButton(WindowId did, U8 modifier, U32 action, U16 button);
+      void handleMouseWheel (WindowId did, U8 modifier, S32 wheelDeltaX, S32 wheelDeltaY);
+      void handleMouseMove  (WindowId did, U8 modifier, S32 x,      S32 y, bool isRelative);
+      void handleKeyboard   (WindowId did, U8 modifier, U32 action, U16 key);
+      void handleCharInput  (WindowId did, U8 modifier, U16 key);
       void handleAppEvent   (WindowId did, S32 event);
       void handleInputEvent (U32 deviceInst,F32 fValue, U16 deviceType, U16 objType, U16 ascii, U16 objInst, U8 action, U8 modifier);
 
@@ -71,7 +72,7 @@ class WindowInputGenerator
       
       /// Returns true if the given keypress event should be send as a raw keyboard
       /// event even if it maps to a character input event.
-      bool wantAsKeyboardEvent( U32 modifiers, U32 key );
+      bool wantAsKeyboardEvent( U8 modifiers, U32 key );
 };
 
 #endif // _WINDOW_INPUTGENERATOR_H_

@@ -571,7 +571,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
    setUpdate();
 
    // Ugly, but now I'm cool like MarkF.
-   if(event.keyCode == KEY_BACKSPACE)
+   if(event.keyCode == GLFW_KEY_BACKSPACE)
       goto dealWithBackspace;
    
    if ( event.modifier & SI_SHIFT )
@@ -583,7 +583,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
       {
          switch ( event.keyCode )
          {
-            case KEY_LEFT:
+            case GLFW_KEY_LEFT:
             {
                S32 newpos = findPrevWord();               
 
@@ -638,7 +638,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
                return true;
             }
 
-            case KEY_RIGHT:
+            case GLFW_KEY_RIGHT:
             {
                S32 newpos = findNextWord();               
 
@@ -703,7 +703,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
         switch ( event.keyCode )
         {
-            case KEY_TAB:
+            case GLFW_KEY_TAB:
                if ( mTabComplete )
                {
 				  onTabComplete_callback("1");
@@ -711,19 +711,19 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
                }
 			   break; // We don't want to fall through if we don't handle the TAB here.
 
-            case KEY_HOME:
+            case GLFW_KEY_HOME:
                mBlockStart = 0;
                mBlockEnd = mCursorPos;
                mCursorPos = 0;
                return true;
 
-            case KEY_END:
+            case GLFW_KEY_END:
                 mBlockStart = mCursorPos;
                 mBlockEnd = stringLen;
                 mCursorPos = stringLen;
                 return true;
 
-            case KEY_LEFT:
+            case GLFW_KEY_LEFT:
                 if ((mCursorPos > 0) & (stringLen > 0))
                 {
                     //if we already have a selected block
@@ -749,7 +749,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
                 }
                 return true;
 
-            case KEY_RIGHT:
+            case GLFW_KEY_RIGHT:
                 if (mCursorPos < stringLen)
                 {
                     if ((mCursorPos == mBlockStart) && (mBlockEnd > 0))
@@ -775,8 +775,8 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
                 }
                 return true;
 
-				case KEY_RETURN:
-				case KEY_NUMPADENTER:
+				case GLFW_KEY_ENTER:
+				case GLFW_KEY_KP_ENTER:
            
 					return dealWithEnter(false);
 
@@ -792,73 +792,73 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
          // Added UNIX emacs key bindings - just a little hack here...
 
          // Ctrl-B - move one character back
-         case KEY_B:
+         case GLFW_KEY_B:
          { 
             GuiEvent new_event;
             new_event.modifier = 0;
-            new_event.keyCode = KEY_LEFT;
+            new_event.keyCode = GLFW_KEY_LEFT;
             return(onKeyDown(new_event));
          }
 
          // Ctrl-F - move one character forward
-         case KEY_F:
+         case GLFW_KEY_F:
          { 
             GuiEvent new_event;
             new_event.modifier = 0;
-            new_event.keyCode = KEY_RIGHT;
+            new_event.keyCode = GLFW_KEY_RIGHT;
             return(onKeyDown(new_event));
          }
 
          // Ctrl-A - move to the beginning of the line
-         case KEY_A:
+         case GLFW_KEY_A:
          { 
             GuiEvent new_event;
             new_event.modifier = 0;
-            new_event.keyCode = KEY_HOME;
+            new_event.keyCode = GLFW_KEY_HOME;
             return(onKeyDown(new_event));
          }
 
          // Ctrl-E - move to the end of the line
-         case KEY_E:
+         case GLFW_KEY_E:
          { 
             GuiEvent new_event;
             new_event.modifier = 0;
-            new_event.keyCode = KEY_END;
+            new_event.keyCode = GLFW_KEY_END;
             return(onKeyDown(new_event));
          }
 
          // Ctrl-P - move backward in history
-         case KEY_P:
+         case GLFW_KEY_P:
          { 
             GuiEvent new_event;
             new_event.modifier = 0;
-            new_event.keyCode = KEY_UP;
+            new_event.keyCode = GLFW_KEY_UP;
             return(onKeyDown(new_event));
          }
 
          // Ctrl-N - move forward in history
-         case KEY_N:
+         case GLFW_KEY_N:
          { 
             GuiEvent new_event;
             new_event.modifier = 0;
-            new_event.keyCode = KEY_DOWN;
+            new_event.keyCode = GLFW_KEY_DOWN;
             return(onKeyDown(new_event));
          }
 
          // Ctrl-D - delete under cursor
-         case KEY_D:
+         case GLFW_KEY_D:
          { 
             GuiEvent new_event;
             new_event.modifier = 0;
-            new_event.keyCode = KEY_DELETE;
+            new_event.keyCode = GLFW_KEY_DELETE;
             return(onKeyDown(new_event));
          }
 
-         case KEY_U:
+         case GLFW_KEY_U:
          { 
             GuiEvent new_event;
             new_event.modifier = SI_CTRL;
-            new_event.keyCode = KEY_DELETE;
+            new_event.keyCode = GLFW_KEY_DELETE;
             return(onKeyDown(new_event));
          }
 
@@ -867,7 +867,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
          // Adding word jump navigation.
 
-         case KEY_LEFT:
+         case GLFW_KEY_LEFT:
          {
 
             mCursorPos = findPrevWord();
@@ -876,7 +876,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
             return true;
          }
 
-         case KEY_RIGHT:
+         case GLFW_KEY_RIGHT:
          {
             mCursorPos = findNextWord();
             mBlockStart = 0;
@@ -886,21 +886,21 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
          
 #if !defined(TORQUE_OS_MAC)
          // Select all
-         case KEY_A:
+         case GLFW_KEY_A:
          {
             selectAllText();
             return true;
          }
 
          // windows style cut / copy / paste / undo keybinds
-         case KEY_C:
-         case KEY_X:
+         case GLFW_KEY_C:
+         case GLFW_KEY_X:
          {
             // copy, and cut the text if we hit ctrl-x
-            onCopy( event.keyCode==KEY_X );
+            onCopy( event.keyCode==GLFW_KEY_X );
             return true;
          }
-         case KEY_V:
+         case GLFW_KEY_V:
          {
             onPaste();
 
@@ -909,7 +909,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
             return true;
          }
 
-         case KEY_Z:
+         case GLFW_KEY_Z:
             if (! mDragHit)
             {
                onUndo();
@@ -917,8 +917,8 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
             }
 #endif
 
-         case KEY_DELETE:
-         case KEY_BACKSPACE:
+         case GLFW_KEY_DELETE:
+         case GLFW_KEY_BACKSPACE:
             //save the current state
             saveUndoState();
 
@@ -945,19 +945,19 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
       switch(event.keyCode)
       {
          // Select all
-         case KEY_A:
+         case GLFW_KEY_A:
          {
             selectAllText();
             return true;
          }
-         case KEY_C:
-         case KEY_X:
+         case GLFW_KEY_C:
+         case GLFW_KEY_X:
          {
             // copy, and cut the text if we hit cmd-x
-            onCopy( event.keyCode==KEY_X );
+            onCopy( event.keyCode==GLFW_KEY_X );
             return true;
          }
-         case KEY_V:
+         case GLFW_KEY_V:
          {
             onPaste();
 
@@ -967,7 +967,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
             return true;
          }
             
-         case KEY_Z:
+         case GLFW_KEY_Z:
             if (! mDragHit)
             {
                onUndo();
@@ -983,7 +983,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
    {
       switch(event.keyCode)
       {
-         case KEY_ESCAPE:
+         case GLFW_KEY_ESCAPE:
             if( mEscapeCommand.isNotEmpty() )
             {
                evaluate( mEscapeCommand );
@@ -991,12 +991,12 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
             }
             return( Parent::onKeyDown( event ) );
 
-         case KEY_RETURN:
-         case KEY_NUMPADENTER:
+         case GLFW_KEY_ENTER:
+         case GLFW_KEY_KP_ENTER:
            
 				return dealWithEnter(true);
 
-         case KEY_UP:
+         case GLFW_KEY_UP:
          {
             if( mHistorySize > 0 )
             {
@@ -1017,7 +1017,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
             return true;
          }
 
-         case KEY_DOWN:
+         case GLFW_KEY_DOWN:
          {
             if( mHistorySize > 0 )
             {
@@ -1038,7 +1038,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
             return true;
          }
 
-         case KEY_LEFT:
+         case GLFW_KEY_LEFT:
             
             // If we have a selection put the cursor to the left side of it.
             if ( mBlockStart != mBlockEnd )
@@ -1054,7 +1054,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
             return true;
 
-         case KEY_RIGHT:
+         case GLFW_KEY_RIGHT:
 
             // If we have a selection put the cursor to the right side of it.            
             if ( mBlockStart != mBlockEnd )
@@ -1070,7 +1070,7 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
 
             return true;
 
-         case KEY_BACKSPACE:
+         case GLFW_KEY_BACKSPACE:
 dealWithBackspace:
             //save the current state
             saveUndoState();
@@ -1098,7 +1098,7 @@ dealWithBackspace:
             }
             return true;
 
-         case KEY_DELETE:
+         case GLFW_KEY_DELETE:
             //save the current state
             saveUndoState();
 
@@ -1124,17 +1124,17 @@ dealWithBackspace:
             }
             return true;
 
-         case KEY_INSERT:
+         case GLFW_KEY_INSERT:
             mInsertOn = !mInsertOn;
             return true;
 
-         case KEY_HOME:
+         case GLFW_KEY_HOME:
             mBlockStart = 0;
             mBlockEnd   = 0;
             mCursorPos  = 0;
             return true;
 
-         case KEY_END:
+         case GLFW_KEY_END:
             mBlockStart = 0;
             mBlockEnd   = 0;
             mCursorPos  = stringLen;
@@ -1148,15 +1148,15 @@ dealWithBackspace:
 
    switch ( event.keyCode )
    {
-      case KEY_TAB:
+      case GLFW_KEY_TAB:
          if ( mTabComplete )
          {
 			onTabComplete_callback("0");
             return( true );
          }
-      case KEY_UP:
-      case KEY_DOWN:
-      case KEY_ESCAPE:
+      case GLFW_KEY_UP:
+      case GLFW_KEY_DOWN:
+      case GLFW_KEY_ESCAPE:
          return Parent::onKeyDown( event );
       default:
          break;

@@ -2593,13 +2593,13 @@ bool GuiTreeViewCtrl::onKeyDown( const GuiEvent& event )
    // Deal with enter and delete
    if ( event.modifier == 0 )
    {
-      if ( event.keyCode == KEY_RETURN )
+      if ( event.keyCode == GLFW_KEY_ENTER )
       {
          execAltConsoleCallback();
          return true;
       }
 
-      if ( event.keyCode == KEY_DELETE && mDeleteObjectAllowed )
+      if ( event.keyCode == GLFW_KEY_DELETE && mDeleteObjectAllowed )
       {
          // Don't delete the root!
          if (mSelectedItems.empty())
@@ -2628,7 +2628,7 @@ bool GuiTreeViewCtrl::onKeyDown( const GuiEvent& event )
    {
       switch ( event.keyCode )
       {
-      case KEY_UP:
+      case GLFW_KEY_UP:
          // Move us up.
          if ( item->mPrevious )
          {
@@ -2637,7 +2637,7 @@ bool GuiTreeViewCtrl::onKeyDown( const GuiEvent& event )
          }
          return true;
 
-      case KEY_DOWN:
+      case GLFW_KEY_DOWN:
          // Move the item under us up.
          if ( item->mNext )
          {
@@ -2646,7 +2646,7 @@ bool GuiTreeViewCtrl::onKeyDown( const GuiEvent& event )
          }
          return true;
 
-      case KEY_LEFT:
+      case GLFW_KEY_LEFT:
          if ( item->mParent )
          {
             if ( item->mParent->mParent )
@@ -2760,7 +2760,7 @@ bool GuiTreeViewCtrl::onKeyDown( const GuiEvent& event )
          }
          return true;
 
-      case KEY_RIGHT:
+      case GLFW_KEY_RIGHT:
          if ( item->mPrevious )
          {
             // Make the item the last child of its previous sibling.
@@ -2869,7 +2869,7 @@ bool GuiTreeViewCtrl::onKeyDown( const GuiEvent& event )
    // Explorer-esque navigation...
    switch( event.keyCode )
    {
-   case KEY_UP:
+   case GLFW_KEY_UP:
       // Select previous visible item:
       if ( item->mPrevious )
       {
@@ -2896,7 +2896,7 @@ bool GuiTreeViewCtrl::onKeyDown( const GuiEvent& event )
       return false;
       break;
 
-   case KEY_DOWN:
+   case GLFW_KEY_DOWN:
       // Selected child if it is visible:
       if ( item->isParent() && item->isExpanded() )
       {
@@ -2920,7 +2920,7 @@ bool GuiTreeViewCtrl::onKeyDown( const GuiEvent& event )
       return false;
       break;
 
-   case KEY_LEFT:
+   case GLFW_KEY_LEFT:
       // Contract current menu:
       if ( item->isExpanded() )
       {
@@ -2939,7 +2939,7 @@ bool GuiTreeViewCtrl::onKeyDown( const GuiEvent& event )
       return false;
       break;
 
-   case KEY_RIGHT:
+   case GLFW_KEY_RIGHT:
       // Expand selected item:
       if ( item->isParent() )
       {

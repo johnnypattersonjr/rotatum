@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -67,7 +68,6 @@ public:
    enum 
    {
       curArrow = 0,
-      curWait,
       curPlus,
       curResizeVert,
       curResizeHorz,
@@ -76,6 +76,7 @@ public:
       curResizeNESW,
       curResizeNWSE,
       curHand,
+      curCOUNT
    };
 
 public:

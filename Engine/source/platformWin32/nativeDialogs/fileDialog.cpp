@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,6 +33,7 @@
 #include <ShlObj.h>
 #include <WindowsX.h>
 #include "console/engineAPI.h"
+#include "windowManager/win32/win32Window.h"
 
 #ifdef TORQUE_TOOLS
 //-----------------------------------------------------------------------------
@@ -416,7 +418,8 @@ bool FileDialog::Execute()
 
 
    // Flag we're showing file browser so we can do some render hacking
-   winState.renderThreadBlocked = true;
+   Win32Window* pWindow = (Win32Window*)WindowManager->getFirstWindow();
+   pWindow->setRenderOnRefresh(true);
 
    // Get the current working directory, so we can back up to it once Windows has
    // done its craziness and messed with it.
@@ -430,7 +433,7 @@ bool FileDialog::Execute()
       dialogSuccess = GetSaveFileName(&ofn);
 
    // Dialog is gone.
-   winState.renderThreadBlocked = false;
+   pWindow->setRenderOnRefresh(false);
 
    // Restore the working directory.
    Platform::setCurrentDirectory( cwd );

@@ -61,8 +61,8 @@ add_engine_src_dir(
 	util
 	util/messaging
 	windowManager
+	windowManager/glfw
 	windowManager/test
-	windowManager/torque
 )
 
 if(ENGINE_PLATFORM_LINUX OR ENGINE_PLATFORM_MAC OR ENGINE_PLATFORM_WIN32)
@@ -294,6 +294,7 @@ target_link_libraries(
 		${PROJECT_NAME}-module
 		collada
 		convexDecomp
+		glfw
 		libjpeg
 		libmng
 		libpng

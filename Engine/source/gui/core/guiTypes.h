@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -48,13 +49,13 @@ class SFXTrack;
 /// This is passed around to all the relevant controls so they know what's going on.
 struct GuiEvent
 {
-   U16                  ascii;            ///< ascii character code 'a', 'A', 'b', '*', etc (if device==keyboard) - possibly a uchar or something
-   U8                   modifier;         ///< SI_LSHIFT, etc
-   InputObjectInstances keyCode;          ///< for unprintables, 'tab', 'return', ...
-   Point2I              mousePoint;       ///< for mouse events
-   U8                   mouseClickCount;  ///< to determine double clicks, etc...
-   U8                   mouseAxis;        ///< mousewheel axis (0 == X, 1 == Y)
-   F32                  fval;             ///< used for mousewheel events
+   U16     ascii;            ///< ascii character code 'a', 'A', 'b', '*', etc (if device==keyboard) - possibly a uchar or something
+   U8      modifier;         ///< SI_LSHIFT, etc
+   S32     keyCode;          ///< for unprintables, 'tab', 'return', ...
+   Point2I mousePoint;       ///< for mouse events
+   U8      mouseClickCount;  ///< to determine double clicks, etc...
+   U8      mouseAxis;        ///< mousewheel axis (0 == X, 1 == Y)
+   F32     fval;             ///< used for mousewheel events
    
    GuiEvent()
       : ascii( 0 ),

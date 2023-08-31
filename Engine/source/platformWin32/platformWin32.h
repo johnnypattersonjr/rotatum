@@ -67,7 +67,6 @@ struct Win32PlatState
    HINSTANCE appInstance;
    HGLRC hGLRC;
    DWORD processId;
-   bool renderThreadBlocked;
    S32 nMessagesPerFrame; ///< The max number of messages to dispatch per frame
    HMENU appMenu; ///< The menu bar for the window
 #ifdef UNICODE
@@ -90,8 +89,6 @@ struct Win32PlatState
 };
 
 extern Win32PlatState winState;
-
-extern void setModifierKeys( S32 modKeys );
 
 //-------------------------------------- Helper Functions
 

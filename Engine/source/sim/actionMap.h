@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -53,7 +54,7 @@ class ActionMap : public SimObject
    bool onAdd();
 
    struct Node {
-      U32 modifiers;
+      U8 modifiers;
       U32 action;
 
       enum Flags {
@@ -114,20 +115,20 @@ class ActionMap : public SimObject
    // Find: return NULL if not found in current map, Get: create if not
    //  found.
    const Node* findNode(const U32 inDeviceType, const U32 inDeviceInst,
-                        const U32 inModifiers,  const U32 inAction);
+                        const U8 inModifiers, const U32 inAction);
    bool findBoundNode( const char* function, U32 &devMapIndex, U32 &nodeIndex );
    bool nextBoundNode( const char* function, U32 &devMapIndex, U32 &nodeIndex );
    Node* getNode(const U32 inDeviceType, const U32 inDeviceInst,
-                 const U32 inModifiers,  const U32 inAction,
+                 const U8 inModifiers, const U32 inAction,
                  SimObject* object = NULL);
 
    void removeNode(const U32 inDeviceType, const U32 inDeviceInst,
-                 const U32 inModifiers,  const U32 inAction,
-                 SimObject* object = NULL);
+                   const U8 inModifiers, const U32 inAction,
+                   SimObject* object = NULL);
 
    void enterBreakEvent(const InputEventInfo* pEvent, const Node* pNode);
 
-   static const char* getModifierString(const U32 modifiers);
+   static const char* getModifierString(const U8 modifiers);
 
    /// Pass index to a break entry, and this function will fire it off.
    static void fireBreakEvent(U32 idx, F32 value = 0.f);
@@ -161,7 +162,7 @@ class ActionMap : public SimObject
    bool processAction(const InputEventInfo*);
    
    /// Return true if the given event triggers is bound to an action in this map.
-   bool isAction( U32 deviceType, U32 deviceInst, U32 modifiers, U32 action );
+   bool isAction( U32 deviceType, U32 deviceInst, U8 modifiers, U32 action );
 
    /// Returns the global ActionMap.
    static ActionMap* getGlobalMap();
@@ -178,7 +179,7 @@ class ActionMap : public SimObject
 
    /// Returns true if the specified key + modifiers are bound to something
    /// on the global action map.
-   static bool checkAsciiGlobal(U16 key, U32 modifiers);
+   static bool checkAsciiGlobal(U16 key, U8 modifiers);
 
    static bool getDeviceTypeAndInstance(const char *device, U32 &deviceType, U32 &deviceInstance);
 

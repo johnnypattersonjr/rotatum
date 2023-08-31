@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -41,7 +42,7 @@ void PlatformWindow::setFullscreen( const bool fullscreen )
 
 //-----------------------------------------------------------------------------
 
-bool PlatformWindow::shouldNotTranslate( U32 modifiers, U32 keyCode ) const
+bool PlatformWindow::shouldNotTranslate( U8 modifiers, U32 keyCode ) const
 {
    if( mWindowInputGenerator )
       return mWindowInputGenerator->wantAsKeyboardEvent( modifiers, keyCode );

@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -89,8 +90,6 @@ ConsoleDocClass( GuiCanvas,
 	"@ingroup GuiCore\n");
 
 ColorI gCanvasClearColor( 255, 0, 255 ); ///< For GFX->clear
-
-extern InputModifiers convertModifierBits(const U32 in);
 
 //-----------------------------------------------------------------------------
 
@@ -286,7 +285,7 @@ void GuiCanvas::onRemove()
 void GuiCanvas::setWindowTitle(const char *newTitle)
 {
    if (mPlatformWindow)
-      mPlatformWindow->setCaption(newTitle);
+      mPlatformWindow->setTitle(newTitle);
 }
 
 void GuiCanvas::handleResize( WindowId did, S32 width, S32 height )
@@ -434,8 +433,7 @@ void GuiCanvas::setCursorPos(const Point2I &pt)
    }
    else
    {
-      Point2I screenPt( mPlatformWindow->clientToScreen( pt ) );
-      mPlatformWindow->setCursorPosition( screenPt.x, screenPt.y ); 
+      mPlatformWindow->setCursorPosition( pt.x, pt.y );
    }
 }
 
@@ -455,7 +453,7 @@ bool GuiCanvas::isCursorShown()
    return mPlatformWindow->isCursorVisible();
 }
 
-void GuiCanvas::addAcceleratorKey(GuiControl *ctrl, U32 index, U32 keyCode, U32 modifier)
+void GuiCanvas::addAcceleratorKey(GuiControl *ctrl, U32 index, U32 keyCode, U8 modifier)
 {
    if (keyCode > 0 && ctrl)
    {
@@ -560,7 +558,7 @@ bool GuiCanvas::processKeyboardEvent(InputEventInfo &inputEvent)
    // Combine left/right shift bits - if one shift modifier key
    // bit is set, then set the other one. This way we can simplify
    // our processing logic by treating the keys identically.
-   U32 eventModifier = inputEvent.modifier;
+   U8 eventModifier = inputEvent.modifier;
    if(eventModifier & SI_SHIFT)
    {
       eventModifier |= SI_SHIFT;
@@ -574,7 +572,7 @@ bool GuiCanvas::processKeyboardEvent(InputEventInfo &inputEvent)
       eventModifier |= SI_ALT;
    }
 
-   if (inputEvent.action == SI_MAKE)
+   if (inputEvent.action == GLFW_PRESS)
    {
       //see if we should now pass the event to the first responder
       if (mFirstResponder)
@@ -584,7 +582,7 @@ bool GuiCanvas::processKeyboardEvent(InputEventInfo &inputEvent)
       }
 
       //see if we should tab next/prev
-      if ( isCursorON() && ( inputEvent.objInst == KEY_TAB ) )
+      if ( isCursorON() && ( inputEvent.objInst == GLFW_KEY_TAB ) )
       {
          if (size() > 0)
          {
@@ -604,14 +602,14 @@ bool GuiCanvas::processKeyboardEvent(InputEventInfo &inputEvent)
       //if not handled, search for an accelerator
       for (U32 i = 0; i < mAcceleratorMap.size(); i++)
       {
-         if ((U32)mAcceleratorMap[i].keyCode == (U32)inputEvent.objInst && (U32)mAcceleratorMap[i].modifier == eventModifier)
+         if ((U32)mAcceleratorMap[i].keyCode == (U32)inputEvent.objInst && mAcceleratorMap[i].modifier == eventModifier)
          {
             mAcceleratorMap[i].ctrl->acceleratorKeyPress(mAcceleratorMap[i].index);
             return true;
          }
       }
    }
-   else if(inputEvent.action == SI_BREAK)
+   else if(inputEvent.action == GLFW_RELEASE)
    {
       if(mFirstResponder && mFirstResponder->onKeyUp(mLastEvent))
          return true;
@@ -619,19 +617,19 @@ bool GuiCanvas::processKeyboardEvent(InputEventInfo &inputEvent)
       //see if there's an accelerator
       for (U32 i = 0; i < mAcceleratorMap.size(); i++)
       {
-         if ((U32)mAcceleratorMap[i].keyCode == (U32)inputEvent.objInst && (U32)mAcceleratorMap[i].modifier == eventModifier)
+         if ((U32)mAcceleratorMap[i].keyCode == (U32)inputEvent.objInst && mAcceleratorMap[i].modifier == eventModifier)
          {
             mAcceleratorMap[i].ctrl->acceleratorKeyRelease(mAcceleratorMap[i].index);
             return true;
          }
       }
    }
-   else if(inputEvent.action == SI_REPEAT)
+   else if(inputEvent.action == GLFW_REPEAT)
    {
       //if not handled, search for an accelerator
       for (U32 i = 0; i < mAcceleratorMap.size(); i++)
       {
-         if ((U32)mAcceleratorMap[i].keyCode == (U32)inputEvent.objInst && (U32)mAcceleratorMap[i].modifier == eventModifier)
+         if ((U32)mAcceleratorMap[i].keyCode == (U32)inputEvent.objInst && mAcceleratorMap[i].modifier == eventModifier)
          {
             mAcceleratorMap[i].ctrl->acceleratorKeyPress(mAcceleratorMap[i].index);
             return true;
@@ -668,10 +666,10 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
       (inputEvent.objInst == SI_XAXIS || inputEvent.objInst == SI_YAXIS))
    {
 
-      // Set the absolute position if we get an SI_MAKE on an axis
+      // Set the absolute position if we get an GLFW_PRESS on an axis
       if( inputEvent.objInst == SI_XAXIS )
       {
-         if( inputEvent.action == SI_MAKE )
+         if( inputEvent.action == GLFW_PRESS )
             mCursorPt.x = (S32)inputEvent.fValue;
          else if( inputEvent.action == SI_MOVE )
             mCursorPt.x += (S32)inputEvent.fValue;
@@ -679,7 +677,7 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
       }
       else if( inputEvent.objInst == SI_YAXIS )
       {
-         if( inputEvent.action == SI_MAKE )
+         if( inputEvent.action == GLFW_PRESS )
             mCursorPt.y = (S32)inputEvent.fValue;
          else if( inputEvent.action == SI_MOVE )
             mCursorPt.y += (S32)inputEvent.fValue;
@@ -735,10 +733,10 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
       mLastEvent.mousePoint.y = S32(mCursorPt.y);
       mMouseDownPoint = mCursorPt;
       
-      if(inputEvent.objInst == KEY_BUTTON0) // left button
+      if(inputEvent.objInst == GLFW_MOUSE_BUTTON_1) // left button
       {
          //see if button was pressed
-         if (inputEvent.action == SI_MAKE)
+         if (inputEvent.action == GLFW_PRESS)
          {
             U32 curTime = Platform::getVirtualMilliseconds();
 
@@ -770,9 +768,9 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
 
          return true;
       }
-      else if(inputEvent.objInst == KEY_BUTTON1) // right button
+      else if(inputEvent.objInst == GLFW_MOUSE_BUTTON_2) // right button
       {
-         if(inputEvent.action == SI_MAKE)
+         if(inputEvent.action == GLFW_PRESS)
          {
             U32 curTime = Platform::getVirtualMilliseconds();
 
@@ -801,9 +799,9 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
 
          return true;
       }
-      else if(inputEvent.objInst == KEY_BUTTON2) // middle button
+      else if(inputEvent.objInst == GLFW_MOUSE_BUTTON_3) // middle button
       {
-         if(inputEvent.action == SI_MAKE)
+         if(inputEvent.action == GLFW_PRESS)
          {
             U32 curTime = Platform::getVirtualMilliseconds();
 
@@ -856,7 +854,7 @@ bool GuiCanvas::processGamepadEvent(InputEventInfo &inputEvent)
    {
       switch (inputEvent.action)
       {
-      case SI_MAKE:
+      case GLFW_PRESS:
          switch (inputEvent.objInst)
          {
          case SI_UPOV:
@@ -876,7 +874,7 @@ bool GuiCanvas::processGamepadEvent(InputEventInfo &inputEvent)
          }
          break;
 
-      case SI_BREAK:
+      case GLFW_RELEASE:
          return mFirstResponder->onGamepadButtonUp(mLastEvent);
 
       default:
@@ -2450,28 +2448,6 @@ DefineEngineMethod( GuiCanvas, toggleFullscreen, void, (),,
    object->getPlatformWindow()->setVideoMode(newMode);
 }
 
-
-DefineEngineMethod( GuiCanvas, clientToScreen, Point2I, ( Point2I coordinate ),,
-   "Translate a coordinate from canvas window-space to screen-space.\n"
-   "@param coordinate The coordinate in window-space.\n"
-   "@return The given coordinate translated to screen-space." )
-{
-   if( !object->getPlatformWindow() )
-      return coordinate;
-      
-   return object->getPlatformWindow()->clientToScreen( coordinate );
-}
-
-DefineEngineMethod( GuiCanvas, screenToClient, Point2I, ( Point2I coordinate ),,
-   "Translate a coordinate from screen-space to canvas window-space.\n"
-   "@param coordinate The coordinate in screen-space.\n"
-   "@return The given coordinate translated to window-space." )
-{
-   if( !object->getPlatformWindow() )
-      return coordinate;
-      
-   return object->getPlatformWindow()->screenToClient( coordinate );
-}
 
 DefineEngineMethod( GuiCanvas, getWindowPosition, Point2I, (),,
    "Get the current position of the platform window associated with the canvas.\n"

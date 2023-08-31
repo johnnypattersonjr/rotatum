@@ -484,28 +484,28 @@ bool GuiArrayCtrl::onKeyDown(const GuiEvent &event)
    Point2I delta(0,0);
    switch (event.keyCode)
    {
-      case KEY_LEFT:
+      case GLFW_KEY_LEFT:
          delta.set(-1, 0);
          break;
-      case KEY_RIGHT:
+      case GLFW_KEY_RIGHT:
          delta.set(1, 0);
          break;
-      case KEY_UP:
+      case GLFW_KEY_UP:
          delta.set(0, -1);
          break;
-      case KEY_DOWN:
+      case GLFW_KEY_DOWN:
          delta.set(0, 1);
          break;
-      case KEY_PAGE_UP:
+      case GLFW_KEY_PAGE_UP:
          delta.set(0, -pageSize);
          break;
-      case KEY_PAGE_DOWN:
+      case GLFW_KEY_PAGE_DOWN:
          delta.set(0, pageSize);
          break;
-      case KEY_HOME:
+      case GLFW_KEY_HOME:
          cellSelected( Point2I( 0, 0 ) );
          return( true );
-      case KEY_END:
+      case GLFW_KEY_END:
          cellSelected( Point2I( 0, mSize.y - 1 ) );
          return( true );
       default:

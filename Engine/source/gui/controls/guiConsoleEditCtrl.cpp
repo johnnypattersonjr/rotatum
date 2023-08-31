@@ -73,7 +73,7 @@ bool GuiConsoleEditCtrl::onKeyDown(const GuiEvent &event)
 {
    setUpdate();
 
-   if (event.keyCode == KEY_TAB) 
+   if (event.keyCode == GLFW_KEY_TAB)
    {
       // Get a buffer that can hold the completed text...
       FrameTemp<UTF8> tmpBuff(GuiTextCtrl::MAX_STRING_LENGTH);
@@ -88,7 +88,7 @@ bool GuiConsoleEditCtrl::onKeyDown(const GuiEvent &event)
       mTextBuffer.set(tmpBuff);
       return true;
    }
-   else if ((event.keyCode == KEY_PAGE_UP) || (event.keyCode == KEY_PAGE_DOWN)) 
+   else if ((event.keyCode == GLFW_KEY_PAGE_UP) || (event.keyCode == GLFW_KEY_PAGE_DOWN))
    {
       // See if there's some other widget that can scroll the console history.
       if (mUseSiblingScroller) 
@@ -119,7 +119,7 @@ bool GuiConsoleEditCtrl::onKeyDown(const GuiEvent &event)
          }
       }
    }
-	else if( event.keyCode == KEY_RETURN || event.keyCode == KEY_NUMPADENTER )
+	else if( event.keyCode == GLFW_KEY_ENTER || event.keyCode == GLFW_KEY_KP_ENTER )
 	{
       if ( event.modifier & SI_SHIFT &&
            mTextBuffer.length() + dStrlen("echo();") <= GuiTextCtrl::MAX_STRING_LENGTH )

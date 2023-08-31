@@ -120,6 +120,7 @@ Files:
 	Engine/lib/cmake/*
 	Engine/source/CMakeLists.txt
 	Engine/source/*.cmake
+	Engine/source/windowManager/glfw/*
 	Templates/CMakeLists.txt
 	Templates/Full/CMakeLists.txt
 	Tools/CMakeLists.txt

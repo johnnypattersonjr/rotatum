@@ -303,11 +303,11 @@ bool GuiGameListOptionsCtrl::onKeyDown(const GuiEvent &event)
 {
    switch (event.keyCode)
    {
-      case KEY_LEFT:
+      case GLFW_KEY_LEFT:
          changeOption(-1);
          return true;
 
-      case KEY_RIGHT:
+      case GLFW_KEY_RIGHT:
          changeOption(1);
          return true;
       

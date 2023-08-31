@@ -63,13 +63,6 @@ bool Platform::getUserIsAdministrator()
    return (access("/Library", W_OK) == 0);
 }
 
-#pragma mark ---- Cosmetic ----
-//-----------------------------------------------------------------------------
-bool Platform::displaySplashWindow()
-{
-    return false;
-}
-
 #pragma mark ---- File IO ----
 //-----------------------------------------------------------------------------
 bool dPathCopy(const char* source, const char* dest, bool nooverwrite)

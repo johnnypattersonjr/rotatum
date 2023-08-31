@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -177,9 +178,9 @@ static inline bool dIsDecentChar(U8 c)
 
 struct CodeMapping
 {
-   const char* pDescription;
-   InputEventType       type;
-   InputObjectInstances code;
+   const char*    pDescription;
+   InputEventType type;
+   S32            code;
 };
 
 struct AsciiMapping
@@ -476,7 +477,7 @@ bool ActionMap::createEventDescriptor(const char* pEventString, EventDescriptor*
          // clear out the FF in upper 8bits for foreign keys??
          asciiCode &= 0xFF;
          U16 keyCode = Input::getKeyCode(asciiCode);
-         if ( keyCode >= KEY_0 )
+         if ( keyCode >= GLFW_KEY_0 )
          {
             pDescriptor->eventType = SI_KEY;
             pDescriptor->eventCode = keyCode;
@@ -485,13 +486,13 @@ bool ActionMap::createEventDescriptor(const char* pEventString, EventDescriptor*
          else if (dIsalpha(*pObjectString) == true)
          {
             pDescriptor->eventType = SI_KEY;
-            pDescriptor->eventCode = KEY_A+dTolower(*pObjectString)-'a';
+            pDescriptor->eventCode = GLFW_KEY_A+dTolower(*pObjectString)-'a';
             return true;
          }
          else if (dIsdigit(*pObjectString) == true)
          {
             pDescriptor->eventType = SI_KEY;
-            pDescriptor->eventCode = KEY_0+(*pObjectString)-'0';
+            pDescriptor->eventCode = GLFW_KEY_0+(*pObjectString)-'0';
             return true;
          }
       }
@@ -507,7 +508,7 @@ bool ActionMap::createEventDescriptor(const char* pEventString, EventDescriptor*
          {
             U16 asciiCode = gAsciiMap[i].asciiCode;
             U16 keyCode   = Input::getKeyCode(asciiCode);
-            if ( keyCode >= KEY_0 )
+            if ( keyCode >= GLFW_KEY_0 )
             {
                pDescriptor->eventType = SI_KEY;
                pDescriptor->eventCode = keyCode;
@@ -536,7 +537,7 @@ bool ActionMap::createEventDescriptor(const char* pEventString, EventDescriptor*
 
 //------------------------------------------------------------------------------
 ActionMap::Node* ActionMap::getNode(const U32 inDeviceType, const U32 inDeviceInst,
-                   const U32 inModifiers,  const U32 inAction,SimObject* object /*= NULL*/)
+                   const U8 inModifiers,  const U32 inAction,SimObject* object /*= NULL*/)
 {
    // DMMTODO - Slow INITIAL implementation.  Replace with a faster version...
    //
@@ -593,7 +594,7 @@ ActionMap::Node* ActionMap::getNode(const U32 inDeviceType, const U32 inDeviceIn
 }
 
 //------------------------------------------------------------------------------
-void ActionMap::removeNode(const U32 inDeviceType, const U32 inDeviceInst, const U32 inModifiers, const U32 inAction, SimObject* object /*= NULL*/)
+void ActionMap::removeNode(const U32 inDeviceType, const U32 inDeviceInst, const U8 inModifiers, const U32 inAction, SimObject* object /*= NULL*/)
 {
    // DMMTODO - Slow INITIAL implementation.  Replace with a faster version...
    //
@@ -610,7 +611,7 @@ void ActionMap::removeNode(const U32 inDeviceType, const U32 inDeviceInst, const
    if (pDeviceMap == NULL)
       return;
 
-   U32 realMods = inModifiers;
+   U8 realMods = inModifiers;
    if (realMods & SI_SHIFT)
       realMods |= SI_SHIFT;
    if (realMods & SI_CTRL)
@@ -634,7 +635,7 @@ void ActionMap::removeNode(const U32 inDeviceType, const U32 inDeviceInst, const
 
 //------------------------------------------------------------------------------
 const ActionMap::Node* ActionMap::findNode(const U32 inDeviceType, const U32 inDeviceInst,
-                    const U32 inModifiers,  const U32 inAction)
+                    const U8 inModifiers,  const U32 inAction)
 {
    // DMMTODO - Slow INITIAL implementation.  Replace with a faster version...
    //
@@ -652,7 +653,7 @@ const ActionMap::Node* ActionMap::findNode(const U32 inDeviceType, const U32 inD
    if (pDeviceMap == NULL)
       return NULL;
 
-   U32 realMods = inModifiers;
+   U8 realMods = inModifiers;
    if (realMods & SI_SHIFT)
       realMods |= SI_SHIFT;
    if (realMods & SI_CTRL)
@@ -973,16 +974,16 @@ bool ActionMap::getDeviceName(const U32 deviceType, const U32 deviceInstance, ch
 }
 
 //------------------------------------------------------------------------------
-const char* ActionMap::getModifierString(const U32 modifiers)
+const char* ActionMap::getModifierString(const U8 modifiers)
 {
-	U32 realModifiers = modifiers;
-	if ( modifiers & SI_LSHIFT || modifiers & SI_RSHIFT )
+	U8 realModifiers = modifiers;
+	if ( modifiers & SI_SHIFT )
 		realModifiers |= SI_SHIFT;
-	if ( modifiers & SI_LCTRL || modifiers & SI_RCTRL )
+	if ( modifiers & SI_CTRL )
 		realModifiers |= SI_CTRL;
-	if ( modifiers & SI_LALT || modifiers & SI_RALT )
+	if ( modifiers & SI_ALT )
 		realModifiers |= SI_ALT;
-	if ( modifiers & SI_MAC_LOPT || modifiers & SI_MAC_ROPT )
+	if ( modifiers & SI_MAC_OPT )
 		realModifiers |= SI_MAC_OPT;
 
    switch (realModifiers & (SI_SHIFT|SI_CTRL|SI_ALT|SI_MAC_OPT)) 
@@ -1065,15 +1066,15 @@ bool ActionMap::getKeyString(const U32 action, char* buffer)
    // This is a special case.... numpad keys do have ascii values
    // but for the purposes of this method we want to return the 
    // description from the gVirtualMap.
-   if ( !( KEY_NUMPAD0 <= action && action <= KEY_NUMPAD9 ) )
+   if ( !( GLFW_KEY_KP_0 <= action && action <= GLFW_KEY_KP_9) )
       asciiCode = Input::getAscii( action, STATE_LOWER );
 
-//   if (action >= KEY_A && action <= KEY_Z) {
-//      buffer[0] = char(action - KEY_A + 'a');
+//   if (action >= GLFW_KEY_A && action <= GLFW_KEY_Z) {
+//      buffer[0] = char(action - GLFW_KEY_A + 'a');
 //      buffer[1] = '\0';
 //      return true;
-//   } else if (action >= KEY_0 && action <= KEY_9) {
-//      buffer[0] = char(action - KEY_0 + '0');
+//   } else if (action >= GLFW_KEY_0 && action <= GLFW_KEY_9) {
+//      buffer[0] = char(action - GLFW_KEY_0 + '0');
 //      buffer[1] = '\0';
    if ( (asciiCode != 0) && dIsDecentChar((char)asciiCode))
    {
@@ -1091,14 +1092,14 @@ bool ActionMap::getKeyString(const U32 action, char* buffer)
    }
    else
    {
-      if (action >= KEY_A && action <= KEY_Z)
+      if (action >= GLFW_KEY_A && action <= GLFW_KEY_Z)
       {
-         buffer[0] = char(action - KEY_A + 'a');
+         buffer[0] = char(action - GLFW_KEY_A + 'a');
          buffer[1] = '\0';
          return true;
       }
-      else if (action >= KEY_0 && action <= KEY_9) {
-         buffer[0] = char(action - KEY_0 + '0');
+      else if (action >= GLFW_KEY_0 && action <= GLFW_KEY_9) {
+         buffer[0] = char(action - GLFW_KEY_0 + '0');
          buffer[1] = '\0';
          return true;
       }
@@ -1298,7 +1299,7 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
       return false;
 
    static const char *argv[2];
-   if (pEvent->action == SI_MAKE) {
+   if (pEvent->action == GLFW_PRESS) {
       const Node* pNode = findNode(pEvent->deviceType, pEvent->deviceInst,
                                    pEvent->modifier,   pEvent->objInst);
 
@@ -1445,7 +1446,7 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
          return true;
       }
    }
-   else if (pEvent->action == SI_BREAK)
+   else if (pEvent->action == GLFW_RELEASE)
    {
       return checkBreakTable(pEvent);
    }
@@ -1454,7 +1455,7 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
 }
 
 //------------------------------------------------------------------------------
-bool ActionMap::isAction( U32 deviceType, U32 deviceInst, U32 modifiers, U32 action )
+bool ActionMap::isAction( U32 deviceType, U32 deviceInst, U8 modifiers, U32 action )
 {
    return ( findNode( deviceType, deviceInst, modifiers, action ) != NULL );
 }
@@ -1549,7 +1550,7 @@ bool ActionMap::handleEvent(const InputEventInfo* pEvent)
    // Found no matching action.  Try with the modifiers stripped.
 
    InputEventInfo eventNoModifiers = *pEvent;
-   eventNoModifiers.modifier = ( InputModifiers ) 0;
+   eventNoModifiers.modifier = 0;
    
    for (SimSet::iterator itr = pActionMapSet->end() - 1;
         itr > pActionMapSet->begin(); itr--) {
@@ -1568,7 +1569,7 @@ bool ActionMap::handleEventGlobal(const InputEventInfo* pEvent)
 }
 
 //------------------------------------------------------------------------------
-bool ActionMap::checkAsciiGlobal( U16 key, U32 modifiers )
+bool ActionMap::checkAsciiGlobal( U16 key, U8 modifiers )
 {
    // Does this ascii map to a key?
    U16 keyCode = Input::getKeyCode(key);
@@ -1599,7 +1600,7 @@ bool ActionMap::checkAsciiGlobal( U16 key, U32 modifiers )
       return false;
 
    // Normalize modifiers.
-   U32 realMods = modifiers;
+   U8 realMods = modifiers;
    if (realMods & SI_SHIFT)
       realMods |= SI_SHIFT;
    if (realMods & SI_CTRL)
@@ -2005,143 +2006,119 @@ CodeMapping gVirtualMap[] =
 {
    //-------------------------------------- KEYBOARD EVENTS
    //
-   { "backspace",     SI_KEY,    KEY_BACKSPACE   },
-   { "tab",           SI_KEY,    KEY_TAB         },
+   { "backspace",     SI_KEY,    GLFW_KEY_BACKSPACE    },
+   { "tab",           SI_KEY,    GLFW_KEY_TAB          },
 
-   { "return",        SI_KEY,    KEY_RETURN      },
-   { "enter",         SI_KEY,    KEY_RETURN      },
+   { "return",        SI_KEY,    GLFW_KEY_ENTER        },
+   { "enter",         SI_KEY,    GLFW_KEY_ENTER        },
 
-   { "shift",         SI_KEY,    KEY_SHIFT       },
-   { "ctrl",          SI_KEY,    KEY_CONTROL     },
-   { "alt",           SI_KEY,    KEY_ALT         },
-   { "pause",         SI_KEY,    KEY_PAUSE       },
-   { "capslock",      SI_KEY,    KEY_CAPSLOCK    },
+   { "shift",         SI_KEY,    GLFW_MOD_SHIFT        },
+   { "ctrl",          SI_KEY,    GLFW_MOD_CONTROL      },
+   { "alt",           SI_KEY,    GLFW_MOD_ALT          },
+   { "pause",         SI_KEY,    GLFW_KEY_PAUSE        },
+   { "capslock",      SI_KEY,    GLFW_KEY_CAPS_LOCK    },
 
-   { "escape",        SI_KEY,    KEY_ESCAPE      },
+   { "escape",        SI_KEY,    GLFW_KEY_ESCAPE       },
 
-   { "space",         SI_KEY,    KEY_SPACE       },
-   { "pagedown",      SI_KEY,    KEY_PAGE_DOWN   },
-   { "pageup",        SI_KEY,    KEY_PAGE_UP     },
-   { "end",           SI_KEY,    KEY_END         },
-   { "home",          SI_KEY,    KEY_HOME        },
-   { "left",          SI_KEY,    KEY_LEFT        },
-   { "up",            SI_KEY,    KEY_UP          },
-   { "right",         SI_KEY,    KEY_RIGHT       },
-   { "down",          SI_KEY,    KEY_DOWN        },
-   { "print",         SI_KEY,    KEY_PRINT       },
-   { "insert",        SI_KEY,    KEY_INSERT      },
-   { "delete",        SI_KEY,    KEY_DELETE      },
-   { "help",          SI_KEY,    KEY_HELP        },
+   { "space",         SI_KEY,    GLFW_KEY_SPACE        },
+   { "pagedown",      SI_KEY,    GLFW_KEY_PAGE_DOWN    },
+   { "pageup",        SI_KEY,    GLFW_KEY_PAGE_UP      },
+   { "end",           SI_KEY,    GLFW_KEY_END          },
+   { "home",          SI_KEY,    GLFW_KEY_HOME         },
+   { "left",          SI_KEY,    GLFW_KEY_LEFT         },
+   { "up",            SI_KEY,    GLFW_KEY_UP           },
+   { "right",         SI_KEY,    GLFW_KEY_RIGHT        },
+   { "down",          SI_KEY,    GLFW_KEY_DOWN         },
+   { "print",         SI_KEY,    GLFW_KEY_PRINT_SCREEN },
+   { "insert",        SI_KEY,    GLFW_KEY_INSERT       },
+   { "delete",        SI_KEY,    GLFW_KEY_DELETE       },
+   { "help",          SI_KEY,    KEY_HELP              },
 
-   { "win_lwindow",   SI_KEY,    KEY_WIN_LWINDOW },
-   { "win_rwindow",   SI_KEY,    KEY_WIN_RWINDOW },
-   { "win_apps",      SI_KEY,    KEY_WIN_APPS    },
+   { "win_lwindow",   SI_KEY,    GLFW_KEY_LEFT_SUPER   },
+   { "win_rwindow",   SI_KEY,    GLFW_KEY_RIGHT_SUPER  },
+   { "win_apps",      SI_KEY,    GLFW_KEY_MENU         },
 
-   { "cmd",           SI_KEY,    KEY_ALT         },
-   { "opt",           SI_KEY,    KEY_MAC_OPT     },
-   { "lopt",          SI_KEY,    KEY_MAC_LOPT    },
-   { "ropt",          SI_KEY,    KEY_MAC_ROPT    },
+   { "cmd",           SI_KEY,    GLFW_MOD_SUPER        },
+   { "opt",           SI_KEY,    GLFW_MOD_ALT          },
+   { "lopt",          SI_KEY,    GLFW_KEY_LEFT_ALT     },
+   { "ropt",          SI_KEY,    GLFW_KEY_RIGHT_ALT    },
 
-   { "numpad0",       SI_KEY,    KEY_NUMPAD0     },
-   { "numpad1",       SI_KEY,    KEY_NUMPAD1     },
-   { "numpad2",       SI_KEY,    KEY_NUMPAD2     },
-   { "numpad3",       SI_KEY,    KEY_NUMPAD3     },
-   { "numpad4",       SI_KEY,    KEY_NUMPAD4     },
-   { "numpad5",       SI_KEY,    KEY_NUMPAD5     },
-   { "numpad6",       SI_KEY,    KEY_NUMPAD6     },
-   { "numpad7",       SI_KEY,    KEY_NUMPAD7     },
-   { "numpad8",       SI_KEY,    KEY_NUMPAD8     },
-   { "numpad9",       SI_KEY,    KEY_NUMPAD9     },
-   { "numpadmult",    SI_KEY,    KEY_MULTIPLY    },
-   { "numpadadd",     SI_KEY,    KEY_ADD         },
-   { "numpadsep",     SI_KEY,    KEY_SEPARATOR   },
-   { "numpadminus",   SI_KEY,    KEY_SUBTRACT    },
-   { "numpaddecimal", SI_KEY,    KEY_DECIMAL     },
-   { "numpaddivide",  SI_KEY,    KEY_DIVIDE      },
-   { "numpadenter",   SI_KEY,    KEY_NUMPADENTER },
+   { "numpad0",       SI_KEY,    GLFW_KEY_KP_0         },
+   { "numpad1",       SI_KEY,    GLFW_KEY_KP_1         },
+   { "numpad2",       SI_KEY,    GLFW_KEY_KP_2         },
+   { "numpad3",       SI_KEY,    GLFW_KEY_KP_3         },
+   { "numpad4",       SI_KEY,    GLFW_KEY_KP_4         },
+   { "numpad5",       SI_KEY,    GLFW_KEY_KP_5         },
+   { "numpad6",       SI_KEY,    GLFW_KEY_KP_6         },
+   { "numpad7",       SI_KEY,    GLFW_KEY_KP_7         },
+   { "numpad8",       SI_KEY,    GLFW_KEY_KP_8         },
+   { "numpad9",       SI_KEY,    GLFW_KEY_KP_9         },
+   { "numpadmult",    SI_KEY,    GLFW_KEY_KP_MULTIPLY  },
+   { "numpadadd",     SI_KEY,    GLFW_KEY_KP_ADD       },
+   { "numpadsep",     SI_KEY,    KEY_SEPARATOR         },
+   { "numpadminus",   SI_KEY,    GLFW_KEY_KP_SUBTRACT  },
+   { "numpaddecimal", SI_KEY,    GLFW_KEY_KP_DECIMAL   },
+   { "numpaddivide",  SI_KEY,    GLFW_KEY_KP_DIVIDE    },
+   { "numpadenter",   SI_KEY,    GLFW_KEY_KP_ENTER     },
 
-   { "f1",            SI_KEY,    KEY_F1          },
-   { "f2",            SI_KEY,    KEY_F2          },
-   { "f3",            SI_KEY,    KEY_F3          },
-   { "f4",            SI_KEY,    KEY_F4          },
-   { "f5",            SI_KEY,    KEY_F5          },
-   { "f6",            SI_KEY,    KEY_F6          },
-   { "f7",            SI_KEY,    KEY_F7          },
-   { "f8",            SI_KEY,    KEY_F8          },
-   { "f9",            SI_KEY,    KEY_F9          },
-   { "f10",           SI_KEY,    KEY_F10         },
-   { "f11",           SI_KEY,    KEY_F11         },
-   { "f12",           SI_KEY,    KEY_F12         },
-   { "f13",           SI_KEY,    KEY_F13         },
-   { "f14",           SI_KEY,    KEY_F14         },
-   { "f15",           SI_KEY,    KEY_F15         },
-   { "f16",           SI_KEY,    KEY_F16         },
-   { "f17",           SI_KEY,    KEY_F17         },
-   { "f18",           SI_KEY,    KEY_F18         },
-   { "f19",           SI_KEY,    KEY_F19         },
-   { "f20",           SI_KEY,    KEY_F20         },
-   { "f21",           SI_KEY,    KEY_F21         },
-   { "f22",           SI_KEY,    KEY_F22         },
-   { "f23",           SI_KEY,    KEY_F23         },
-   { "f24",           SI_KEY,    KEY_F24         },
+   { "f1",            SI_KEY,    GLFW_KEY_F1           },
+   { "f2",            SI_KEY,    GLFW_KEY_F2           },
+   { "f3",            SI_KEY,    GLFW_KEY_F3           },
+   { "f4",            SI_KEY,    GLFW_KEY_F4           },
+   { "f5",            SI_KEY,    GLFW_KEY_F5           },
+   { "f6",            SI_KEY,    GLFW_KEY_F6           },
+   { "f7",            SI_KEY,    GLFW_KEY_F7           },
+   { "f8",            SI_KEY,    GLFW_KEY_F8           },
+   { "f9",            SI_KEY,    GLFW_KEY_F9           },
+   { "f10",           SI_KEY,    GLFW_KEY_F10          },
+   { "f11",           SI_KEY,    GLFW_KEY_F11          },
+   { "f12",           SI_KEY,    GLFW_KEY_F12          },
+   { "f13",           SI_KEY,    GLFW_KEY_F13          },
+   { "f14",           SI_KEY,    GLFW_KEY_F14          },
+   { "f15",           SI_KEY,    GLFW_KEY_F15          },
+   { "f16",           SI_KEY,    GLFW_KEY_F16          },
+   { "f17",           SI_KEY,    GLFW_KEY_F17          },
+   { "f18",           SI_KEY,    GLFW_KEY_F18          },
+   { "f19",           SI_KEY,    GLFW_KEY_F19          },
+   { "f20",           SI_KEY,    GLFW_KEY_F20          },
+   { "f21",           SI_KEY,    GLFW_KEY_F21          },
+   { "f22",           SI_KEY,    GLFW_KEY_F22          },
+   { "f23",           SI_KEY,    GLFW_KEY_F23          },
+   { "f24",           SI_KEY,    GLFW_KEY_F24          },
 
-   { "numlock",       SI_KEY,    KEY_NUMLOCK     },
-   { "scrolllock",    SI_KEY,    KEY_SCROLLLOCK  },
+   { "numlock",       SI_KEY,    GLFW_KEY_NUM_LOCK     },
+   { "scrolllock",    SI_KEY,    GLFW_KEY_SCROLL_LOCK  },
 
-   { "lshift",        SI_KEY,    KEY_LSHIFT      },
-   { "rshift",        SI_KEY,    KEY_RSHIFT      },
-   { "lcontrol",      SI_KEY,    KEY_LCONTROL    },
-   { "rcontrol",      SI_KEY,    KEY_RCONTROL    },
-   { "lalt",          SI_KEY,    KEY_LALT        },
-   { "ralt",          SI_KEY,    KEY_RALT        },
-   { "tilde",         SI_KEY,    KEY_TILDE       },
+   { "lshift",        SI_KEY,    GLFW_KEY_LEFT_SHIFT    },
+   { "rshift",        SI_KEY,    GLFW_KEY_RIGHT_SHIFT   },
+   { "lcontrol",      SI_KEY,    GLFW_KEY_LEFT_CONTROL  },
+   { "rcontrol",      SI_KEY,    GLFW_KEY_RIGHT_CONTROL },
+   { "lalt",          SI_KEY,    GLFW_KEY_LEFT_ALT      },
+   { "ralt",          SI_KEY,    GLFW_KEY_RIGHT_ALT     },
+   { "tilde",         SI_KEY,    GLFW_KEY_GRAVE_ACCENT  },
 
-   { "minus",         SI_KEY,    KEY_MINUS       },
-   { "equals",        SI_KEY,    KEY_EQUALS      },
-   { "lbracket",      SI_KEY,    KEY_LBRACKET    },
-   { "rbracket",      SI_KEY,    KEY_RBRACKET    },
-   { "backslash",     SI_KEY,    KEY_BACKSLASH   },
-   { "semicolon",     SI_KEY,    KEY_SEMICOLON   },
-   { "apostrophe",    SI_KEY,    KEY_APOSTROPHE  },
-   { "comma",         SI_KEY,    KEY_COMMA       },
-   { "period",        SI_KEY,    KEY_PERIOD      },
-   { "slash",         SI_KEY,    KEY_SLASH       },
-   { "lessthan",      SI_KEY,    KEY_OEM_102     },
+   { "minus",         SI_KEY,    GLFW_KEY_MINUS         },
+   { "equals",        SI_KEY,    GLFW_KEY_EQUAL         },
+   { "lbracket",      SI_KEY,    GLFW_KEY_LEFT_BRACKET  },
+   { "rbracket",      SI_KEY,    GLFW_KEY_RIGHT_BRACKET },
+   { "backslash",     SI_KEY,    GLFW_KEY_BACKSLASH     },
+   { "semicolon",     SI_KEY,    GLFW_KEY_SEMICOLON     },
+   { "apostrophe",    SI_KEY,    GLFW_KEY_APOSTROPHE    },
+   { "comma",         SI_KEY,    GLFW_KEY_COMMA         },
+   { "period",        SI_KEY,    GLFW_KEY_PERIOD        },
+   { "slash",         SI_KEY,    GLFW_KEY_SLASH         },
+   { "lessthan",      SI_KEY,    KEY_OEM_102            },
 
    //-------------------------------------- BUTTON EVENTS
    // Joystick/Mouse buttons
-   { "button0",       SI_BUTTON, KEY_BUTTON0    },
-   { "button1",       SI_BUTTON, KEY_BUTTON1    },
-   { "button2",       SI_BUTTON, KEY_BUTTON2    },
-   { "button3",       SI_BUTTON, KEY_BUTTON3    },
-   { "button4",       SI_BUTTON, KEY_BUTTON4    },
-   { "button5",       SI_BUTTON, KEY_BUTTON5    },
-   { "button6",       SI_BUTTON, KEY_BUTTON6    },
-   { "button7",       SI_BUTTON, KEY_BUTTON7    },
-   { "button8",       SI_BUTTON, KEY_BUTTON8    },
-   { "button9",       SI_BUTTON, KEY_BUTTON9    },
-   { "button10",      SI_BUTTON, KEY_BUTTON10   },
-   { "button11",      SI_BUTTON, KEY_BUTTON11   },
-   { "button12",      SI_BUTTON, KEY_BUTTON12   },
-   { "button13",      SI_BUTTON, KEY_BUTTON13   },
-   { "button14",      SI_BUTTON, KEY_BUTTON14   },
-   { "button15",      SI_BUTTON, KEY_BUTTON15   },
-   { "button16",      SI_BUTTON, KEY_BUTTON16   },
-   { "button17",      SI_BUTTON, KEY_BUTTON17   },
-   { "button18",      SI_BUTTON, KEY_BUTTON18   },
-   { "button19",      SI_BUTTON, KEY_BUTTON19   },
-   { "button20",      SI_BUTTON, KEY_BUTTON20   },
-   { "button21",      SI_BUTTON, KEY_BUTTON21   },
-   { "button22",      SI_BUTTON, KEY_BUTTON22   },
-   { "button23",      SI_BUTTON, KEY_BUTTON23   },
-   { "button24",      SI_BUTTON, KEY_BUTTON24   },
-   { "button25",      SI_BUTTON, KEY_BUTTON25   },
-   { "button26",      SI_BUTTON, KEY_BUTTON26   },
-   { "button27",      SI_BUTTON, KEY_BUTTON27   },
-   { "button28",      SI_BUTTON, KEY_BUTTON28   },
-   { "button29",      SI_BUTTON, KEY_BUTTON29   },
-   { "button30",      SI_BUTTON, KEY_BUTTON30   },
-   { "button31",      SI_BUTTON, KEY_BUTTON31   },
+   { "button0",       SI_BUTTON, GLFW_MOUSE_BUTTON_1 },
+   { "button1",       SI_BUTTON, GLFW_MOUSE_BUTTON_2 },
+   { "button2",       SI_BUTTON, GLFW_MOUSE_BUTTON_3 },
+   { "button3",       SI_BUTTON, GLFW_MOUSE_BUTTON_4 },
+   { "button4",       SI_BUTTON, GLFW_MOUSE_BUTTON_5 },
+   { "button5",       SI_BUTTON, GLFW_MOUSE_BUTTON_6 },
+   { "button6",       SI_BUTTON, GLFW_MOUSE_BUTTON_7 },
+   { "button7",       SI_BUTTON, GLFW_MOUSE_BUTTON_8 },
 
    //-------------------------------------- MOVE EVENTS
    // Mouse/Joystick axes:
@@ -2212,7 +2189,7 @@ CodeMapping gVirtualMap[] =
    //
 
    { "anykey",        SI_KEY,      KEY_ANYKEY },
-   { "nomatch",       SI_UNKNOWN,  (InputObjectInstances)0xFFFFFFFF }
+   { "nomatch",       SI_UNKNOWN,  -1 }
 };
 
 AsciiMapping gAsciiMap[] =

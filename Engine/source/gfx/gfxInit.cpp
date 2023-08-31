@@ -104,7 +104,6 @@ inline static void _GFXInitGetInitialRes(GFXVideoMode &vm, const Point2I &initia
    vm.fullScreen   = kDefaultFullscreen;
    vm.bitDepth     = kDefaultBitDepth;
    vm.refreshRate  = kDefaultRefreshRate;
-   vm.wideScreen = false;
 
    vm.parseFromString(resString);
 }

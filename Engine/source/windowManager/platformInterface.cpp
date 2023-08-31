@@ -24,7 +24,6 @@
 #include "platform/event.h"
 #include "windowManager/platformWindowMgr.h"
 #include "gfx/gfxInit.h"
-#include "gfx/gfxDevice.h"
 #include "core/util/journal/process.h"
 #include "core/util/autoPtr.h"
 
@@ -45,44 +44,7 @@ PlatformWindowManager *PlatformWindowManager::get()
    return smWindowManager.ptr();
 }
 
-void PlatformWindowManager::processCmdLineArgs( const S32 argc, const char **argv )
-{
-   // Only call the get() routine if we have arguments on the command line
-   if(argc > 0)
-   {
-      PlatformWindowManager::get()->_processCmdLineArgs(argc, argv);
-   }
-}
-
-
-GFXDevice *gDevice          = NULL;
 PlatformWindow *gWindow     = NULL;
-
-// Conversion from window manager input conventions to Torque standard.
-static struct ModifierBitMap {
-   U32 grendelMask,torqueMask;
-} _ModifierBitMap[] = {
-   { IM_LSHIFT, SI_LSHIFT   },
-   { IM_RSHIFT, SI_RSHIFT   },
-   { IM_LALT,   SI_LALT     },
-   { IM_RALT,   SI_RALT     },
-   { IM_LCTRL,  SI_LCTRL    },
-   { IM_RCTRL,  SI_RCTRL    },
-   { IM_LOPT,   SI_MAC_LOPT },
-   { IM_ROPT,   SI_MAC_ROPT },
-};
-static int _ModifierBitMapCount = sizeof(_ModifierBitMap) / sizeof(ModifierBitMap);
-
-InputModifiers convertModifierBits(const U32 in)
-{
-   U32 out=0;
-
-   for(S32 i=0; i<_ModifierBitMapCount; i++)
-      if(in & _ModifierBitMap[i].grendelMask)
-         out |= _ModifierBitMap[i].torqueMask;
-
-   return (InputModifiers)out;
-}
 
 //------------------------------------------------------------------------------
 
@@ -114,7 +76,6 @@ void Platform::minimizeWindow()
 void Platform::closeWindow()
 {
    // Shutdown all our stuff.
-   //SAFE_DELETE(gDevice); // <-- device is already cleaned up elsewhere by now...
    SAFE_DELETE(gWindow);
 }
 

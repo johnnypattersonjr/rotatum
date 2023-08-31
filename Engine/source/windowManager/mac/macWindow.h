@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -43,7 +44,7 @@ public:
    virtual GFXDevice *getGFXDevice() { return mDevice; }
    virtual GFXWindowTarget *getGFXTarget() { return mTarget; }
    virtual void setVideoMode(const GFXVideoMode &mode);
-   virtual const GFXVideoMode &getVideoMode() { return mCurrentMode; }
+   virtual const GFXVideoMode &getVideoMode() const { return mCurrentMode; }
    
    virtual WindowId getWindowId() { return mWindowId; }
    
@@ -52,15 +53,8 @@ public:
    CGRect getMainDisplayBounds() { return mMainDisplayBounds; }
    CGRect getDisplayBounds() { return mDisplayBounds; }
 
-   virtual bool clearFullscreen() 
-   { 
-      // TODO: properly drop out of full screen
-      return true;
-   }
    virtual bool isFullscreen() { return mFullscreen; }
 
-   virtual PlatformWindow * getNextWindow() const;
-   
    virtual void setMouseLocked( bool enable ) 
    { 
       mShouldMouseLock = enable; 
@@ -70,39 +64,32 @@ public:
    virtual bool isMouseLocked() const { return mMouseLocked; }
    virtual bool shouldLockMouse() const { return mShouldMouseLock; }
 
-   virtual bool setSize(const Point2I &newSize);
+   virtual void setSize(const Point2I &size);
 
-   virtual void setClientExtent( const Point2I newExtent );
-   virtual const Point2I getClientExtent();
+   virtual Point2I getClientExtent() const;
    
-   virtual void setBounds( const RectI &newBounds );
-   virtual const RectI getBounds() const;
+   virtual RectI getBounds() const;
 
-   virtual void setPosition( const Point2I newPosition );
-   virtual const Point2I getPosition();
+   virtual void setPosition(const Point2I &position);
+   virtual Point2I getPosition() const;
    
    virtual void centerWindow();
    
-   virtual Point2I clientToScreen( const Point2I& pos );
-   virtual Point2I screenToClient( const Point2I& pos );
-
-   virtual bool setCaption(const char *windowText);
-   virtual const char *getCaption() { return mTitle; }
+   virtual void setTitle(const char *title);
+   virtual const char *getTitle() const { return mTitle; }
 
    virtual bool setType( S32 windowType ) { return true; }
 
    virtual void minimize();
    virtual void maximize();
    virtual void restore();
-   virtual bool isMinimized();
-   virtual bool isMaximized();
+   virtual bool isMinimized() const;
+   virtual bool isMaximized() const;
    virtual void show();
-   virtual void close();
    virtual void hide();
-   virtual bool isOpen();
-   virtual bool isVisible();
+   virtual bool isVisible() const;
 
-   virtual bool isFocused();
+   virtual bool isFocused() const;
    virtual void setFocus();
    virtual void clearFocus();
    
@@ -166,8 +153,6 @@ private:
    GFXWindowTargetRef mTarget;
    GFXVideoMode mCurrentMode;
    
-   MacWindow *mNextWindow;
-
    bool mMouseLocked;
    bool mShouldMouseLock;
       

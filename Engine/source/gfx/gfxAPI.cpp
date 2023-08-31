@@ -33,7 +33,6 @@ IMPLEMENT_STRUCT( GFXVideoMode,
    FIELD( bitDepth, bitDepth, 1, "Bits per pixel." )
    FIELD( refreshRate, refreshRate, 1, "Frequency at which the screen is refreshed (in Hertz)." )
    FIELD( fullScreen, fullScreen, 1, "Whether this is a fullscreen or windowed mode." )
-   FIELD( wideScreen, wideScreen, 1, "Whether this is a widescreen display mode." )
    FIELD( antialiasLevel, antialiasLevel, 1, "Maximum or desired antialiasing level." )
 END_IMPLEMENT_STRUCT;
 
