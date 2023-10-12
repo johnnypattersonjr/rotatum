@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -211,8 +212,8 @@ GFXAdapterType GFXInit::getAdapterTypeFromName(const char* name)
    
    if( ret == -1 )
    {
-      Con::errorf( "GFXInit::getAdapterTypeFromName - Invalid renderer name, defaulting to D3D9" );
-      ret = Direct3D9;
+      Con::errorf( "GFXInit::getAdapterTypeFromName - Invalid renderer name, defaulting to OpenGL" );
+      ret = OpenGL;
    }
    
    return (GFXAdapterType)ret;
@@ -222,7 +223,7 @@ GFXAdapter *GFXInit::getBestAdapterChoice()
 {
    // Get the user's preference for device...
    const String   renderer   = Con::getVariable("$pref::Video::displayDevice");
-   GFXAdapterType adapterType = getAdapterTypeFromName(renderer);
+   GFXAdapterType adapterType = getAdapterTypeFromName(renderer.isNotEmpty() ? renderer : "OpenGL");
    GFXAdapter     *adapter    = chooseAdapter(adapterType);
 
    // Did they have one? Return it.

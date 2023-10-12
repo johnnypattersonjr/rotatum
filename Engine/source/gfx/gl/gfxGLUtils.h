@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -62,7 +63,11 @@ static inline GLenum minificationFilter(U32 minFilter, U32 mipFilter, U32 mipLev
 class GFXGLPreserveInteger
 {
 public:
+#ifdef TORQUE_OS_WIN32
+   typedef void(APIENTRY *BindFn)(GLenum, GLuint);
+#else
    typedef void(*BindFn)(GLenum, GLuint);
+#endif
 
    /// Preserve the integer.
    /// @param binding The binding which should be set on destruction.

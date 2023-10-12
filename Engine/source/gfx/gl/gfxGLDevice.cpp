@@ -681,6 +681,8 @@ U32 GFXGLDevice::getNumRenderTargets() const
    return 1; 
 }
 
+#ifndef TORQUE_OS_WIN32
+
 void GFXGLDevice::_updateRenderTargets()
 {
    if ( mRTDirty || mCurrentRT->isPendingState() )
@@ -727,6 +729,8 @@ void GFXGLDevice::_updateRenderTargets()
       mViewportDirty = false;
    }
 }
+
+#endif
 
 GFXFormat GFXGLDevice::selectSupportedFormat(   GFXTextureProfile* profile, 
                                                 const Vector<GFXFormat>& formats, 

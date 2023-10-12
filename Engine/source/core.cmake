@@ -31,6 +31,9 @@ add_engine_src_dir(
 	gfx
 	gfx/bitmap
 	gfx/bitmap/loaders
+	gfx/gl
+	gfx/gl/ggl
+	gfx/gl/ggl/generated
 	gfx/Null
 	gfx/sim
 	gfx/test
@@ -55,6 +58,7 @@ add_engine_src_dir(
 	sfx/media
 	sfx/null
 	shaderGen
+	shaderGen/glsl
 	sim
 	unit
 	unit/tests
@@ -84,14 +88,10 @@ if(ENGINE_PLATFORM_LINUX)
 elseif(ENGINE_PLATFORM_MAC)
 	add_engine_src_dir(
 		${MODULE_NAME}
-		gfx/gl
-		gfx/gl/ggl
-		gfx/gl/ggl/generated
 		gfx/gl/ggl/mac
 		platformMac
 		platformMac/Menus
 		platformPOSIX
-		shaderGen/glsl
 		windowManager/mac
 	)
 
@@ -111,6 +111,7 @@ elseif(ENGINE_PLATFORM_MAC)
 elseif(ENGINE_PLATFORM_WIN32)
 	add_engine_src_dir(
 		${MODULE_NAME}
+		gfx/gl/ggl/win32
 		platformWin32
 		platformWin32/menus
 		platformWin32/minidump
@@ -237,9 +238,12 @@ elseif(ENGINE_PLATFORM_WIN32)
 		endif()
 	endif()
 
+	find_package(OpenGL REQUIRED)
+
 	target_link_libraries(
 		${MODULE_NAME}
 		INTERFACE
+			OpenGL::GL
 			ComCtl32.Lib
 			ComDlg32.Lib
 			User32.Lib

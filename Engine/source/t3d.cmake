@@ -12,6 +12,7 @@ add_engine_src_dir(
 	environment
 	forest
 	forest/editor
+	forest/glsl
 	forest/ts
 	gui/3d
 	interior
@@ -36,6 +37,7 @@ add_engine_src_dir(
 	T3D/sfx
 	T3D/vehicles
 	terrain
+	terrain/glsl
 	ts
 	ts/arch
 )
@@ -63,12 +65,6 @@ if(ENGINE_PLATFORM_WIN32)
 		${MODULE_NAME}
 		terrain/hlsl
 		forest/hlsl
-	)
-else()
-	add_engine_src_dir(
-		${MODULE_NAME}
-		terrain/glsl
-		forest/glsl
 	)
 endif()
 

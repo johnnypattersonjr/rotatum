@@ -9,6 +9,7 @@ add_library(${MODULE_NAME} INTERFACE)
 add_engine_src_dir(
 	${MODULE_NAME}
 	lighting/advanced
+	lighting/advanced/glsl
 	lighting/shadowMap
 )
 
@@ -16,11 +17,6 @@ if(ENGINE_PLATFORM_WIN32)
 	add_engine_src_dir(
 		${MODULE_NAME}
 		lighting/advanced/hlsl
-	)
-else()
-	add_engine_src_dir(
-		${MODULE_NAME}
-		lighting/advanced/glsl
 	)
 endif()
 

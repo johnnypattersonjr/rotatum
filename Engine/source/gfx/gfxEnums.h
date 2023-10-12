@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -485,7 +486,7 @@ enum GFXTextureTransformFlags
 
 // CodeReview: This number is used for the declaration of variables, but it
 // should *not* be used for any run-time purposes [7/2/2007 Pat]
-#define TEXTURE_STAGE_COUNT 16
+#define TEXTURE_STAGE_COUNT 96 // OpenGL 4.x Maximum
 
 enum GFXSamplerState 
 {

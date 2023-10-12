@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,7 +21,9 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#if TORQUE_PLATFORM_WINDOWS
+#include "platform/platform.h"
+
+#ifdef TORQUE_OS_WIN32
 
 #include "platformWin32/platformWin32.h"
 #include "gfx/gfxCubemap.h"
@@ -283,6 +286,7 @@ void GFXGLDevice::init( const GFXVideoMode &mode, PlatformWindow *window )
 bool GFXGLDevice::beginSceneInternal() 
 {
    glGetError();
+   mCanCurrentlyRender = true;
    return true;
 }
 
@@ -296,18 +300,13 @@ U32 GFXGLDevice::getTotalVideoMemory()
 
 GFXWindowTarget *GFXGLDevice::allocWindowTarget( PlatformWindow *window )
 {
-   HDC hdcGL = GetDC(GETHWND(window));
-
    if(!mContext)
    {
       init(window->getVideoMode(), window);
-      GFXGLWindowTarget *ggwt = new GFXGLWindowTarget(window, this);
-      ggwt->registerResourceWithDevice(this);
-      ggwt->mContext = wglCreateContext(hdcGL);
-      AssertFatal(ggwt->mContext, "GFXGLDevice::allocWindowTarget - failed to allocate window target!");
-
-      return ggwt;
+      AssertFatal(mContext, "GFXGLDevice::allocWindowTarget - failed to allocate window target!");
    }
+
+   HDC hdcGL = GetDC(GETHWND(window));
 
    GFXGLWindowTarget *ggwt = new GFXGLWindowTarget(window, this);
    ggwt->registerResourceWithDevice(this);
@@ -338,8 +337,11 @@ void GFXGLDevice::_updateRenderTargets()
 {
    if ( mRTDirty || mCurrentRT->isPendingState() )
    {
-      // GL doesn't need to deactivate targets.
-      mRTDeactivate = NULL;
+      if ( mRTDeactivate )
+      {
+         mRTDeactivate->deactivate();
+         mRTDeactivate = NULL;
+      }
 
       // NOTE: The render target changes is not really accurate
       // as the GFXTextureTarget supports MRT internally.  So when

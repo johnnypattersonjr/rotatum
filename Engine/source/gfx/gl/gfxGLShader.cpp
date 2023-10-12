@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -818,9 +819,14 @@ bool GFXGLShader::_loadShaderFromStream(  GLuint shader,
    lengths.push_back( dStrlen( versionDecl ) );
 
    // Now add all the macros.
+#ifdef TORQUE_OS_WIN32
+   const char *format = "#define %s %s\r\n";
+#else
+   const char *format = "#define %s %s\n";
+#endif
    for( U32 i = 0; i < macros.size(); i++ )
    {
-      String define = String::ToString( "#define %s %s\n", macros[i].name.c_str(), macros[i].value.c_str() );
+      String define = String::ToString( format, macros[i].name.c_str(), macros[i].value.c_str() );
       buffers.push_back( dStrdup( define.c_str() ) );
       lengths.push_back( define.length() );
    }
