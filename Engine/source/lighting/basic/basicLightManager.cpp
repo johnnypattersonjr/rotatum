@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -41,20 +42,18 @@
 #include "scene/sceneObject.h"
 #include "renderInstance/renderPrePassMgr.h"
 #include "shaderGen/featureMgr.h"
-#include "shaderGen/HLSL/shaderFeatureHLSL.h"
-#include "shaderGen/HLSL/bumpHLSL.h"
-#include "shaderGen/HLSL/pixSpecularHLSL.h"
+#include "shaderGen/GLSL/shaderFeatureGLSL.h"
+#include "shaderGen/GLSL/bumpGLSL.h"
+#include "shaderGen/GLSL/pixSpecularGLSL.h"
 #include "lighting/basic/blInteriorSystem.h"
 #include "lighting/basic/blTerrainSystem.h"
 #include "lighting/common/projectedShadow.h"
 
-
-#ifdef TORQUE_OS_MAC
-#include "shaderGen/GLSL/shaderFeatureGLSL.h"
-#include "shaderGen/GLSL/bumpGLSL.h"
-#include "shaderGen/GLSL/pixSpecularGLSL.h"
+#ifdef TORQUE_OS_WIN32
+#include "shaderGen/HLSL/shaderFeatureHLSL.h"
+#include "shaderGen/HLSL/bumpHLSL.h"
+#include "shaderGen/HLSL/pixSpecularHLSL.h"
 #endif
-
 
 MODULE_BEGIN( BasicLightManager )
 
@@ -165,25 +164,23 @@ void BasicLightManager::activate( SceneManager *sceneManager )
 {
    Parent::activate( sceneManager );
 
-   if( GFX->getAdapterType() == OpenGL )
+   if ( GFX->getAdapterType() == OpenGL )
    {
-      #ifdef TORQUE_OS_MAC
-         FEATUREMGR->registerFeature( MFT_LightMap, new LightmapFeatGLSL );
-         FEATUREMGR->registerFeature( MFT_ToneMap, new TonemapFeatGLSL );
-         FEATUREMGR->registerFeature( MFT_NormalMap, new BumpFeatGLSL );
-         FEATUREMGR->registerFeature( MFT_RTLighting, new RTLightingFeatGLSL );
-         FEATUREMGR->registerFeature( MFT_PixSpecular, new PixelSpecularGLSL );
-      #endif
+      FEATUREMGR->registerFeature( MFT_LightMap, new LightmapFeatGLSL );
+      FEATUREMGR->registerFeature( MFT_ToneMap, new TonemapFeatGLSL );
+      FEATUREMGR->registerFeature( MFT_NormalMap, new BumpFeatGLSL );
+      FEATUREMGR->registerFeature( MFT_RTLighting, new RTLightingFeatGLSL );
+      FEATUREMGR->registerFeature( MFT_PixSpecular, new PixelSpecularGLSL );
    }
    else
    {
-      #ifndef TORQUE_OS_MAC
-         FEATUREMGR->registerFeature( MFT_LightMap, new LightmapFeatHLSL );
-         FEATUREMGR->registerFeature( MFT_ToneMap, new TonemapFeatHLSL );
-         FEATUREMGR->registerFeature( MFT_NormalMap, new BumpFeatHLSL );
-         FEATUREMGR->registerFeature( MFT_RTLighting, new RTLightingFeatHLSL );
-         FEATUREMGR->registerFeature( MFT_PixSpecular, new PixelSpecularHLSL );
-      #endif
+#ifdef TORQUE_OS_WIN32
+      FEATUREMGR->registerFeature( MFT_LightMap, new LightmapFeatHLSL );
+      FEATUREMGR->registerFeature( MFT_ToneMap, new TonemapFeatHLSL );
+      FEATUREMGR->registerFeature( MFT_NormalMap, new BumpFeatHLSL );
+      FEATUREMGR->registerFeature( MFT_RTLighting, new RTLightingFeatHLSL );
+      FEATUREMGR->registerFeature( MFT_PixSpecular, new PixelSpecularHLSL );
+#endif
    }
 
    FEATUREMGR->unregisterFeature( MFT_MinnaertShading );

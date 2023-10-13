@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,20 +24,19 @@
 #include "platform/platform.h"
 #include "lighting/advanced/advancedLightingFeatures.h"
 
-#include "shaderGen/featureMgr.h"
-#include "gfx/gfxStringEnumTranslate.h"
-#include "materials/materialParameters.h"
-#include "materials/materialFeatureTypes.h"
-#include "materials/matTextureTarget.h"
-#include "gfx/gfxDevice.h"
 #include "core/util/safeDelete.h"
+#include "gfx/gfxDevice.h"
+#include "gfx/gfxStringEnumTranslate.h"
+#include "lighting/advanced/glsl/advancedLightingFeaturesGLSL.h"
+#include "lighting/advanced/glsl/gBufferConditionerGLSL.h"
+#include "materials/materialFeatureTypes.h"
+#include "materials/materialParameters.h"
+#include "materials/matTextureTarget.h"
+#include "shaderGen/featureMgr.h"
 
-#ifndef TORQUE_OS_MAC
-#  include "lighting/advanced/hlsl/gBufferConditionerHLSL.h"
-#  include "lighting/advanced/hlsl/advancedLightingFeaturesHLSL.h"
-#else
-#  include "lighting/advanced/glsl/gBufferConditionerGLSL.h"
-#  include "lighting/advanced/glsl/advancedLightingFeaturesGLSL.h"
+#ifdef TORQUE_OS_WIN32
+#include "lighting/advanced/hlsl/gBufferConditionerHLSL.h"
+#include "lighting/advanced/hlsl/advancedLightingFeaturesHLSL.h"
 #endif
 
 
@@ -52,9 +52,8 @@ void AdvancedLightingFeatures::registerFeatures( const GFXFormat &prepassTargetF
 
    ConditionerFeature *cond = NULL;
 
-   if(GFX->getAdapterType() == OpenGL)
+   if (GFX->getAdapterType() == OpenGL)
    {
-#ifdef TORQUE_OS_MAC
       cond = new GBufferConditionerGLSL( prepassTargetFormat );
       FEATUREMGR->registerFeature(MFT_PrePassConditioner, cond);
       FEATUREMGR->registerFeature(MFT_RTLighting, new DeferredRTLightingFeatGLSL());
@@ -62,11 +61,10 @@ void AdvancedLightingFeatures::registerFeatures( const GFXFormat &prepassTargetF
       FEATUREMGR->registerFeature(MFT_PixSpecular, new DeferredPixelSpecularGLSL());
       FEATUREMGR->registerFeature(MFT_MinnaertShading, new DeferredMinnaertGLSL());
       FEATUREMGR->registerFeature(MFT_SubSurface, new DeferredSubSurfaceGLSL());
-#endif
    }
    else
    {
-#ifndef TORQUE_OS_MAC
+#ifdef TORQUE_OS_WIN32
       cond = new GBufferConditionerHLSL( prepassTargetFormat, GBufferConditionerHLSL::ViewSpace );
       FEATUREMGR->registerFeature(MFT_PrePassConditioner, cond);
       FEATUREMGR->registerFeature(MFT_RTLighting, new DeferredRTLightingFeatHLSL());
