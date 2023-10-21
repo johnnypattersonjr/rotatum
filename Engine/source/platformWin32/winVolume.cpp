@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -421,7 +422,7 @@ bool Win32File::open(AccessMode mode)
          (mode == ReadWrite)? Modes[2]: Modes[3];
 
    mHandle = (void*)::CreateFileW(PathToOS(mName).utf16(),
-               m.mode, FILE_SHARE_READ,
+               m.mode, FILE_SHARE_READ | FILE_SHARE_WRITE,
                NULL, m.open,
                FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN,
                NULL);
