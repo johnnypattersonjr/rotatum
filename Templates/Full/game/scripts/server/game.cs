@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 // Game duration in secs, no limit if the duration is set to 0
-$Game::Duration = 20 * 60;
+$Game::Duration = 0;
 
 // When a client score reaches this value, the game is ended.
 $Game::EndGameScore = 30;
