@@ -69,29 +69,19 @@ void _initShaderGenHLSL( ShaderGen *shaderGen )
    FEATUREMGR->registerFeature( MFT_GlossMap, new NamedFeatureHLSL( "Gloss Map" ) );
    FEATUREMGR->registerFeature( MFT_LightbufferMRT, new NamedFeatureHLSL( "Lightbuffer MRT" ) );
    FEATUREMGR->registerFeature( MFT_RenderTarget1_Zero, new RenderTargetZeroHLSL( ShaderFeature::RenderTarget1 ) );
-
    FEATUREMGR->registerFeature( MFT_DiffuseMapAtlas, new NamedFeatureHLSL( "Diffuse Map Atlas" ) );
    FEATUREMGR->registerFeature( MFT_NormalMapAtlas, new NamedFeatureHLSL( "Normal Map Atlas" ) );
-
    FEATUREMGR->registerFeature( MFT_NormalsOut, new NormalsOutFeatHLSL );
-   
    FEATUREMGR->registerFeature( MFT_DepthOut, new DepthOutHLSL );
    FEATUREMGR->registerFeature( MFT_EyeSpaceDepthOut, new EyeSpaceDepthOutHLSL() );
-
    FEATUREMGR->registerFeature( MFT_HDROut, new HDROutHLSL );
-
    FEATUREMGR->registerFeature( MFT_ParaboloidVertTransform, new ParaboloidVertTransformHLSL );
    FEATUREMGR->registerFeature( MFT_IsSinglePassParaboloid, new NamedFeatureHLSL( "Single Pass Paraboloid" ) );
    FEATUREMGR->registerFeature( MFT_UseInstancing, new NamedFeatureHLSL( "Hardware Instancing" ) );
-
    FEATUREMGR->registerFeature( MFT_Foliage, new FoliageFeatureHLSL );
-
    FEATUREMGR->registerFeature( MFT_ParticleNormal, new ParticleNormalFeatureHLSL );
-
    FEATUREMGR->registerFeature( MFT_InterlacedPrePass, new NamedFeatureHLSL( "Interlaced Pre Pass" ) );
-
    FEATUREMGR->registerFeature( MFT_ForwardShading, new NamedFeatureHLSL( "Forward Shaded Material" ) );
-
    FEATUREMGR->registerFeature( MFT_ImposterVert, new ImposterVertFeatureHLSL );
 }
 
