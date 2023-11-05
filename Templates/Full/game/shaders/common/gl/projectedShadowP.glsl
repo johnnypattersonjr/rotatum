@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,17 +31,6 @@ uniform vec4 ambient;
             
 void main()
 {   
-   vec3 LUMINANCE_VECTOR  = vec3(0.2125f, 0.4154f, 0.1721f);
-   float esmFactor = 200.0;
-   
-   float lum = dot( ambient.rgb, LUMINANCE_VECTOR );   
-
-   gl_FragColor.rgb = ambient.rgb * lum; 
-   gl_FragColor.a = 0.0;
-   float depth = texture2D(inputTex, texCoord).a;
-   
-   depth = depth * exp(depth - 10.0);
-   depth = exp(esmFactor * depth) - 1.0;
-   
-   gl_FragColor.a = clamp(depth * 300.0, 0.0, 1.0) * (1.0 - lum) * fade * color.a;
+   float shadow = texture2D( inputTex, vec2(texCoord.x, 1 - texCoord.y) ).a * color.a;
+   gl_FragColor = (( ambient * shadow ) + ( 1 - shadow ));
 }

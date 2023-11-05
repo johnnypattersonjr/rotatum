@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -38,7 +39,6 @@ void EyeSpaceDepthOutGLSL::processVert(   Vector<ShaderComponent*> &componentLis
    Var *outWSEyeVec = connectComp->getElement( RT_TEXCOORD );
    outWSEyeVec->setName( "outWSEyeVec" );
 	
-	
    // grab incoming vert position
    Var *wsPosition = new Var( "depthPos", "vec3" );
    getWsPosition( componentList, fd.features[MFT_UseInstancing], meta, new DecOp( wsPosition ) );
@@ -53,7 +53,7 @@ void EyeSpaceDepthOutGLSL::processVert(   Vector<ShaderComponent*> &componentLis
       eyePos->constSortPos = cspPass;
    }
 
-meta->addStatement( new GenOp( "   @ = vec4( @.xyz - @, 1 );\r\n", outWSEyeVec, wsPosition, eyePos ) );
+   meta->addStatement( new GenOp( "   @ = vec4( @.xyz - @, 1 );\r\n", outWSEyeVec, wsPosition, eyePos ) );
 }
 
 void EyeSpaceDepthOutGLSL::processPix( Vector<ShaderComponent*> &componentList, 
@@ -83,12 +83,27 @@ void EyeSpaceDepthOutGLSL::processPix( Vector<ShaderComponent*> &componentList,
 
    LangElement *depthOutDecl = new DecOp( depthOut );
 
+   meta->addStatement( new GenOp( "#ifndef CUBE_SHADOW_MAP\r\n" ) );
    meta->addStatement( new GenOp( "   @ = dot(@, (@.xyz / @.w));\r\n", depthOutDecl, vEye, wsEyeVec, wsEyeVec ) );
+   meta->addStatement( new GenOp( "#else\r\n" ) );
+
+   Var *farDist = (Var*)Var::find( "oneOverFarplane" );
+   if ( !farDist )
+   {
+      farDist = new Var;
+      farDist->setType("vec4");
+      farDist->setName("oneOverFarplane");
+      farDist->uniform = true;
+      farDist->constSortPos = cspPass;
+   }
+
+   meta->addStatement( new GenOp( "   @ = length( @.xyz / @.w ) * @.x;\r\n", depthOutDecl, wsEyeVec, wsEyeVec, farDist ) );
+   meta->addStatement( new GenOp( "#endif\r\n" ) );
 
    // If there isn't an output conditioner for the pre-pass, than just write
    // out the depth to rgba and return.
    if( !fd.features[MFT_PrePassConditioner] )
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "vec4(@)", depthOut ), Material::None ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "vec4(vec3(@),1)", depthOut ), Material::None ) ) );
    
    output = meta;
 }
@@ -140,7 +155,7 @@ void DepthOutGLSL::processPix(   Vector<ShaderComponent*> &componentList,
    depthOut->setName(getOutputVarName());
    */
 
-   LangElement *depthOut = new GenOp( "vec4( @, @ * @, 0, 1 )", depthVar, depthVar, depthVar );
+   LangElement *depthOut = new GenOp( "vec4( @, 0, 0, 1 )", depthVar );
 
    output = new GenOp( "   @;\r\n", assignColor( depthOut, Material::None ) );
 }
