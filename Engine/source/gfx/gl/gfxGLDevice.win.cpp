@@ -271,7 +271,7 @@ void GFXGLDevice::init( const GFXVideoMode &mode, PlatformWindow *window )
    loadGLCore();
    loadGLExtensions(hdcGL);
 
-   wglSwapIntervalEXT(0);
+   wglSwapIntervalEXT(smDisableVSync ? 0 : 1);
    
    // It is very important that extensions be loaded
    // before we call initGLState()

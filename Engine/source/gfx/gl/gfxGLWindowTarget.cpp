@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,6 +26,7 @@
 #include "gfx/gl/gfxGLWindowTarget.h"
 #include "gfx/gl/gfxGLTextureObject.h"
 #include "gfx/gl/gfxGLUtils.h"
+#include "ggl/Win32/wgl.h"
 
 GFXGLWindowTarget::GFXGLWindowTarget(PlatformWindow *win, GFXDevice *d)
       : GFXWindowTarget(win), mDevice(d), mContext(NULL), mFullscreenContext(NULL)
@@ -39,6 +41,8 @@ void GFXGLWindowTarget::resetMode()
       _teardownCurrentMode();
       _setupNewMode();
    }
+
+   wglSwapIntervalEXT(GFXDevice::smDisableVSync ? 0 : 1);
 }
 
 void GFXGLWindowTarget::_onAppSignal(WindowId wnd, S32 event)
