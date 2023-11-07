@@ -918,7 +918,7 @@ void WaterObject::setShaderParams( SceneRenderState *state, BaseMatInstance *mat
    Point2F reflectTexSize( mPlaneReflector.reflectTex.getWidth(), mPlaneReflector.reflectTex.getHeight() );
    matParams->setSafe( paramHandles.mReflectTexSizeSC, reflectTexSize );
 
-   static AlignedArray<Point2F> mConstArray( MAX_WAVES, sizeof( Point4F ) );   
+   static AlignedArray<Point2F> mConstArray( MAX_WAVES, sizeof( Point2F ) );
 
    // Ripples...
 
