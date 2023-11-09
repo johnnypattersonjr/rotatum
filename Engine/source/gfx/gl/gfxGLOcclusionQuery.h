@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -44,6 +45,9 @@ public:
    
 private:
    U32 mQuery;
+   int mLastResult;
+   bool mActive;
+   bool mResultPending;
 };
 
 #endif // _GFX_GL_OCCLUSIONQUERY_H_
