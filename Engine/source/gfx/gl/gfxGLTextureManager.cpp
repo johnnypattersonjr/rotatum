@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -141,9 +142,27 @@ void GFXGLTextureManager::innerCreateTexture( GFXGLTextureObject *retTex,
    AssertFatal(GFXGLTextureType[format] != GL_ZERO, "GFXGLTextureManager::innerCreateTexture - invalid type");
    
    if(binding != GL_TEXTURE_3D)
-      glTexImage2D(binding, 0, GFXGLTextureInternalFormat[format], width, height, 0, GFXGLTextureFormat[format], GFXGLTextureType[format], NULL);
+   {
+      if(format == GFXFormatDXT1 || format == GFXFormatDXT3 || format == GFXFormatDXT5)
+      {
+         if((!isPow2(width) || !isPow2(width)) && GFX->getCardProfiler()->queryProfile("GL::Workaround::noCompressedNPoTTextures"))
+         {
+            glTexImage2D(binding, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+         }
+         else
+         {
+            glCompressedTexImage2D(binding, 0, GFXGLTextureInternalFormat[format], width, height, 0, DDSFile::getSizeInBytes(format, height, width, 1), NULL);
+         }
+      }
+      else
+      {
+         glTexImage2D(binding, 0, GFXGLTextureInternalFormat[format], width, height, 0, GFXGLTextureFormat[format], GFXGLTextureType[format], NULL);
+      }
+   }
    else
+   {
       glTexImage3D(GL_TEXTURE_3D, 0, GFXGLTextureInternalFormat[format], width, height, depth, 0, GFXGLTextureFormat[format], GFXGLTextureType[format], NULL);
+   }
    
    // Complete the texture
    glTexParameteri(binding, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
