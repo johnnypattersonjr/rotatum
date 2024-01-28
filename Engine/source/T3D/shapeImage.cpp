@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3092,7 +3093,10 @@ TICKAGAIN:
    }
 
    if ( image.rDT > 0.0f && image.delayTime > 0.0f && imageData.useRemainderDT && dt != 0.0f )
+   {
+      dt = image.rDT;
       goto TICKAGAIN;
+   }
 }
 
 
