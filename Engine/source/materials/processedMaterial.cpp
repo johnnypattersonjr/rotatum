@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -41,10 +42,14 @@ RenderPassData::RenderPassData()
 void RenderPassData::reset()
 {
    for( U32 i = 0; i < Material::MAX_TEX_PER_PASS; ++ i )
-      destructInPlace( &mTexSlot[ i ] );
-
-   dMemset( &mTexSlot, 0, sizeof(mTexSlot) );
-   dMemset( &mTexType, 0, sizeof(mTexType) );
+   {
+      TexBind& bind = mTexBind[ i ];
+      bind.samplerName.clear();
+      bind.type = Material::NoTexture;
+      bind.samplerRegister = -1;
+      bind.target = NULL;
+      bind.object = NULL;
+   }
 
    mCubeMap = NULL;
    mNumTex = mNumTexReg = mStageNum = 0;
@@ -65,16 +70,18 @@ String RenderPassData::describeSelf() const
    String texName;
    for ( U32 i=0; i < Material::MAX_TEX_PER_PASS; i++ )
    {
-      if ( mTexType[i] == Material::TexTarget )
-         texName = ( mTexSlot[i].texTarget ) ? mTexSlot[i].texTarget->getName() : "null_texTarget";
-      else if ( mTexType[i] == Material::Cube && mCubeMap )
+      const TexBind& bind = mTexBind[i];
+
+      if ( bind.type == Material::TexTarget )
+         texName = ( bind.target ) ? bind.target->getName() : "null_texTarget";
+      else if ( bind.type == Material::Cube && mCubeMap )
          texName = mCubeMap->getPath();
-      else if ( mTexSlot[i].texObject )
-         texName = mTexSlot[i].texObject->getPath();
+      else if ( bind.object )
+         texName = bind.object->getPath();
       else
          continue;
 
-      desc += String::ToString( "TexSlot %d: %d, %s\n", i, mTexType[i], texName.c_str() );
+      desc += String::ToString( "TexBind %d: %d, %s\n", i, bind.type, texName.c_str() );
    }
 
    // Write out the first render state which is the
@@ -239,10 +246,10 @@ void ProcessedMaterial::_initPassStateBlock( RenderPassData *rpd, GFXStateBlockD
       maxAnisotropy = MATMGR->getDefaultAnisotropy();
 
    for( U32 i=0; i < rpd->mNumTex; i++ )
-   {      
-      U32 currTexFlag = rpd->mTexType[i];
+   {
+      const TexBind& bind = rpd->mTexBind[i];
 
-      switch( currTexFlag )
+      switch( bind.type )
       {
          default:
          {
@@ -276,7 +283,7 @@ void ProcessedMaterial::_initPassStateBlock( RenderPassData *rpd, GFXStateBlockD
 
          case Material::TexTarget:
          {
-            texTarget = mPasses[0]->mTexSlot[i].texTarget;
+            texTarget = bind.target;
             if ( texTarget )
                texTarget->setupSamplerState( &result.samplers[i] );
             break;

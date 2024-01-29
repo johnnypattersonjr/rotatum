@@ -600,24 +600,29 @@ void GFXGLShader::initHandles()
          // Set sampler number on our program.
          glUniform1i(handle->mLocation, handle->mSamplerNum);
          // Set sampler in constant buffer so it does not get unset later.
-         dMemcpy(mConstBuffer + handle->mOffset, &handle->mLocation, handle->getSize());
+         dMemcpy(mConstBuffer + handle->mOffset, &handle->mSamplerNum, handle->getSize());
       }
    }
    glUseProgram(0);
 }
 
-GFXShaderConstHandle* GFXGLShader::getShaderConstHandle(const String& name)
+GFXShaderConstHandle* GFXGLShader::getShaderConstHandle(const String& name, bool create)
 {
    HandleMap::Iterator i = mHandles.find(name);
-   if(i != mHandles.end())
+
+   if (i != mHandles.end())
+   {
       return i->value;
-   else
+   }
+   else if (create)
    {
       GFXGLShaderConstHandle* handle = new GFXGLShaderConstHandle( this );
       mHandles[ name ] = handle;
-      
+
       return handle;
    }
+
+   return NULL;
 }
 
 void GFXGLShader::setConstantsFromBuffer(GFXGLShaderConstBuffer* buffer)

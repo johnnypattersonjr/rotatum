@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -92,14 +93,6 @@ void ShaderConstHandles::init( GFXShader *shader, CustomMaterial* mat /*=NULL*/ 
 
    for (S32 i = 0; i < TEXTURE_STAGE_COUNT; ++i)
       mRTParamsSC[i] = shader->getShaderConstHandle( String::ToString( "$rtParams%d", i ) );
-
-   // Clear any existing texture handles.
-   dMemset( mTexHandlesSC, 0, sizeof( mTexHandlesSC ) );
-   if(mat)
-   {
-      for (S32 i = 0; i < Material::MAX_TEX_PER_PASS; ++i)
-         mTexHandlesSC[i] = shader->getShaderConstHandle(mat->mSamplerNames[i]);
-   }
 }
 
 ///
@@ -218,8 +211,10 @@ bool ProcessedShaderMaterial::init( const FeatureSet &features,
 
          if (rpd)
          {
-            rpd->mTexSlot[0].texTarget = texTarget;
-            rpd->mTexType[0] = Material::TexTarget;
+            TexBind& bind = rpd->mTexBind[0];
+            bind.samplerName = "$diffuseMap";
+            bind.target = texTarget;
+            bind.type = Material::TexTarget;
          }
       }
 
@@ -556,7 +551,8 @@ void ProcessedShaderMaterial::_initMaterialParameters()
    // Run through each shader and prepare its constants.
    for ( U32 i = 0; i < mPasses.size(); i++ )
    {
-      const Vector<GFXShaderConstDesc>& desc = shaders[i]->getShaderConstDesc();
+      GFXShader* shader = shaders[i];
+      const Vector<GFXShaderConstDesc>& desc = shader->getShaderConstDesc();
 
       Vector<GFXShaderConstDesc>::const_iterator p = desc.begin();
       for ( ; p != desc.end(); p++ )
@@ -567,6 +563,19 @@ void ProcessedShaderMaterial::_initMaterialParameters()
 
          ShaderMaterialParameterHandle* smph = new ShaderMaterialParameterHandle(d.name, shaders);
          mParameterHandles.push_back(smph);
+      }
+
+      // Update sampler registers for texture bindings.
+      ShaderRenderPassData* rpd = _getRPD( i );
+      for( U32 j = 0; j < rpd->mNumTex; j++ )
+      {
+         TexBind& bind = rpd->mTexBind[j];
+
+         GFXShaderConstHandle* handle = rpd->shader->getShaderConstHandle(bind.samplerName, false);
+         if (!handle || !handle->isValid())
+            continue;
+
+         bind.samplerRegister = handle->getSamplerRegister();
       }
    }
 }
@@ -709,56 +718,62 @@ void ProcessedShaderMaterial::setTextureStages( SceneRenderState *state, const S
    AssertFatal( pass<mPasses.size(), "Pass out of bounds" );
 #endif
 
-   RenderPassData *rpd = mPasses[pass];
+   ShaderRenderPassData* rpd = _getRPD(pass);
    GFXShaderConstBuffer* shaderConsts = _getShaderConstBuffer(pass);
    NamedTexTarget *texTarget;
    GFXTextureObject *texObject; 
 
    for( U32 i=0; i<rpd->mNumTex; i++ )
    {
-      U32 currTexFlag = rpd->mTexType[i];
-      if (!LIGHTMGR || !LIGHTMGR->setTextureStage(sgData, currTexFlag, i, shaderConsts, handles))
+      const TexBind& bind = rpd->mTexBind[i];
+
+      if (!LIGHTMGR || !LIGHTMGR->setTextureStage(sgData, bind.type, shaderConsts, handles))
       {
-         switch( currTexFlag )
+         if ( bind.samplerRegister < 0 )
+            continue;
+
+         U32 samplerRegister = bind.samplerRegister;
+
+         switch( bind.type )
          {
          // If the flag is unset then assume its just
          // a regular texture to set... nothing special.
          case 0:
          default:
-            GFX->setTexture(i, rpd->mTexSlot[i].texObject);
+            GFX->setTexture( samplerRegister, bind.object );
             break;
 
          case Material::NormalizeCube:
-            GFX->setCubeTexture(i, Material::GetNormalizeCube());
+            GFX->setCubeTexture( samplerRegister, Material::GetNormalizeCube() );
             break;
 
          case Material::Lightmap:
-            GFX->setTexture( i, sgData.lightmap );
+            GFX->setTexture( samplerRegister, sgData.lightmap );
             break;
 
          case Material::ToneMapTex:
-            shaderConsts->setSafe(handles->mToneMapTexSC, (S32)i);
-            GFX->setTexture(i, rpd->mTexSlot[i].texObject);
+            shaderConsts->setSafe(handles->mToneMapTexSC, (S32)samplerRegister);
+            GFX->setTexture( samplerRegister, bind.object );
             break;
 
          case Material::Cube:
-            GFX->setCubeTexture( i, rpd->mCubeMap );
+            GFX->setCubeTexture( samplerRegister, rpd->mCubeMap );
             break;
 
          case Material::SGCube:
-            GFX->setCubeTexture( i, sgData.cubemap );
+            GFX->setCubeTexture( samplerRegister, sgData.cubemap );
             break;
 
          case Material::BackBuff:
-            GFX->setTexture( i, sgData.backBuffTex );
+            GFX->setTexture( samplerRegister, sgData.backBuffTex );
             break;
             
          case Material::TexTarget:
             {
-               texTarget = rpd->mTexSlot[i].texTarget;
+               texTarget = bind.target;
                if ( !texTarget )
                {
-                  GFX->setTexture( i, NULL );
+                  GFX->setTexture( samplerRegister, NULL );
                   break;
                }
             
@@ -770,7 +785,7 @@ void ProcessedShaderMaterial::setTextureStages( SceneRenderState *state, const S
                if ( !texObject )
                   texObject = GFXTexHandle::ZERO;
 
-               if ( handles->mRTParamsSC[i]->isValid() && texObject )
+               if ( handles->mRTParamsSC[samplerRegister]->isValid() && texObject )
                {
                   const Point3I &targetSz = texObject->getSize();
                   const RectI &targetVp = texTarget->getViewport();
@@ -778,10 +793,10 @@ void ProcessedShaderMaterial::setTextureStages( SceneRenderState *state, const S
 
                   ScreenSpace::RenderTargetParameters(targetSz, targetVp, rtParams);
 
-                  shaderConsts->set(handles->mRTParamsSC[i], rtParams);
+                  shaderConsts->set(handles->mRTParamsSC[samplerRegister], rtParams);
                }
 
-               GFX->setTexture( i, texObject );
+               GFX->setTexture( samplerRegister, texObject );
                break;
             }
          }

@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -146,7 +147,9 @@ void SpecularMapHLSL::setTexData( Material::StageData &stageDat,
    GFXTextureObject *tex = stageDat.getTex( MFT_SpecularMap );
    if ( tex )
    {
-      passData.mTexType[ texIndex ] = Material::Standard;
-      passData.mTexSlot[ texIndex++ ].texObject = tex;
+      TexBind& bind = passData.mTexBind[ texIndex++ ];
+	  bind.samplerName = "$specularMap";
+      bind.type = Material::Standard;
+      bind.object = tex;
    }
 }

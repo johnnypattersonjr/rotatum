@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1354,22 +1355,25 @@ GFXShaderConstBufferRef GFXD3D9Shader::allocConstBuffer()
 }
 
 /// Returns a shader constant handle for name, if the variable doesn't exist NULL is returned.
-GFXShaderConstHandle* GFXD3D9Shader::getShaderConstHandle(const String& name)
+GFXShaderConstHandle* GFXD3D9Shader::getShaderConstHandle(const String& name, bool create)
 {
-   HandleMap::Iterator i = mHandles.find(name);   
+   HandleMap::Iterator i = mHandles.find(name);
+
    if ( i != mHandles.end() )
    {
       return i->value;
-   } 
-   else 
-   {     
+   }
+   else if ( create )
+   {
       GFXD3D9ShaderConstHandle *handle = new GFXD3D9ShaderConstHandle();
       handle->setValid( false );
       handle->mShader = this;
       mHandles[name] = handle;
 
-      return handle;      
-   }      
+      return handle;
+   }
+
+   return NULL;
 }
 
 const Vector<GFXShaderConstDesc>& GFXD3D9Shader::getShaderConstDesc() const

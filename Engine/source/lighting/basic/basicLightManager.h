@@ -61,7 +61,7 @@ public:
    virtual void activate( SceneManager *sceneManager );
    virtual void deactivate();
    virtual void setLightInfo(ProcessedMaterial* pmat, const Material* mat, const SceneData& sgData, const SceneRenderState *state, U32 pass, GFXShaderConstBuffer* shaderConsts);
-   virtual bool setTextureStage(const SceneData& sgData, const U32 currTexFlag, const U32 textureSlot, GFXShaderConstBuffer* shaderConsts, ShaderConstHandles* handles) { return false; }
+   virtual bool setTextureStage(const SceneData& sgData, const U32 currTexFlag, GFXShaderConstBuffer* shaderConsts, ShaderConstHandles* handles) { return false; }
 
    static F32 getShadowFilterDistance() { return smProjectedShadowFilterDistance; }
 

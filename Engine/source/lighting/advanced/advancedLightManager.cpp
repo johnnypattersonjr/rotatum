@@ -443,7 +443,6 @@ void AdvancedLightManager::unregisterAllLights()
 
 bool AdvancedLightManager::setTextureStage(  const SceneData &sgData,
                                              const U32 currTexFlag,
-                                             const U32 textureSlot, 
                                              GFXShaderConstBuffer *shaderConsts, 
                                              ShaderConstHandles *handles )
 {

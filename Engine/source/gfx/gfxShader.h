@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -313,7 +314,7 @@ public:
    /// Since shaders can reload and later have handles that didn't 
    /// exist originally this will return a handle in an invalid state
    /// if the constant doesn't exist at this time.
-   virtual GFXShaderConstHandle* getShaderConstHandle( const String& name ) = 0; 
+   virtual GFXShaderConstHandle* getShaderConstHandle( const String& name, bool create = true ) = 0;
 
    /// Returns the alignment value for constType
    virtual U32 getAlignmentValue(const GFXShaderConstType constType) const = 0;   

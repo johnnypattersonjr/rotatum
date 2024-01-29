@@ -151,7 +151,6 @@ public:
    /// Allows us to set textures during the Material::setTextureStage call, return true if we've done work.
    virtual bool setTextureStage( const SceneData &sgData, 
                                  const U32 currTexFlag, 
-                                 const U32 textureSlot, 
                                  GFXShaderConstBuffer *shaderConsts, 
                                  ShaderConstHandles *handles ) = 0;
 

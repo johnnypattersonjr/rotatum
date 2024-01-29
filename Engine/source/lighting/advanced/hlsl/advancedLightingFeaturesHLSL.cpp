@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -206,8 +207,10 @@ void DeferredRTLightingFeatHLSL::setTexData( Material::StageData &stageDat,
       // which cannot deduce the texture unit itself.
       mLastTexIndex = texIndex;
 
-      passData.mTexType[ texIndex ] = Material::TexTarget;
-      passData.mTexSlot[ texIndex++ ].texTarget = texTarget;
+      TexBind& bind = passData.mTexBind[ texIndex++ ];
+      bind.samplerName = "$lightInfoBuffer";
+      bind.type = Material::TexTarget;
+      bind.target = texTarget;
    }
 }
 
@@ -401,14 +404,18 @@ void DeferredBumpFeatHLSL::setTexData( Material::StageData &stageDat,
          ( fd.features[MFT_PrePassConditioner] ||
            fd.features[MFT_PixSpecular] ) )
    {
-      passData.mTexType[ texIndex ] = Material::Bump;
-      passData.mTexSlot[ texIndex++ ].texObject = stageDat.getTex( MFT_NormalMap );
+      TexBind& bind = passData.mTexBind[ texIndex++ ];
+      bind.samplerName = "$bumpMap";
+      bind.type = Material::Bump;
+      bind.object = stageDat.getTex( MFT_NormalMap );
 
       if (  fd.features[MFT_PrePassConditioner] &&
             fd.features.hasFeature( MFT_DetailNormalMap ) )
       {
-         passData.mTexType[ texIndex ] = Material::DetailBump;
-         passData.mTexSlot[ texIndex++ ].texObject = stageDat.getTex( MFT_DetailNormalMap );
+         TexBind& bind = passData.mTexBind[ texIndex++ ];
+         bind.samplerName = "$detailBumpMap";
+         bind.type = Material::DetailBump;
+         bind.object = stageDat.getTex( MFT_DetailNormalMap );
       }
    }
 }
@@ -523,8 +530,10 @@ void DeferredMinnaertHLSL::setTexData( Material::StageData &stageDat,
       NamedTexTarget *texTarget = NamedTexTarget::find(RenderPrePassMgr::BufferName);
       if ( texTarget )
       {
-         passData.mTexType[ texIndex ] = Material::TexTarget;
-         passData.mTexSlot[ texIndex++ ].texTarget = texTarget;
+         TexBind& bind = passData.mTexBind[ texIndex++ ];
+         bind.samplerName = "$prepassBuffer";
+         bind.type = Material::TexTarget;
+         bind.target = texTarget;
       }
    }
 }

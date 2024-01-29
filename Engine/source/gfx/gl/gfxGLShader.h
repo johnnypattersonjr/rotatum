@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -42,7 +43,7 @@ public:
    
    /// @name GFXShader interface
    /// @{
-   virtual GFXShaderConstHandle* getShaderConstHandle(const String& name);
+   virtual GFXShaderConstHandle* getShaderConstHandle(const String& name, bool create = true);
 
    /// Returns our list of shader constants, the material can get this and just set the constants it knows about
    virtual const Vector<GFXShaderConstDesc>& getShaderConstDesc() const;

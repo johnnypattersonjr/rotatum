@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -178,15 +179,16 @@ void ProcessedFFMaterial::setTextureStages(SceneRenderState * state, const Scene
 #endif
    RenderPassData *rpd = mPasses[pass];
    for( U32 i=0; i<rpd->mNumTex; i++ )
-   {      
-      U32 currTexFlag = rpd->mTexType[i];
-      if (!LIGHTMGR || !LIGHTMGR->setTextureStage(sgData, currTexFlag, i, NULL, NULL))
+   {
+      const TexBind& bind = rpd->mTexBind[i];
+
+      if (!LIGHTMGR || !LIGHTMGR->setTextureStage(sgData, bind.type, NULL, NULL))
       {
-         switch( currTexFlag )
+         switch( bind.type )
          {
          case Material::NoTexture:
-            if (rpd->mTexSlot[i].texObject)
-               GFX->setTexture( i, rpd->mTexSlot[i].texObject );
+            if (bind.object)
+               GFX->setTexture( i, bind.object );
             break;
 
          case Material::NormalizeCube:
@@ -199,13 +201,13 @@ void ProcessedFFMaterial::setTextureStages(SceneRenderState * state, const Scene
 
          case Material::Cube:
             // TODO: Is this right?
-            GFX->setTexture( i, rpd->mTexSlot[0].texObject );
+            GFX->setTexture( i, bind.object );
             break;
 
          case Material::SGCube:
             // No cubemap support just yet
             //GFX->setCubeTexture( i, sgData.cubemap );
-            GFX->setTexture( i, rpd->mTexSlot[0].texObject );
+            GFX->setTexture( i, bind.object );
             break;
 
          case Material::BackBuff:
@@ -334,16 +336,18 @@ void ProcessedFFMaterial::_addPass(U32 stageNum, FixedFuncFeatureData& featData)
    // Base texture, texunit 0
    if(featData.features[FixedFuncFeatureData::DiffuseMap])
    {
-      rpd.mTexSlot[0].texObject = mStages[stageNum].getTex( MFT_DiffuseMap );
-      rpd.mTexType[0] = Material::NoTexture;
-      numTex++;
+      TexBind& bind = rpd.mTexBind[ numTex++ ];
+	  bind.samplerName = "$diffuseMap";
+      bind.type = Material::NoTexture;
+      bind.object = mStages[stageNum].getTex( MFT_DiffuseMap );
    }
 
    // lightmap, texunit 1
    if(featData.features[FixedFuncFeatureData::LightMap])
    {
-      rpd.mTexType[1] = Material::Lightmap;
-      numTex++;
+      TexBind& bind = rpd.mTexBind[ numTex++ ];
+	  bind.samplerName = "$lightMap";
+      bind.type = Material::Lightmap;
    }
 
    rpd.mNumTex = numTex;

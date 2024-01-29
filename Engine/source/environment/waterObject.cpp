@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -88,6 +89,7 @@ void WaterMatParams::clear()
    mRippleSamplerSC = NULL;
    mCubemapSamplerSC = NULL;
    mSpecularParamsSC = NULL;
+   mDepthGradMapSamplerSC = NULL;
    mDepthGradMaxSC = NULL;
    mReflectivitySC = NULL;
 }
@@ -129,6 +131,7 @@ void WaterMatParams::init( BaseMatInstance* matInst )
    mRippleSamplerSC = matInst->getMaterialParameterHandle( "$bumpMap" );
    mCubemapSamplerSC = matInst->getMaterialParameterHandle( "$skyMap" );
    mSpecularParamsSC = matInst->getMaterialParameterHandle( "$specularParams" );   
+   mDepthGradMapSamplerSC = matInst->getMaterialParameterHandle( "$depthGradMap" );
    mDepthGradMaxSC = matInst->getMaterialParameterHandle( "$depthGradMax" );
    mReflectivitySC = matInst->getMaterialParameterHandle( "$reflectivity" );
 }
@@ -746,22 +749,27 @@ void WaterObject::renderObject( ObjectRenderInst *ri, SceneRenderState *state, B
 
 void WaterObject::setCustomTextures( S32 matIdx, U32 pass, const WaterMatParams &paramHandles )
 {
-   // TODO: Retrieve sampler numbers from parameter handles, see r22631.
-   
+   U32 bumpMap = paramHandles.mRippleSamplerSC->getSamplerRegister( pass );
+
    // Always use the ripple texture.
-   GFX->setTexture( 0, mRippleTex );
+   GFX->setTexture( bumpMap, mRippleTex );
 
    // Only above-water in advanced-lighting uses the foam texture.
    if ( matIdx == WaterMat )
    {
-      GFX->setTexture( 5, mFoamTex );
-      GFX->setTexture( 6, mDepthGradientTex );
+      U32 foamMap = paramHandles.mFoamSamplerSC->getSamplerRegister( pass );
+      U32 depthGradMap = paramHandles.mDepthGradMapSamplerSC->getSamplerRegister( pass );
+
+      GFX->setTexture( foamMap, mFoamTex );
+      GFX->setTexture( depthGradMap, mDepthGradientTex );
    }
 
-   if ( ( matIdx == WaterMat || matIdx == BasicWaterMat ) && mCubemap )   
-      GFX->setCubeTexture( 4, mCubemap->mCubemap );
-   else
-      GFX->setCubeTexture( 4, NULL );
+   if ( matIdx == WaterMat || matIdx == BasicWaterMat )
+   {
+      U32 skyMap = paramHandles.mCubemapSamplerSC->getSamplerRegister( pass );
+
+      GFX->setCubeTexture( skyMap, mCubemap ? mCubemap->mCubemap : NULL );
+   }
 }
 
 void WaterObject::drawUnderwaterFilter( SceneRenderState *state )
@@ -918,7 +926,7 @@ void WaterObject::setShaderParams( SceneRenderState *state, BaseMatInstance *mat
    Point2F reflectTexSize( mPlaneReflector.reflectTex.getWidth(), mPlaneReflector.reflectTex.getHeight() );
    matParams->setSafe( paramHandles.mReflectTexSizeSC, reflectTexSize );
 
-   static AlignedArray<Point2F> mConstArray( MAX_WAVES, sizeof( Point2F ) );
+   static AlignedArray<Point2F> mConstArray( MAX_WAVES, sizeof( Point4F ) );
 
    // Ripples...
 

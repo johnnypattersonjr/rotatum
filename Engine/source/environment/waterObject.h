@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -95,6 +96,7 @@ struct WaterMatParams
    MaterialParameterHandle* mRippleSamplerSC;
    MaterialParameterHandle* mCubemapSamplerSC;
    MaterialParameterHandle* mSpecularParamsSC;   
+   MaterialParameterHandle* mDepthGradMapSamplerSC;
    MaterialParameterHandle* mDepthGradMaxSC;
    MaterialParameterHandle* mReflectivitySC;
 

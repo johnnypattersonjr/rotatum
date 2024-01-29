@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -47,31 +48,40 @@ class GFXVertexBufferHandleBase;
 class GFXPrimitiveBufferHandle;
 class MatrixSet;
 
+struct TexBind
+{
+   TexBind()
+      : samplerRegister(-1)
+      , type(0)
+   {
+   }
+
+   String samplerName;
+
+   S32 samplerRegister;
+
+   U32 type;
+
+   /// This is the default type of texture which
+   /// is valid with most texture types.
+   /// @see type
+   GFXTexHandle object;
+
+   /// Only valid when the texture type is set
+   /// to Material::TexTarget.
+   /// @see type
+   NamedTexTargetRef target;
+};
 
 /// This contains the common data needed to render a pass.
 struct RenderPassData
 {
 public:
-
-   struct TexSlotT
-   {
-      /// This is the default type of texture which 
-      /// is valid with most texture types.
-      /// @see mTexType
-      GFXTexHandle texObject;
-
-      /// Only valid when the texture type is set 
-      /// to Material::TexTarget.
-      /// @see mTexType
-     NamedTexTargetRef texTarget;
-
-   } mTexSlot[Material::MAX_TEX_PER_PASS];
-
-   U32 mTexType[Material::MAX_TEX_PER_PASS];
+   TexBind mTexBind[Material::MAX_TEX_PER_PASS];
 
    /// The cubemap to use when the texture type is
    /// set to Material::Cube.
-   /// @see mTexType
+   /// @see TexSlot::type
    GFXCubemap *mCubeMap;
 
    U32 mNumTex;

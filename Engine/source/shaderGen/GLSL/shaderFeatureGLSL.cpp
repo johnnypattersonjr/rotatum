@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -767,7 +768,11 @@ void DiffuseMapFeatGLSL::setTexData(   Material::StageData &stageDat,
 {
    GFXTextureObject *tex = stageDat.getTex( MFT_DiffuseMap );
    if ( tex )
-      passData.mTexSlot[ texIndex++ ].texObject = tex;
+   {
+      TexBind& bind = passData.mTexBind[ texIndex++ ];
+      bind.samplerName = "$diffuseMap";
+      bind.object = tex;
+   }
 }
 
 
@@ -849,7 +854,11 @@ void OverlayTexFeatGLSL::setTexData(   Material::StageData &stageDat,
 {
    GFXTextureObject *tex = stageDat.getTex( MFT_OverlayMap );
    if ( tex )
-      passData.mTexSlot[ texIndex++ ].texObject = tex;
+   {
+      TexBind& bind = passData.mTexBind[ texIndex++ ];
+      bind.samplerName = "$overlapMap";
+      bind.object = tex;
+   }
 }
 
 
@@ -1027,10 +1036,12 @@ void LightmapFeatGLSL::setTexData(  Material::StageData &stageDat,
                                     U32 &texIndex )
 {
    GFXTextureObject *tex = stageDat.getTex( MFT_LightMap );
+   TexBind& bind = passData.mTexBind[ texIndex++ ];
+   bind.samplerName = "$lightMap";
    if ( tex )
-      passData.mTexSlot[ texIndex++ ].texObject = tex;
+      bind.object = tex;
    else
-      passData.mTexType[ texIndex++ ] = Material::Lightmap;
+      bind.type = Material::Lightmap;
 }
 
 U32 LightmapFeatGLSL::getOutputTargets( const MaterialFeatureData &fd ) const
@@ -1150,8 +1161,10 @@ void TonemapFeatGLSL::setTexData(  Material::StageData &stageDat,
    GFXTextureObject *tex = stageDat.getTex( MFT_ToneMap );
    if ( tex )
    {
-      passData.mTexType[ texIndex ] = Material::ToneMapTex;
-      passData.mTexSlot[ texIndex++ ].texObject = tex;
+      TexBind& bind = passData.mTexBind[ texIndex++ ];
+      bind.samplerName = "$toneMap";
+      bind.type = Material::ToneMapTex;
+      bind.object = tex;
    }
 }
 
@@ -1339,7 +1352,11 @@ void DetailFeatGLSL::setTexData( Material::StageData &stageDat,
 {
    GFXTextureObject *tex = stageDat.getTex( MFT_DetailMap );
    if ( tex )
-      passData.mTexSlot[ texIndex++ ].texObject = tex;
+   {
+      TexBind& bind = passData.mTexBind[ texIndex++ ];
+      bind.samplerName = "$detailMap";
+      bind.object = tex;
+   }
 }
 
 
@@ -1585,31 +1602,42 @@ void ReflectCubeFeatGLSL::setTexData(  Material::StageData &stageDat,
       GFXTextureObject *tex = stageDat.getTex( MFT_DetailMap );
       if (  tex &&
             stageFeatures.features[MFT_DiffuseMap] )
-         passData.mTexSlot[ texIndex++ ].texObject = tex;
+      {
+         TexBind& bind = passData.mTexBind[ texIndex++ ];
+         bind.samplerName = "$glossMap";
+         bind.object = tex;
+      }
       else
       {
          tex = stageDat.getTex( MFT_NormalMap );
 
          if (  tex &&
                stageFeatures.features[ MFT_NormalMap ] )
-            passData.mTexSlot[ texIndex++ ].texObject = tex;
+         {
+            TexBind& bind = passData.mTexBind[ texIndex++ ];
+            bind.samplerName = "$glossMap";
+            bind.object = tex;
+         }
       }
    }
    
    if( stageDat.getCubemap() )
    {
+      TexBind& bind = passData.mTexBind[ texIndex++ ];
+      bind.samplerName = "$cubeMap";
+      bind.type = Material::Cube;
       passData.mCubeMap = stageDat.getCubemap();
-      passData.mTexType[texIndex++] = Material::Cube;
    }
    else
    {
       if( stageFeatures.features[MFT_CubeMap] )
       {
          // assuming here that it is a scenegraph cubemap
-         passData.mTexType[texIndex++] = Material::SGCube;
+         TexBind& bind = passData.mTexBind[ texIndex++ ];
+         bind.samplerName = "$cubeMap";
+         bind.type = Material::SGCube;
       }
    }
-
 }
 
 

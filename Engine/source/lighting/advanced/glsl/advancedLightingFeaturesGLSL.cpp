@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -190,8 +191,10 @@ void DeferredRTLightingFeatGLSL::setTexData( Material::StageData &stageDat,
    NamedTexTarget *texTarget = NamedTexTarget::find( AdvancedLightBinManager::smBufferName );
    if( texTarget )
    {
-      passData.mTexType[ texIndex ] = Material::TexTarget;
-      passData.mTexSlot[ texIndex++ ].texTarget = texTarget;
+      TexBind& bind = passData.mTexBind[ texIndex++ ];
+      bind.samplerName = "$lightInfoBuffer";
+      bind.type = Material::TexTarget;
+      bind.target = texTarget;
    }
 }
 
@@ -460,8 +463,10 @@ void DeferredBumpFeatGLSL::setTexData( Material::StageData &stageDat,
            fd.features[MFT_PixSpecular] ) &&         
          normalMap )
    {
-      passData.mTexType[ texIndex ] = Material::Bump;
-      passData.mTexSlot[ texIndex++ ].texObject = normalMap;
+      TexBind& bind = passData.mTexBind[ texIndex++ ];
+      bind.samplerName = "$bumpMap";
+      bind.type = Material::Bump;
+      bind.object = normalMap;
    }
 }
 
@@ -576,8 +581,10 @@ void DeferredMinnaertGLSL::setTexData( Material::StageData &stageDat,
       NamedTexTarget *texTarget = NamedTexTarget::find(RenderPrePassMgr::BufferName);
       if ( texTarget )
       {
-         passData.mTexType[ texIndex ] = Material::TexTarget;
-         passData.mTexSlot[ texIndex++ ].texTarget = texTarget;
+         TexBind& bind = passData.mTexBind[ texIndex++ ];
+         bind.samplerName = "$prepassBuffer";
+         bind.type = Material::TexTarget;
+         bind.target = texTarget;
       }
    }
 }

@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -69,29 +70,34 @@ void ProcessedCustomMaterial::_setStageData()
    // Loop through all the possible textures, set the right flags, and load them if needed
    for(U32 i=0; i<CustomMaterial::MAX_TEX_PER_PASS; i++ )
    {
-      rpd->mTexType[i] = Material::NoTexture;   // Set none as the default in case none of the cases below catch it.
+      TexBind& bind = rpd->mTexBind[ i ];
+      bind.type = Material::NoTexture;   // Set none as the default in case none of the cases below catch it.
+
+      const String& samplerName = mCustomMaterial->mSamplerNames[i];
       String filename = mCustomMaterial->mTexFilename[i];
 
-      if(filename.isEmpty())
+      if(filename.isEmpty() || samplerName.isEmpty())
          continue;
+
+      bind.samplerName = samplerName;
 
       if(filename.equal(String("$dynamiclight"), String::NoCase))
       {
-         rpd->mTexType[i] = Material::DynamicLight;
+         bind.type = Material::DynamicLight;
          mMaxTex = i+1;
          continue;
       }
 
       if(filename.equal(String("$dynamiclightmask"), String::NoCase))
       {
-         rpd->mTexType[i] = Material::DynamicLightMask;
+         bind.type = Material::DynamicLightMask;
          mMaxTex = i+1;
          continue;
       }
 
       if(filename.equal(String("$lightmap"), String::NoCase))
       {
-         rpd->mTexType[i] = Material::Lightmap;
+         bind.type = Material::Lightmap;
          mMaxTex = i+1;
          continue;
       }
@@ -100,7 +106,7 @@ void ProcessedCustomMaterial::_setStageData()
       {
          if( mCustomMaterial->mCubemapData )
          {
-            rpd->mTexType[i] = Material::Cube;
+            bind.type = Material::Cube;
             mMaxTex = i+1;
          }
          else
@@ -112,28 +118,28 @@ void ProcessedCustomMaterial::_setStageData()
 
       if(filename.equal(String("$dynamicCubemap"), String::NoCase))
       {
-         rpd->mTexType[i] = Material::SGCube;
+         bind.type = Material::SGCube;
          mMaxTex = i+1;
          continue;
       }
 
       if(filename.equal(String("$backbuff"), String::NoCase))
       {
-         rpd->mTexType[i] = Material::BackBuff;
+         bind.type = Material::BackBuff;
          mMaxTex = i+1;
          continue;
       }
 
       if(filename.equal(String("$reflectbuff"), String::NoCase))
       {
-         rpd->mTexType[i] = Material::ReflectBuff;
+         bind.type = Material::ReflectBuff;
          mMaxTex = i+1;
          continue;
       }
 
       if(filename.equal(String("$miscbuff"), String::NoCase))
       {
-         rpd->mTexType[i] = Material::Misc;
+         bind.type = Material::Misc;
          mMaxTex = i+1;
          continue;
       }
@@ -143,26 +149,30 @@ void ProcessedCustomMaterial::_setStageData()
       {
          String texTargetBufferName = filename.substr(1, filename.length() - 1);
          NamedTexTarget *texTarget = NamedTexTarget::find( texTargetBufferName ); 
-         rpd->mTexSlot[i].texTarget = texTarget;
+         bind.target = texTarget;
 
          // Get the conditioner macros.
          if ( texTarget )
             texTarget->getShaderMacros( &mConditionerMacros );
 
-         rpd->mTexType[i] = Material::TexTarget;
+         bind.type = Material::TexTarget;
          mMaxTex = i+1;
          continue;
       }
 
-      rpd->mTexSlot[i].texObject = _createTexture( filename, &GFXDefaultStaticDiffuseProfile );
-      if ( !rpd->mTexSlot[i].texObject )
+      GFXTexHandle tex = _createTexture( filename, &GFXDefaultStaticDiffuseProfile );
+      if ( !tex )
       {
          mMaterial->logError("Failed to load texture %s", _getTexturePath(filename).c_str());
          continue;
       }
-      rpd->mTexType[i] = Material::Standard;
+
+      bind.type = Material::Standard;
+      bind.object = tex;
       mMaxTex = i+1;
    }
+
+   rpd->mNumTex = mMaxTex;
 
    // We only get one cubemap
    if( mCustomMaterial->mCubemapData )
@@ -304,17 +314,17 @@ void ProcessedCustomMaterial::setTextureStages( SceneRenderState *state, const S
    GFXTextureObject *texObject; 
    
    for( U32 i=0; i<mMaxTex; i++ )
-   {            
-      U32 currTexFlag = rpd->mTexType[i];
-      if ( !lm || !lm->setTextureStage(sgData, currTexFlag, i, shaderConsts, handles ) )
-      {
-      	GFXShaderConstHandle* handle = handles->mTexHandlesSC[i];
-         if ( !handle->isValid() )
-         	continue;
+   {
+      const TexBind& bind = rpd->mTexBind[i];
 
-         S32 samplerRegister = handle->getSamplerRegister();
-         
-         switch( currTexFlag )
+      if ( !lm || !lm->setTextureStage(sgData, bind.type, shaderConsts, handles ) )
+      {
+         if ( bind.samplerRegister < 0 )
+            continue;
+
+         U32 samplerRegister = bind.samplerRegister;
+
+         switch( bind.type )
          {
          case 0:
          default:
@@ -325,7 +335,7 @@ void ProcessedCustomMaterial::setTextureStages( SceneRenderState *state, const S
          case Material::Bump:
          case Material::Detail:
             {
-               GFX->setTexture( samplerRegister, rpd->mTexSlot[i].texObject );
+               GFX->setTexture( samplerRegister, bind.object );
                break;
             }
 
@@ -361,7 +371,7 @@ void ProcessedCustomMaterial::setTextureStages( SceneRenderState *state, const S
             }
          case Material::TexTarget:
             {
-               texTarget = rpd->mTexSlot[i].texTarget;
+               texTarget = bind.target;
                if ( !texTarget )
                {
                   GFX->setTexture( samplerRegister, NULL );

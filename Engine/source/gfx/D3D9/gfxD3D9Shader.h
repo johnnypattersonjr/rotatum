@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -204,7 +205,7 @@ public:
    // GFXShader
    virtual GFXShaderConstBufferRef allocConstBuffer();
    virtual const Vector<GFXShaderConstDesc>& getShaderConstDesc() const;
-   virtual GFXShaderConstHandle* getShaderConstHandle(const String& name); 
+   virtual GFXShaderConstHandle* getShaderConstHandle(const String& name, bool create = true); 
    virtual U32 getAlignmentValue(const GFXShaderConstType constType) const;
    virtual bool getDisassembly( String &outStr ) const;
 

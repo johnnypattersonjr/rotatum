@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -226,15 +227,18 @@ void BumpFeatGLSL::setTexData(   Material::StageData &stageDat,
 
    if ( fd.features[MFT_NormalMap] )
    {
-      passData.mTexType[ texIndex ] = Material::Bump;
-      passData.mTexSlot[ texIndex++ ].texObject = stageDat.getTex( MFT_NormalMap );
+      TexBind& bind = passData.mTexBind[ texIndex++ ];
+      bind.samplerName = "$bumpMap";
+      bind.type = Material::Bump;
+      bind.object = stageDat.getTex( MFT_NormalMap );
    }
-	
-	
+
    if ( fd.features[ MFT_DetailNormalMap ] )
    {
-      passData.mTexType[ texIndex ] = Material::DetailBump;
-      passData.mTexSlot[ texIndex++ ].texObject = stageDat.getTex( MFT_DetailNormalMap );
+      TexBind& bind = passData.mTexBind[ texIndex++ ];
+      bind.samplerName = "$detailBumpMap";
+      bind.type = Material::DetailBump;
+      bind.object = stageDat.getTex( MFT_DetailNormalMap );
    }
 }
 
@@ -375,8 +379,10 @@ void ParallaxFeatGLSL::setTexData(  Material::StageData &stageDat,
    GFXTextureObject *tex = stageDat.getTex( MFT_NormalMap );
    if ( tex )
    {
-      passData.mTexType[ texIndex ] = Material::Bump;
-      passData.mTexSlot[ texIndex++ ].texObject = tex;
+      TexBind& bind = passData.mTexBind[ texIndex++ ];
+      bind.samplerName = "$bumpMap";
+      bind.type = Material::Bump;
+      bind.object = tex;
    }
 }
 
