@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,10 +27,11 @@
 #include "math/mPoint3.h"
 #include "math/mPoint4.h"
 #include "math/mRect.h"
+#include "gfx/gfxEnums.h"
 
 namespace ScreenSpace
 {
-void RenderTargetParameters(const Point3I &targetSize, const RectI &targetViewport, Point4F &rtParams);
+void RenderTargetParameters(GFXAdapterType type, const Point3I &targetSize, const RectI &targetViewport, Point4F &rtParams);
 };
 
 #endif

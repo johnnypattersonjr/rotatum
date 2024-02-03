@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -375,6 +376,8 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
    if(ri->systemState == PSS_DrawComplete)
       return;
 
+   GFXAdapterType adapterType = GFX->getAdapterType();
+
    if(ri->systemState != PSS_AwaitingCompositeDraw)
    {
       // Set proper stateblock, and update state
@@ -443,7 +446,7 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
 
          Point4F rtParams( 0.0f, 0.0f, 1.0f, 1.0f );
          if ( texObject )
-            ScreenSpace::RenderTargetParameters(texObject->getSize(), mPrepassTarget->getViewport(), rtParams);
+            ScreenSpace::RenderTargetParameters(adapterType, texObject->getSize(), mPrepassTarget->getViewport(), rtParams);
 
          mParticleShaderConsts.mShaderConsts->set( mParticleShaderConsts.mPrePassTargetParamsSC, rtParams );
       }
@@ -475,7 +478,7 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
       GFX->setTexture( 0, particleSource );
       if(particleSource)
       {
-         ScreenSpace::RenderTargetParameters(particleSource->getSize(), mNamedTarget.getViewport(), rtParams);
+         ScreenSpace::RenderTargetParameters(adapterType, particleSource->getSize(), mNamedTarget.getViewport(), rtParams);
          mParticleCompositeShaderConsts.mShaderConsts->setSafe( mParticleCompositeShaderConsts.mOffscreenTargetParamsSC, rtParams );
       }
 
@@ -484,7 +487,7 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
       GFX->setTexture( 1, texObject );
       if(texObject)
       {
-         ScreenSpace::RenderTargetParameters(texObject->getSize(), mEdgeTarget->getViewport(), rtParams);
+         ScreenSpace::RenderTargetParameters(adapterType, texObject->getSize(), mEdgeTarget->getViewport(), rtParams);
          mParticleCompositeShaderConsts.mShaderConsts->setSafe( mParticleCompositeShaderConsts.mEdgeTargetParamsSC, rtParams );
       }
 

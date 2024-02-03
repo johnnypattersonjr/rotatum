@@ -304,7 +304,8 @@ bool ProcessedCustomMaterial::setupPass( SceneRenderState *state, const SceneDat
 }
 
 void ProcessedCustomMaterial::setTextureStages( SceneRenderState *state, const SceneData &sgData, U32 pass )
-{      
+{
+   GFXAdapterType adapterType = GFX->getAdapterType();
    LightManager* lm = state ? LIGHTMGR : NULL;   
    ShaderRenderPassData* rpd = _getRPD(pass);
    ShaderConstHandles* handles = _getShaderConstHandles(pass);
@@ -392,7 +393,7 @@ void ProcessedCustomMaterial::setTextureStages( SceneRenderState *state, const S
                   const RectI &targetVp = texTarget->getViewport();
                   Point4F rtParams;
 
-                  ScreenSpace::RenderTargetParameters(targetSz, targetVp, rtParams);
+                  ScreenSpace::RenderTargetParameters(adapterType, targetSz, targetVp, rtParams);
                   shaderConsts->set(handles->mRTParamsSC[samplerRegister], rtParams);
                }
               

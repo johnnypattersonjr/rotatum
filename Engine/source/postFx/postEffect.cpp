@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -563,6 +564,8 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       }
    }
 
+   GFXAdapterType adapterType = GFX->getAdapterType();
+
    for ( U32 i = 0; i < NumTextures; i++ )
    {
       if ( !mRenderTargetParamsSC[i]->isValid() )
@@ -574,7 +577,7 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       {
          const Point3I &targetSz = mActiveTextures[i]->getSize();
          RectI targetVp = mActiveTextureViewport[i];
-         ScreenSpace::RenderTargetParameters(targetSz, targetVp, rtParams);
+         ScreenSpace::RenderTargetParameters(adapterType, targetSz, targetVp, rtParams);
       }
 
       mShaderConsts->set( mRenderTargetParamsSC[i], rtParams );

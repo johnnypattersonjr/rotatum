@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -750,7 +751,7 @@ bool TerrainCellMaterial::setupPass(   const SceneRenderState *state,
          const Point3I &targetSz = texObject->getSize();
          const RectI &targetVp = mLightInfoTarget->getViewport();
          Point4F rtParams;
-         ScreenSpace::RenderTargetParameters(targetSz, targetVp, rtParams);
+         ScreenSpace::RenderTargetParameters(GFX->getAdapterType(), targetSz, targetVp, rtParams);
          pass.consts->setSafe( pass.lightParamsConst, rtParams );
       }
    }

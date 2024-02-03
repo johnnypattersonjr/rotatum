@@ -718,6 +718,7 @@ void ProcessedShaderMaterial::setTextureStages( SceneRenderState *state, const S
    AssertFatal( pass<mPasses.size(), "Pass out of bounds" );
 #endif
 
+   GFXAdapterType adapterType = GFX->getAdapterType();
    ShaderRenderPassData* rpd = _getRPD(pass);
    GFXShaderConstBuffer* shaderConsts = _getShaderConstBuffer(pass);
    NamedTexTarget *texTarget;
@@ -791,7 +792,7 @@ void ProcessedShaderMaterial::setTextureStages( SceneRenderState *state, const S
                   const RectI &targetVp = texTarget->getViewport();
                   Point4F rtParams;
 
-                  ScreenSpace::RenderTargetParameters(targetSz, targetVp, rtParams);
+                  ScreenSpace::RenderTargetParameters(adapterType, targetSz, targetVp, rtParams);
 
                   shaderConsts->set(handles->mRTParamsSC[samplerRegister], rtParams);
                }
