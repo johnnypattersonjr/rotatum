@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -401,7 +402,9 @@ AdvancedLightBinManager::LightMaterialInfo* AdvancedLightBinManager::_getLightMa
          shadowMacros.push_back( GFXShaderMacro( "NO_SHADOW" ) );
       else
       {
-         shadowMacros.push_back( GFXShaderMacro( smShadowTypeMacro[ shadowType ] ) );
+         const String& typeMacro = smShadowTypeMacro[ shadowType ];
+         if ( typeMacro.isNotEmpty() )
+            shadowMacros.push_back( GFXShaderMacro( typeMacro ) );
 
          // Do we need to do shadow filtering?
          if ( smShadowFilterMode != ShadowFilterMode_None )
