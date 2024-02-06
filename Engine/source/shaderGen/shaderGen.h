@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -46,6 +47,7 @@
 #ifndef _MATERIALFEATUREDATA_H_
 #include "materials/materialFeatureData.h"
 #endif
+#include "shaderGen/shaderGenHelper.h"
 
 
 /// Base class used by shaderGen to be API agnostic.  Subclasses implement the various methods
@@ -161,6 +163,7 @@ public:
    // the ShaderFeatures have changed (due to lighting system change, or new plugin)
    virtual void flushProceduralShaders();
 
+   void setHelper(ShaderGenHelper* helper);
    void setPrinter(ShaderGenPrinter* printer) { mPrinter = printer; }
    void setComponentFactory(ShaderGenComponentFactory* factory) { mComponentFactory = factory; }
    void setFileEnding(String ending) { mFileEnding = ending; }
@@ -175,6 +178,7 @@ protected:
    
    Vector< ShaderComponent *> mComponents;
 
+   AutoPtr<ShaderGenHelper> mHelper;
    AutoPtr<ShaderGenPrinter> mPrinter;
    AutoPtr<ShaderGenComponentFactory> mComponentFactory;
 

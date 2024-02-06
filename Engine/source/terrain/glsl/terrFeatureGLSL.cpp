@@ -511,7 +511,7 @@ void TerrainNormalMapFeatGLSL::processPix(   Vector<ShaderComponent*> &component
 
    Var *viewToTangent = getInViewToTangent( componentList );
 
-   // This var is read from GBufferConditionerGLSL and 
+   // This var is read from GBufferConditioner and
    // used in the prepass output.
    Var *gbNormal = (Var*)LangElement::find( "gbNormal" );
    if ( !gbNormal )

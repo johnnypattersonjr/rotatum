@@ -251,7 +251,7 @@ Var* ShaderFeatureHLSL::getOutWorldToTangent(   Vector<ShaderComponent*> &compon
                // We just use transpose to convert the 3x3 portion of
                // the object transform to its inverse.
                worldToObj->setType( "float3x3" );
-               Var *objTrans = getObjTrans( componentList, true, meta );
+               Var *objTrans = sHelper->getObjTrans( componentList, true, mInstancingFormat, meta );
                meta->addStatement( new GenOp( "   @ = transpose( (float3x3)@ ); // Instancing!\r\n", new DecOp( worldToObj ), objTrans ) );
             }
             else
@@ -426,65 +426,6 @@ Var* ShaderFeatureHLSL::getInColor( const char *name,
    return inColor;
 }
 
-Var* ShaderFeatureHLSL::addOutVpos( MultiLine *meta,
-                                    Vector<ShaderComponent*> &componentList )
-{
-   // Nothing to do if we're on SM 3.0... we use the real vpos.
-   if ( GFX->getPixelShaderVersion() >= 3.0f )
-      return NULL;
-
-   // For SM 2.x we need to generate the vpos in the vertex shader
-   // and pass it as a texture coord to the pixel shader.
-
-   Var *outVpos = (Var*)LangElement::find( "outVpos" );
-   if ( !outVpos )
-   {
-      ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-
-      outVpos = connectComp->getElement( RT_TEXCOORD );
-      outVpos->setName( "outVpos" );
-      outVpos->setStructName( "OUT" );
-      outVpos->setType( "float4" );
-      outVpos->mapsToSampler = false;
-
-      Var *outPosition = (Var*) LangElement::find( "hpos" );
-      AssertFatal( outPosition, "ShaderFeatureHLSL::addOutVpos - Didn't find the output position." );
-
-      meta->addStatement( new GenOp( "   @ = @;\r\n", outVpos, outPosition ) );
-   }
-
-   return outVpos;
-}
-
-Var* ShaderFeatureHLSL::getInVpos(  MultiLine *meta,
-                                    Vector<ShaderComponent*> &componentList )
-{
-   Var *inVpos = (Var*)LangElement::find( "vpos" );
-   if ( inVpos )
-      return inVpos;
-
-   ShaderConnector *connectComp = dynamic_cast<ShaderConnector*>( componentList[C_CONNECTOR] );
-
-   if ( GFX->getPixelShaderVersion() >= 3.0f )
-   {
-      inVpos = connectComp->getElement( RT_VPOS );
-      inVpos->setName( "vpos" );
-      inVpos->setStructName( "IN" );
-      inVpos->setType( "float2" );
-      return inVpos;
-   }
-
-   inVpos = connectComp->getElement( RT_TEXCOORD );
-   inVpos->setName( "inVpos" );
-   inVpos->setStructName( "IN" );
-   inVpos->setType( "float4" );
-
-   Var *vpos = new Var( "vpos", "float2" );
-   meta->addStatement( new GenOp( "   @ = @.xy / @.w;\r\n", new DecOp( vpos ), inVpos, inVpos ) );
-
-   return vpos;
-}
-
 Var* ShaderFeatureHLSL::getInWorldToTangent( Vector<ShaderComponent*> &componentList )
 {
    Var *worldToTangent = (Var*)LangElement::find( "worldToTangent" );
@@ -531,47 +472,6 @@ Var* ShaderFeatureHLSL::getNormalMapTex()
    return normalMap;
 }
 
-Var* ShaderFeatureHLSL::getObjTrans(   Vector<ShaderComponent*> &componentList,                                       
-                                       bool useInstancing,
-                                       MultiLine *meta )
-{
-   Var *objTrans = (Var*)LangElement::find( "objTrans" );
-   if ( objTrans )
-      return objTrans;
-
-   if ( useInstancing )
-   {
-      ShaderConnector *vertStruct = dynamic_cast<ShaderConnector *>( componentList[C_VERT_STRUCT] );
-      Var *instObjTrans = vertStruct->getElement( RT_TEXCOORD, 4, 4 );
-      instObjTrans->setStructName( "IN" );
-      instObjTrans->setName( "inst_objectTrans" );
-
-      mInstancingFormat->addElement( "objTrans", GFXDeclType_Float4, instObjTrans->constNum+0 );
-      mInstancingFormat->addElement( "objTrans", GFXDeclType_Float4, instObjTrans->constNum+1 );
-      mInstancingFormat->addElement( "objTrans", GFXDeclType_Float4, instObjTrans->constNum+2 );
-      mInstancingFormat->addElement( "objTrans", GFXDeclType_Float4, instObjTrans->constNum+3 );
-
-      objTrans = new Var;
-      objTrans->setType( "float4x4" );
-      objTrans->setName( "objTrans" );
-      meta->addStatement( new GenOp( "   @ = { // Instancing!\r\n", new DecOp( objTrans ), instObjTrans ) );
-      meta->addStatement( new GenOp( "      @[0],\r\n", instObjTrans ) );
-      meta->addStatement( new GenOp( "      @[1],\r\n", instObjTrans ) );
-      meta->addStatement( new GenOp( "      @[2],\r\n",instObjTrans ) );
-      meta->addStatement( new GenOp( "      @[3] };\r\n", instObjTrans ) );
-   }
-   else
-   {
-      objTrans = new Var;
-      objTrans->setType( "float4x4" );
-      objTrans->setName( "objTrans" );
-      objTrans->uniform = true;
-      objTrans->constSortPos = cspPrimitive;
-   }
-
-   return objTrans;
-}
-
 Var* ShaderFeatureHLSL::getModelView(  Vector<ShaderComponent*> &componentList,                                       
                                        bool useInstancing,
                                        MultiLine *meta )
@@ -582,7 +482,7 @@ Var* ShaderFeatureHLSL::getModelView(  Vector<ShaderComponent*> &componentList,
 
    if ( useInstancing )
    {
-      Var *objTrans = getObjTrans( componentList, useInstancing, meta );
+      Var *objTrans = sHelper->getObjTrans( componentList, useInstancing, mInstancingFormat, meta );
 
       Var *viewProj = (Var*)LangElement::find( "viewProj" );
       if ( !viewProj )
@@ -611,47 +511,6 @@ Var* ShaderFeatureHLSL::getModelView(  Vector<ShaderComponent*> &componentList,
    return modelview;
 }
 
-Var* ShaderFeatureHLSL::getWorldView(  Vector<ShaderComponent*> &componentList,                                       
-                                       bool useInstancing,
-                                       MultiLine *meta )
-{
-   Var *worldView = (Var*)LangElement::find( "worldViewOnly" );
-   if ( worldView )
-      return worldView;
-
-   if ( useInstancing )
-   {
-      Var *objTrans = getObjTrans( componentList, useInstancing, meta );
-
-      Var *worldToCamera = (Var*)LangElement::find( "worldToCamera" );
-      if ( !worldToCamera )
-      {
-         worldToCamera = new Var;
-         worldToCamera->setType( "float4x4" );
-         worldToCamera->setName( "worldToCamera" );
-         worldToCamera->uniform = true;
-         worldToCamera->constSortPos = cspPass;        
-      }
-
-      worldView = new Var;
-      worldView->setType( "float4x4" );
-      worldView->setName( "worldViewOnly" );
-
-      meta->addStatement( new GenOp( "   @ = mul( @, @ ); // Instancing!\r\n", new DecOp( worldView ), worldToCamera, objTrans ) );
-   }
-   else
-   {
-      worldView = new Var;
-      worldView->setType( "float4x4" );
-      worldView->setName( "worldViewOnly" );
-      worldView->uniform = true;
-      worldView->constSortPos = cspPrimitive;  
-   }
-
-   return worldView;
-}
-
-
 Var* ShaderFeatureHLSL::getInvWorldView(  Vector<ShaderComponent*> &componentList,                                       
                                           bool useInstancing,
                                           MultiLine *meta )
@@ -662,7 +521,7 @@ Var* ShaderFeatureHLSL::getInvWorldView(  Vector<ShaderComponent*> &componentLis
 
    if ( useInstancing )
    {
-      Var *worldView = getWorldView( componentList, useInstancing, meta );
+      Var *worldView = sHelper->getWorldView( componentList, useInstancing, mInstancingFormat, meta );
 
       viewToObj = new Var;
       viewToObj->setType( "float3x3" );
@@ -705,7 +564,7 @@ void ShaderFeatureHLSL::getWsPosition( Vector<ShaderComponent*> &componentList,
 
    AssertFatal( inPosition, "ShaderFeatureHLSL::getWsPosition - The vertex position was not found!" );
 
-   Var *objTrans = getObjTrans( componentList, useInstancing, meta );
+   Var *objTrans = sHelper->getObjTrans( componentList, useInstancing, mInstancingFormat, meta );
 
    meta->addStatement( new GenOp( "   @ = mul( @, float4( @.xyz, 1 ) ).xyz;\r\n", 
       wsPosition, objTrans, inPosition ) );
@@ -1968,7 +1827,7 @@ void RTLightingFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList,
       outNormal->mapsToSampler = false;
 
       // Get the transform to world space.
-      Var *objTrans = getObjTrans( componentList, fd.features[MFT_UseInstancing], meta );
+      Var *objTrans = sHelper->getObjTrans( componentList, fd.features[MFT_UseInstancing], mInstancingFormat, meta );
 
       // Transform the normal to world space.
       meta->addStatement( new GenOp( "   @ = mul( @, float4( normalize( @ ), 0.0 ) ).xyz;\r\n", outNormal, objTrans, inNormal ) );
@@ -2285,7 +2144,7 @@ void VisibilityFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
    if ( fd.features[ MFT_IsTranslucent ] )
       return;
 
-   addOutVpos( meta, componentList );
+   sHelper->addOutVpos( meta, componentList );
 }
 
 void VisibilityFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList, 
@@ -2321,7 +2180,7 @@ void VisibilityFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    }
 
    // Everything else does a fizzle.
-   Var *vPos = getInVpos( meta, componentList );
+   Var *vPos = sHelper->getInVpos( meta, componentList );
    meta->addStatement( new GenOp( "   fizzle( @, @ );\r\n", vPos, visibility ) );
 }
 

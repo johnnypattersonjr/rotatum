@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,8 +21,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _GBUFFER_CONDITIONER_GLSL_H_
-#define _GBUFFER_CONDITIONER_GLSL_H_
+#ifndef _GBUFFER_CONDITIONER_H_
+#define _GBUFFER_CONDITIONER_H_
 
 #ifndef _CONDITIONER_BASE_H_
 #include "shaderGen/conditionerFeature.h"
@@ -32,7 +33,7 @@
 
 
 ///
-class GBufferConditionerGLSL : public ConditionerFeature
+class GBufferConditioner : public ConditionerFeature
 {
    typedef ConditionerFeature Parent;
 
@@ -42,6 +43,13 @@ public:
       CartesianXYZ,
       CartesianXY,
       Spherical,
+      LambertAzimuthal,
+   };
+
+   enum NormalSpace
+   {
+      WorldSpace,
+      ViewSpace,
    };
    
 protected:
@@ -52,8 +60,8 @@ protected:
 
 public:
 
-   GBufferConditionerGLSL( const GFXFormat bufferFormat );
-   virtual ~GBufferConditionerGLSL();
+   GBufferConditioner( const GFXFormat bufferFormat, const NormalSpace nrmSpace );
+   virtual ~GBufferConditioner();
 
 
    virtual void processVert( Vector<ShaderComponent*> &componentList, const MaterialFeatureData &fd );
@@ -71,4 +79,4 @@ protected:
    virtual Var* _unconditionInput( Var *conditionedInput, MultiLine *meta );
 };
 
-#endif // _GBUFFER_CONDITIONER_GLSL_H_
+#endif // _GBUFFER_CONDITIONER_H_

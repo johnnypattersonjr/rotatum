@@ -313,7 +313,7 @@ void DeferredBumpFeatHLSL::processPix( Vector<ShaderComponent*> &componentList,
          meta->addStatement( new GenOp( "   @.xy += @.xy * @;\r\n", bumpNorm, detailBump, detailBumpScale ) );
       }
 
-      // This var is read from GBufferConditionerHLSL and 
+      // This var is read from GBufferConditioner and
       // used in the prepass output.
       //
       // By using the 'half' type here we get a bunch of partial

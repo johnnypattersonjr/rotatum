@@ -370,7 +370,7 @@ void DeferredBumpFeatGLSL::processPix( Vector<ShaderComponent*> &componentList,
       LangElement *bumpNormDecl = new DecOp( bumpNorm );
       meta->addStatement( expandNormalMap( texOp, bumpNormDecl, bumpNorm, fd ) );
 
-      // This var is read from GBufferConditionerHLSL and 
+      // This var is read from GBufferConditioner and
       // used in the prepass output.
       Var *gbNormal = new Var;
       gbNormal->setName( "gbNormal" );

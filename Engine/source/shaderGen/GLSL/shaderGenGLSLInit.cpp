@@ -25,6 +25,7 @@
 
 #include "shaderGen/shaderGen.h"
 #include "shaderGen/GLSL/shaderGenGLSL.h"
+#include "shaderGen/GLSL/shaderGenHelperGLSL.h"
 #include "shaderGen/GLSL/shaderFeatureGLSL.h"
 #include "shaderGen/featureMgr.h"
 #include "shaderGen/GLSL/bumpGLSL.h"
@@ -39,6 +40,7 @@ static ShaderGen::ShaderGenInitDelegate sInitDelegate;
 
 void _initShaderGenGLSL( ShaderGen *shaderGen )
 {
+   shaderGen->setHelper( new ShaderGenHelperGLSL );
    shaderGen->setPrinter( new ShaderGenPrinterGLSL );
    shaderGen->setComponentFactory( new ShaderGenComponentFactoryGLSL );
    shaderGen->setFileEnding( "glsl" );
@@ -63,7 +65,7 @@ void _initShaderGenGLSL( ShaderGen *shaderGen )
    FEATUREMGR->registerFeature( MFT_CubeMap, new ReflectCubeFeatGLSL );
    FEATUREMGR->registerFeature( MFT_PixSpecular, new PixelSpecularGLSL );
    FEATUREMGR->registerFeature( MFT_IsTranslucent, new NamedFeatureGLSL( "Translucent" ) );
-   // FEATUREMGR->registerFeature( MFT_IsTranslucentZWrite, new NamedFeatureGLSL( "Translucent ZWrite" ) );
+   FEATUREMGR->registerFeature( MFT_IsTranslucentZWrite, new NamedFeatureGLSL( "Translucent ZWrite" ) );
    FEATUREMGR->registerFeature( MFT_Visibility, new VisibilityFeatGLSL );
    FEATUREMGR->registerFeature( MFT_Fog, new FogFeatGLSL );
    FEATUREMGR->registerFeature( MFT_SpecularMap, new SpecularMapGLSL );

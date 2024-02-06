@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -498,4 +499,10 @@ void ShaderGen::flushProceduralShaders()
    // The shaders are reference counted, so we
    // just need to clear the map.
    mProcShaders.clear();  
+}
+
+void ShaderGen::setHelper(ShaderGenHelper* helper)
+{
+   mHelper = helper;
+   ShaderFeature::sHelper = helper;
 }

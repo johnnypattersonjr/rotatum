@@ -55,14 +55,6 @@ public:
                            const char *type,
                            Vector<ShaderComponent*> &componentList );
 
-   ///
-   static Var* addOutVpos( MultiLine *meta,
-                           Vector<ShaderComponent*> &componentList );
-
-   /// Returns the VPOS input register for the pixel shader.
-   static Var* getInVpos(  MultiLine *meta,
-                           Vector<ShaderComponent*> &componentList );
-
    /// Returns the "objToTangentSpace" transform or creates one if this
    /// is the first feature to need it.
    Var* getOutObjToTangentSpace( Vector<ShaderComponent*> &componentList,
@@ -118,17 +110,7 @@ public:
                               bool useTexAnim );
 
    ///
-   Var* getObjTrans( Vector<ShaderComponent*> &componentList,                                       
-                     bool useInstancing,
-                     MultiLine *meta );
-
-   ///
    Var* getModelView(   Vector<ShaderComponent*> &componentList,                                       
-                        bool useInstancing,
-                        MultiLine *meta );
-
-   ///
-   Var* getWorldView(   Vector<ShaderComponent*> &componentList,                                       
                         bool useInstancing,
                         MultiLine *meta );
 

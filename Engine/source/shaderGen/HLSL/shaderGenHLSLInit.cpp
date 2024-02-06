@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,6 +25,7 @@
 
 #include "shaderGen/shaderGen.h"
 #include "shaderGen/HLSL/shaderGenHLSL.h"
+#include "shaderGen/HLSL/shaderGenHelperHLSL.h"
 #include "shaderGen/HLSL/shaderFeatureHLSL.h"
 #include "shaderGen/featureMgr.h"
 #include "shaderGen/HLSL/bumpHLSL.h"
@@ -38,6 +40,7 @@ static ShaderGen::ShaderGenInitDelegate sInitDelegate;
 
 void _initShaderGenHLSL( ShaderGen *shaderGen )
 {
+   shaderGen->setHelper( new ShaderGenHelperHLSL );
    shaderGen->setPrinter( new ShaderGenPrinterHLSL );
    shaderGen->setComponentFactory( new ShaderGenComponentFactoryHLSL );
    shaderGen->setFileEnding( "hlsl" );

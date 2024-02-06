@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -58,7 +59,7 @@ void ParaboloidVertTransformHLSL::processVert(  Vector<ShaderComponent*> &compon
    atlasScale->constSortPos = cspPass;  
 
    // Transform into camera space
-   Var *worldViewOnly = getWorldView( componentList, fd.features[MFT_UseInstancing], meta );
+   Var *worldViewOnly = sHelper->getWorldView( componentList, fd.features[MFT_UseInstancing], mInstancingFormat, meta );
 
    // So what we're doing here is transforming into camera space, and
    // then directly manipulate into shadowmap space.

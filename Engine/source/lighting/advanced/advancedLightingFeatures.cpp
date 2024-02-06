@@ -27,15 +27,14 @@
 #include "core/util/safeDelete.h"
 #include "gfx/gfxDevice.h"
 #include "gfx/gfxStringEnumTranslate.h"
+#include "lighting/advanced/gBufferConditioner.h"
 #include "lighting/advanced/glsl/advancedLightingFeaturesGLSL.h"
-#include "lighting/advanced/glsl/gBufferConditionerGLSL.h"
 #include "materials/materialFeatureTypes.h"
 #include "materials/materialParameters.h"
 #include "materials/matTextureTarget.h"
 #include "shaderGen/featureMgr.h"
 
 #ifdef TORQUE_OS_WIN32
-#include "lighting/advanced/hlsl/gBufferConditionerHLSL.h"
 #include "lighting/advanced/hlsl/advancedLightingFeaturesHLSL.h"
 #endif
 
@@ -50,12 +49,11 @@ void AdvancedLightingFeatures::registerFeatures( const GFXFormat &prepassTargetF
    // If we ever need this...
    TORQUE_UNUSED(lightInfoTargetFormat);
 
-   ConditionerFeature *cond = NULL;
+   ConditionerFeature *cond = new GBufferConditioner( prepassTargetFormat, GBufferConditioner::ViewSpace );
+   FEATUREMGR->registerFeature(MFT_PrePassConditioner, cond);
 
    if (GFX->getAdapterType() == OpenGL)
    {
-      cond = new GBufferConditionerGLSL( prepassTargetFormat );
-      FEATUREMGR->registerFeature(MFT_PrePassConditioner, cond);
       FEATUREMGR->registerFeature(MFT_RTLighting, new DeferredRTLightingFeatGLSL());
       FEATUREMGR->registerFeature(MFT_NormalMap, new DeferredBumpFeatGLSL());
       FEATUREMGR->registerFeature(MFT_PixSpecular, new DeferredPixelSpecularGLSL());
@@ -65,8 +63,6 @@ void AdvancedLightingFeatures::registerFeatures( const GFXFormat &prepassTargetF
    else
    {
 #ifdef TORQUE_OS_WIN32
-      cond = new GBufferConditionerHLSL( prepassTargetFormat, GBufferConditionerHLSL::ViewSpace );
-      FEATUREMGR->registerFeature(MFT_PrePassConditioner, cond);
       FEATUREMGR->registerFeature(MFT_RTLighting, new DeferredRTLightingFeatHLSL());
       FEATUREMGR->registerFeature(MFT_NormalMap, new DeferredBumpFeatHLSL());
       FEATUREMGR->registerFeature(MFT_PixSpecular, new DeferredPixelSpecularHLSL());

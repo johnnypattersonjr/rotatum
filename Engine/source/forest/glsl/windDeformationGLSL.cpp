@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -138,7 +139,7 @@ void WindDeformationGLSL::processVert( Vector<ShaderComponent*> &componentList,
    }
 
    // Get the transform to world space.
-   Var *objTrans = getObjTrans( componentList, fd.features[MFT_UseInstancing], meta );
+   Var *objTrans = sHelper->getObjTrans( componentList, fd.features[MFT_UseInstancing], mInstancingFormat, meta );
 
    // First check for an input position from a previous feature
    // then look for the default vertex position.

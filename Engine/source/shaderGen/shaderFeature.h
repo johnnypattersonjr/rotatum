@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,6 +32,7 @@
 #ifndef _SHADER_DEPENDENCY_H_
 #include "shaderGen/shaderDependency.h"
 #endif
+#include "shaderGen/shaderGenHelper.h"
 
 class MultiLine;
 struct LangElement;
@@ -98,6 +100,7 @@ protected:
    S32 mProcessIndex;
 
 public:
+   static ShaderGenHelper* sHelper;
 
    // TODO: Make this protected and give it a proper API.
    GFXVertexFormat *mInstancingFormat;

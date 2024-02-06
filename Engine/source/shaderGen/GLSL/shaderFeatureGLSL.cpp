@@ -404,20 +404,6 @@ Var* ShaderFeatureGLSL::getNormalMapTex()
    return normalMap;
 }
 
-Var* ShaderFeatureGLSL::getObjTrans(   Vector<ShaderComponent*> &componentList,
-												bool useInstancing,
-												MultiLine *meta )
-{
-   Var *objTrans = (Var*) LangElement::find( "objTrans" );   if ( objTrans )
-		return objTrans;        
-	objTrans = new Var;        objTrans->setType( "mat4x4" );
-	objTrans->setName( "objTrans" );
-	objTrans->uniform = true;
-	objTrans->constSortPos = cspPrimitive;      
-	
-	return objTrans;
-}
-
 Var* ShaderFeatureGLSL::getModelView(  Vector<ShaderComponent*> &componentList,                                       
 												 bool useInstancing,
 												 MultiLine *meta )
@@ -435,23 +421,6 @@ Var* ShaderFeatureGLSL::getModelView(  Vector<ShaderComponent*> &componentList,
 	
 	return modelview;
 }
-
-Var* ShaderFeatureGLSL::getWorldView(  Vector<ShaderComponent*> &componentList,                                       
-												 bool useInstancing,
-												 MultiLine *meta )
-{
-   Var *worldView = (Var*)LangElement::find( "worldViewOnly" );
-   if ( worldView )
-      return worldView;
-	
-	worldView = new Var;
-	worldView->setType( "mat4x4" );
-	worldView->setName( "worldViewOnly" );
-	worldView->uniform = true;
-	worldView->constSortPos = cspPrimitive;  
-	
-   return worldView;
-}		
 
 Var* ShaderFeatureGLSL::getInvWorldView(  Vector<ShaderComponent*> &componentList,                                       
 													 bool useInstancing,
@@ -490,7 +459,7 @@ void ShaderFeatureGLSL::getWsPosition( Vector<ShaderComponent*> &componentList,
 	
    AssertFatal( inPosition, "ShaderFeatureGLSL::getWsPosition - The vertex position was not found!" );
 	
-   Var *objTrans = getObjTrans( componentList, useInstancing, meta );
+   Var *objTrans = sHelper->getObjTrans( componentList, useInstancing, mInstancingFormat, meta );
 	
    meta->addStatement( new GenOp( "   @ = ( @ * vec4( @.xyz, 1 ) ).xyz;\r\n", 
 											wsPosition, objTrans, inPosition ) );
@@ -1706,7 +1675,7 @@ void RTLightingFeatGLSL::processVert(  Vector<ShaderComponent*> &componentList,
       return;
 
    // Get the transform to world space.
-   Var *objTrans = getObjTrans( componentList, fd.features[MFT_UseInstancing], meta );
+   Var *objTrans = sHelper->getObjTrans( componentList, fd.features[MFT_UseInstancing], mInstancingFormat, meta );
 	
    // If there isn't a normal map then we need to pass
    // the world space normal to the pixel shader ourselves.

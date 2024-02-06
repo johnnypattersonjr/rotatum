@@ -110,17 +110,7 @@ public:
 									  bool useTexAnim );
 
 	///
-	Var* getObjTrans( Vector<ShaderComponent*> &componentList,                                       
-						  bool useInstancing,
-						  MultiLine *meta );
-	
-	///
    Var* getModelView( Vector<ShaderComponent*> &componentList,                                       
-							bool useInstancing,
-							MultiLine *meta );
-	
-   ///
-   Var* getWorldView( Vector<ShaderComponent*> &componentList,                
 							bool useInstancing,
 							MultiLine *meta );
 	
