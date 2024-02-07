@@ -151,7 +151,7 @@ void DeferredRTLightingFeatGLSL::processPix( Vector<ShaderComponent*> &component
 
    // This is kind of weak sauce
    if( !fd.features[MFT_SubSurface] && !fd.features[MFT_ToneMap] && !fd.features[MFT_LightMap] )
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( rtShading, Material::Mul ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( rtShading, Material::Mul ) ) );
 
    output = meta;
 }
@@ -212,7 +212,7 @@ void DeferredBumpFeatGLSL::processVert(   Vector<ShaderComponent*> &componentLis
       Var *texSpaceMat = (Var*) LangElement::find( "objToTangentSpace" );
       if( !texSpaceMat )
       {
-         LangElement * texSpaceSetup = setupTexSpaceMat( componentList, &texSpaceMat );
+         LangElement * texSpaceSetup = sHelper->setupTexSpaceMat( componentList, &texSpaceMat );
          meta->addStatement( texSpaceSetup );
          texSpaceMat = (Var*) LangElement::find( "objToTangentSpace" );
       }
@@ -261,7 +261,7 @@ void DeferredBumpFeatGLSL::processVert(   Vector<ShaderComponent*> &componentLis
       if( !fd.features[MFT_DiffuseMap] )
       {
          // find incoming texture var
-         Var *inTex = getVertTexCoord( "texCoord" );
+         Var *inTex = sHelper->getVertTexCoord( "texCoord" );
 
          // grab connector texcoord register
          ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
@@ -368,7 +368,7 @@ void DeferredBumpFeatGLSL::processPix( Vector<ShaderComponent*> &componentList,
       bumpNorm->setType( "vec4" );
 
       LangElement *bumpNormDecl = new DecOp( bumpNorm );
-      meta->addStatement( expandNormalMap( texOp, bumpNormDecl, bumpNorm, fd ) );
+      meta->addStatement( sHelper->expandNormalMap( texOp, bumpNormDecl, bumpNorm, fd, getProcessIndex() ) );
 
       // This var is read from GBufferConditioner and
       // used in the prepass output.
@@ -545,7 +545,7 @@ void DeferredPixelSpecularGLSL::processPix(  Vector<ShaderComponent*> &component
    }
 
    // add to color
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( final, Material::Add ) ) );
+   meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( final, Material::Add ) ) );
 
    output = meta;
 }
@@ -699,7 +699,7 @@ void DeferredMinnaertGLSL::processPix( Vector<ShaderComponent*> &componentList,
    meta->addStatement( new GenOp( "   vec3 worldViewVec = normalize(@.xyz / @.w);\r\n", wsViewVec, wsViewVec ) );
    meta->addStatement( new GenOp( "   float vDotN = dot(normalDepth.xyz, worldViewVec);\r\n" ) );
    meta->addStatement( new GenOp( "   float Minnaert = pow(d_NL_Att, @) * pow(vDotN, 1.0 - @);\r\n", minnaertConstant, minnaertConstant ) );
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "vec4(Minnaert, Minnaert, Minnaert, 1.0)" ), Material::Mul ) ) );
+   meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( new GenOp( "vec4(Minnaert, Minnaert, Minnaert, 1.0)" ), Material::Mul ) ) );
 
    output = meta;
 }
@@ -726,7 +726,7 @@ void DeferredSubSurfaceGLSL::processPix(  Vector<ShaderComponent*> &componentLis
    MultiLine *meta = new MultiLine;
    meta->addStatement( new GenOp( "   float subLamb = smoothstep(-@.a, 1.0, d_NL_Att) - smoothstep(0.0, 1.0, d_NL_Att);\r\n", subSurfaceParams ) );
    meta->addStatement( new GenOp( "   subLamb = max(0.0, subLamb);\r\n" ) );
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "vec4(@.rgb + (subLamb * @.rgb), 1.0)", inColor, subSurfaceParams ), Material::Mul ) ) );
+   meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( new GenOp( "vec4(@.rgb + (subLamb * @.rgb), 1.0)", inColor, subSurfaceParams ), Material::Mul ) ) );
 
    output = meta;
 }

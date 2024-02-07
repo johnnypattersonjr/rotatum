@@ -168,7 +168,7 @@ void DeferredRTLightingFeatHLSL::processPix( Vector<ShaderComponent*> &component
 
    // This is kind of weak sauce
    if( !fd.features[MFT_VertLit] && !fd.features[MFT_ToneMap] && !fd.features[MFT_LightMap] && !fd.features[MFT_SubSurface] )
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "float4(@, 1.0)", d_lightcolor ), Material::Mul ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( new GenOp( "float4(@, 1.0)", d_lightcolor ), Material::Mul ) ) );
 
    output = meta;
 }
@@ -225,7 +225,7 @@ void DeferredBumpFeatHLSL::processVert(   Vector<ShaderComponent*> &componentLis
       MultiLine *meta = new MultiLine;
 
       // We need the view to tangent space transform in the pixel shader.
-      getOutViewToTangent( componentList, meta, fd );
+      sHelper->getOutViewToTangent( componentList, mInstancingFormat, meta, fd );
 
       // Make sure there are texcoords
       if( !fd.features[MFT_Parallax] && !fd.features[MFT_DiffuseMap] )
@@ -270,11 +270,11 @@ void DeferredBumpFeatHLSL::processPix( Vector<ShaderComponent*> &componentList,
    {
       MultiLine *meta = new MultiLine;
 
-      Var *viewToTangent = getInViewToTangent( componentList );
+      Var *viewToTangent = sHelper->getInViewToTangent( componentList );
 
       // create texture var
       Var *bumpMap = getNormalMapTex();
-      Var *texCoord = getInTexCoord( "texCoord", "float2", true, componentList );
+      Var *texCoord = sHelper->getInTexCoord( "texCoord", "float2", true, componentList );
       LangElement *texOp = new GenOp( "tex2D(@, @)", bumpMap, texCoord );
 
       // create bump normal
@@ -283,7 +283,7 @@ void DeferredBumpFeatHLSL::processPix( Vector<ShaderComponent*> &componentList,
       bumpNorm->setType( "float4" );
 
       LangElement *bumpNormDecl = new DecOp( bumpNorm );
-      meta->addStatement( expandNormalMap( texOp, bumpNormDecl, bumpNorm, fd ) );
+      meta->addStatement( sHelper->expandNormalMap( texOp, bumpNormDecl, bumpNorm, fd, getProcessIndex() ) );
 
       // If we have a detail normal map we add the xy coords of
       // it to the base normal map.  This gives us the effect we
@@ -297,13 +297,13 @@ void DeferredBumpFeatHLSL::processPix( Vector<ShaderComponent*> &componentList,
          bumpMap->sampler = true;
          bumpMap->constNum = Var::getTexUnitNum();
 
-         texCoord = getInTexCoord( "detCoord", "float2", true, componentList );
+         texCoord = sHelper->getInTexCoord( "detCoord", "float2", true, componentList );
          texOp = new GenOp( "tex2D(@, @)", bumpMap, texCoord );
 
          Var *detailBump = new Var;
          detailBump->setName( "detailBump" );
          detailBump->setType( "float4" );
-         meta->addStatement( expandNormalMap( texOp, new DecOp( detailBump ), detailBump, fd ) );
+         meta->addStatement( sHelper->expandNormalMap( texOp, new DecOp( detailBump ), detailBump, fd, getProcessIndex() ) );
 
          Var *detailBumpScale = new Var;
          detailBumpScale->setType( "float" );
@@ -344,7 +344,7 @@ void DeferredBumpFeatHLSL::processPix( Vector<ShaderComponent*> &componentList,
       Var *bumpSample = (Var *)LangElement::find( "bumpSample" );
       if( bumpSample == NULL )
       {
-         Var *texCoord = getInTexCoord( "texCoord", "float2", true, componentList );
+         Var *texCoord = sHelper->getInTexCoord( "texCoord", "float2", true, componentList );
 
          Var *bumpMap = getNormalMapTex();
 
@@ -494,7 +494,7 @@ void DeferredPixelSpecularHLSL::processPix(  Vector<ShaderComponent*> &component
    }
 
    // add to color
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( final, Material::Add ) ) );
+   meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( final, Material::Add ) ) );
 
    output = meta;
 }
@@ -611,7 +611,7 @@ void DeferredMinnaertHLSL::processPix( Vector<ShaderComponent*> &componentList,
    meta->addStatement( new GenOp( avar( "   float4 normalDepth = %s(@, @);\r\n", unconditionPrePassMethod.c_str() ), prepassBuffer, uvScene ) );
    meta->addStatement( new GenOp( "   float vDotN = dot(normalDepth.xyz, @);\r\n", wsViewVec ) );
    meta->addStatement( new GenOp( "   float Minnaert = pow( @, @) * pow(vDotN, 1.0 - @);\r\n", d_NL_Att, minnaertConstant, minnaertConstant ) );
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "float4(Minnaert, Minnaert, Minnaert, 1.0)" ), Material::Mul ) ) );
+   meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( new GenOp( "float4(Minnaert, Minnaert, Minnaert, 1.0)" ), Material::Mul ) ) );
 
    output = meta;
 }
@@ -639,7 +639,7 @@ void DeferredSubSurfaceHLSL::processPix(  Vector<ShaderComponent*> &componentLis
    MultiLine *meta = new MultiLine;
    meta->addStatement( new GenOp( "   float subLamb = smoothstep(-@.a, 1.0, @) - smoothstep(0.0, 1.0, @);\r\n", subSurfaceParams, d_NL_Att, d_NL_Att ) );
    meta->addStatement( new GenOp( "   subLamb = max(0.0, subLamb);\r\n" ) );
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "float4(@ + (subLamb * @.rgb), 1.0)", d_lightcolor, subSurfaceParams ), Material::Mul ) ) );
+   meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( new GenOp( "float4(@ + (subLamb * @.rgb), 1.0)", d_lightcolor, subSurfaceParams ), Material::Mul ) ) );
 
    output = meta;
 }

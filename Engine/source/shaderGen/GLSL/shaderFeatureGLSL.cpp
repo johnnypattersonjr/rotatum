@@ -35,154 +35,9 @@
 
 #include "lighting/advanced/advancedLightBinManager.h"
 
-LangElement * ShaderFeatureGLSL::setupTexSpaceMat( Vector<ShaderComponent*> &, // componentList
-                                                   Var **texSpaceMat )
-{
-   Var *N = (Var*) LangElement::find( "normal" );
-   Var *B = (Var*) LangElement::find( "B" );
-   Var *T = (Var*) LangElement::find( "T" );
-   
-   // setup matrix var
-   *texSpaceMat = new Var;
-   (*texSpaceMat)->setType( "mat3" );
-   (*texSpaceMat)->setName( "objToTangentSpace" );
-
-   MultiLine * meta = new MultiLine;
-   
-   // Recreate the binormal if we don't have one.
-   if ( !B )
-   {
-      B = new Var;
-      B->setType( "vec3" );
-      B->setName( "B" );
-      meta->addStatement( new GenOp( "   @ = cross( @, normalize(@) );\r\n", new DecOp( B ), T, N ) );
-   }
-
-   meta->addStatement( new GenOp( "   @;\r\n", new DecOp( *texSpaceMat ) ) );
-   meta->addStatement( new GenOp( "   @[0] = vec3(@.x, @.x, normalize(@).x);\r\n", *texSpaceMat, T, B, N ) );
-   meta->addStatement( new GenOp( "   @[1] = vec3(@.y, @.y, normalize(@).y);\r\n", *texSpaceMat, T, B, N ) );
-   meta->addStatement( new GenOp( "   @[2] = vec3(@.z, @.z, normalize(@).z);\r\n", *texSpaceMat, T, B, N ) );
-
-   return meta;
-}
-
-LangElement* ShaderFeatureGLSL::assignColor( LangElement *elem, 
-                                             Material::BlendOp blend, 
-                                             LangElement *lerpElem, 
-                                             ShaderFeature::OutputTarget outputTarget )
-{
-
-   // search for color var
-   Var *color = (Var*) LangElement::find( getOutputTargetVarName(outputTarget) );
-
-   if ( !color )
-   {
-      // create color var
-      color = new Var;
-      color->setName( getOutputTargetVarName( outputTarget ) );
-      color->setType( "vec4" );
-
-      return new GenOp( "@ = @", new DecOp(color), elem );
-   }
-
-   LangElement *assign;
-
-   switch ( blend )
-   {
-      case Material::Add:
-         assign = new GenOp( "@ += @", color, elem );
-         break;
-
-      case Material::Sub:
-         assign = new GenOp( "@ -= @", color, elem );
-         break;
-
-      case Material::Mul:
-         assign = new GenOp( "@ *= @", color, elem );
-         break;
-
-      case Material::AddAlpha:
-         assign = new GenOp( "@ += @ * @.a", color, elem, elem );
-         break;
-
-      case Material::LerpAlpha:
-         if ( !lerpElem )
-            lerpElem = elem;
-         assign = new GenOp( "@.rgb = mix( @.rgb, (@).rgb, (@).a )", color, elem, color, lerpElem );
-         break;
-      
-      case Material::ToneMap:
-         assign = new GenOp( "@ = 1.0 - exp(-1.0 * @ * @)", color, color, elem );
-         break;
-         
-      default:
-         AssertFatal(false, "Unrecognized color blendOp");
-         // Fallthru
-
-      case Material::None:
-         assign = new GenOp( "@ = @", color, elem );
-         break;      
-   }
-  
-   return assign;
-}
-
-
-LangElement *ShaderFeatureGLSL::expandNormalMap(   LangElement *sampleNormalOp, 
-                                                   LangElement *normalDecl, 
-                                                   LangElement *normalVar, 
-                                                   const MaterialFeatureData &fd )
-{
-   MultiLine *meta = new MultiLine;
-
-   if ( fd.features.hasFeature( MFT_IsDXTnm, getProcessIndex() ) )
-   {
-      // DXT Swizzle trick
-      meta->addStatement( new GenOp( "   @ = vec4( @.ag * 2.0 - 1.0, 0.0, 0.0 );  // DXTnm\r\n", normalDecl, sampleNormalOp ) );
-      meta->addStatement( new GenOp( "   @.z = sqrt( 1.0 - dot( @.xy, @.xy ) );  // DXTnm\r\n", normalVar, normalVar, normalVar ) );      
-   }
-   else
-   {
-      meta->addStatement( new GenOp( "   @ = @;\r\n", normalDecl, sampleNormalOp ) );
-      meta->addStatement( new GenOp( "   @.xyz = @.xyz * 2.0 - 1.0;\r\n", normalVar, normalVar ) );
-   }
-
-   return meta;
-}
-
 ShaderFeatureGLSL::ShaderFeatureGLSL()
 {
    output = NULL;
-}
-
-Var * ShaderFeatureGLSL::getVertTexCoord( const String &name )
-{
-   Var *inTex = NULL;
-
-   for( U32 i=0; i<LangElement::elementList.size(); i++ )
-   {
-      if( !dStrcmp( (char*)LangElement::elementList[i]->name, name.c_str() ) )
-      {
-         inTex = dynamic_cast<Var*>( LangElement::elementList[i] );
-			if ( inTex )
-			{
-				break;
-			}
-      }
-   }
-
-   return inTex;
-}
-
-Var* ShaderFeatureGLSL::getOutObjToTangentSpace(   Vector<ShaderComponent*> &componentList,
-                                                   MultiLine *meta,
-                                                   const MaterialFeatureData &fd )
-{
-   Var *outObjToTangentSpace = (Var*)LangElement::find( "objToTangentSpace" );
-   if ( !outObjToTangentSpace )
-      meta->addStatement( setupTexSpaceMat( componentList, &outObjToTangentSpace ) );
-
-   return outObjToTangentSpace;
 }
 
 Var* ShaderFeatureGLSL::getOutWorldToTangent(   Vector<ShaderComponent*> &componentList,
@@ -196,7 +51,7 @@ Var* ShaderFeatureGLSL::getOutWorldToTangent(   Vector<ShaderComponent*> &compon
 	Var *worldToTangent = (Var*)LangElement::find( "worldToTangent" );
    if ( !worldToTangent )
    {
-      Var *texSpaceMat = getOutObjToTangentSpace( componentList, meta, fd );
+      Var *texSpaceMat = sHelper->getOutObjToTangentSpace( componentList, meta, fd );
 		
       if(!fd.features[MFT_ParticleNormal])
       {
@@ -237,56 +92,6 @@ Var* ShaderFeatureGLSL::getOutWorldToTangent(   Vector<ShaderComponent*> &compon
    return outWorldToTangent;
 }
 
-Var* ShaderFeatureGLSL::getOutViewToTangent(   Vector<ShaderComponent*> &componentList,
-														  MultiLine *meta,
-														  const MaterialFeatureData &fd )
-{
-   Var *outViewToTangent = (Var*)LangElement::find( "outViewToTangent" );
-   if ( outViewToTangent )
-		return outViewToTangent;
-	
-	Var *viewToTangent = (Var*)LangElement::find( "viewToTangent" );
-   if ( !viewToTangent )
-   {
-		Var *texSpaceMat = getOutObjToTangentSpace( componentList, meta, fd );
-		
-		if(!fd.features[MFT_ParticleNormal])
-		{
-			
-			// turn obj->tangent into world->tangent
-			viewToTangent = new Var;
-			viewToTangent->setType( "mat3" );
-			viewToTangent->setName( "viewToTangent" );
-			LangElement *viewToTangentDecl = new DecOp( viewToTangent );
-			
-			// Get the view->obj transform
-			Var *viewToObj = getInvWorldView( componentList, fd.features[MFT_UseInstancing], meta );
-			
-			// assign world->tangent transform
-			meta->addStatement( new GenOp( "   mat3 mat3ViewToObj;\r\n" ) );
-			meta->addStatement( new GenOp( "   mat3ViewToObj[0] = @[0].xyz;\r\n", viewToObj ) );
-			meta->addStatement( new GenOp( "   mat3ViewToObj[1] = @[1].xyz;\r\n", viewToObj ) );
-			meta->addStatement( new GenOp( "   mat3ViewToObj[2] = @[2].xyz;\r\n", viewToObj ) );
-			meta->addStatement( new GenOp( "   @ = @ * mat3ViewToObj;\r\n", viewToTangentDecl, texSpaceMat ) );
-		}
-		else
-		{
-			// Assume particle normal generation has set this up in the proper space
-			viewToTangent = texSpaceMat;
-		}
-	}
-   
-	// send transform to pixel shader
-	ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-	
-	outViewToTangent = connectComp->getElement( RT_TEXCOORD, 1, 3 );
-	outViewToTangent->setName( "outViewToTangent" );
-	outViewToTangent->setType( "mat3" );
-	meta->addStatement( new GenOp( "   @ = @;\r\n", outViewToTangent, viewToTangent ) );
-   
-   return outViewToTangent;
-}
-
 Var* ShaderFeatureGLSL::getOutTexCoord(   const char *name,
                                           const char *type,
                                           bool mapsToSampler,
@@ -298,7 +103,7 @@ Var* ShaderFeatureGLSL::getOutTexCoord(   const char *name,
    Var *texCoord = (Var*)LangElement::find( outTexName );
    if ( !texCoord )
    {
-      Var *inTex = getVertTexCoord( name );
+      Var *inTex = sHelper->getVertTexCoord( name );
       AssertFatal( inTex, "ShaderFeatureGLSL::getOutTexCoord - Unknown vertex input coord!" );
 
       ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
@@ -339,27 +144,6 @@ Var* ShaderFeatureGLSL::getOutTexCoord(   const char *name,
    return texCoord;
 }
 
-Var* ShaderFeatureGLSL::getInTexCoord( const char *name,
-                                       const char *type,
-                                       bool mapsToSampler,
-                                       Vector<ShaderComponent*> &componentList )
-{
-   Var* texCoord = (Var*)LangElement::find( name );
-   if ( !texCoord )
-   {
-      ShaderConnector *connectComp = dynamic_cast<ShaderConnector*>( componentList[C_CONNECTOR] );
-      texCoord = connectComp->getElement( RT_TEXCOORD );
-      texCoord->setName( name );
-      texCoord->setType( type );
-      texCoord->mapsToSampler = mapsToSampler;
-   }
-
-   AssertFatal( dStrcmp( type, (const char*)texCoord->type ) == 0, 
-      "ShaderFeatureGLSL::getInTexCoord - Type mismatch!" );
-
-   return texCoord;
-}
-
 Var* ShaderFeatureGLSL::getInWorldToTangent( Vector<ShaderComponent*> &componentList )
 {
    Var *worldToTangent = (Var*)LangElement::find( "outWorldToTangent" );
@@ -372,20 +156,6 @@ Var* ShaderFeatureGLSL::getInWorldToTangent( Vector<ShaderComponent*> &component
    }
 
    return worldToTangent;
-}
-
-Var* ShaderFeatureGLSL::getInViewToTangent( Vector<ShaderComponent*> &componentList )
-{
-   Var *viewToTangent = (Var*)LangElement::find( "outViewToTangent" );
-   if ( !viewToTangent )
-   {
-      ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-      viewToTangent = connectComp->getElement( RT_TEXCOORD, 1, 3 );
-      viewToTangent->setName( "outViewToTangent" );
-      viewToTangent->setType( "mat3" );
-   }
-
-   return viewToTangent;
 }
 
 Var* ShaderFeatureGLSL::getNormalMapTex()
@@ -420,23 +190,6 @@ Var* ShaderFeatureGLSL::getModelView(  Vector<ShaderComponent*> &componentList,
 	modelview->constSortPos = cspPrimitive;
 	
 	return modelview;
-}
-
-Var* ShaderFeatureGLSL::getInvWorldView(  Vector<ShaderComponent*> &componentList,                                       
-													 bool useInstancing,
-													 MultiLine *meta )
-{
-   Var *viewToObj = (Var*)LangElement::find( "viewToObj" );
-   if ( viewToObj )
-      return viewToObj;
-	
-	viewToObj = new Var;
-	viewToObj->setType( "mat4" );
-	viewToObj->setName( "viewToObj" );
-	viewToObj->uniform = true;
-	viewToObj->constSortPos = cspPrimitive;
-	
-   return viewToObj;
 }
 
 void ShaderFeatureGLSL::getWsPosition( Vector<ShaderComponent*> &componentList,                                       
@@ -532,7 +285,7 @@ Var* ShaderFeatureGLSL::addOutDetailTexCoord(   Vector<ShaderComponent*> &compon
 		return outTex;
 	
 	// Grab incoming texture coords.
-	Var *inTex = getVertTexCoord( "texCoord" );
+	Var *inTex = sHelper->getVertTexCoord( "texCoord" );
 	
 	// create detail variable
 	Var *detScale = new Var;
@@ -595,7 +348,7 @@ void DiffuseMapFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
 {
    // grab connector texcoord register
-   Var *inTex = getInTexCoord( "out_texCoord", "vec2", true, componentList );
+   Var *inTex = sHelper->getInTexCoord( "out_texCoord", "vec2", true, componentList );
 
    // create texture var
    Var *diffuseMap = new Var;
@@ -620,7 +373,7 @@ void DiffuseMapFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
                            diffuseMap, 
                            inTex ) );
       
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( diffColor, Material::Mul ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( diffColor, Material::Mul ) ) );
       output = meta;
    }
    else if(fd.features[MFT_DiffuseMapAtlas])
@@ -695,7 +448,7 @@ void DiffuseMapFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
       if(!fd.features[MFT_PrePassConditioner])
       {
          meta->addStatement(new GenOp("   @ = vec4(@.xy, mipLod / @.w, 1.0);\r\n", new DecOp(diffColor), inTex, atParams));
-         meta->addStatement(new GenOp("   @; return OUT;\r\n", assignColor(diffColor, Material::Mul)));
+         meta->addStatement(new GenOp("   @; return OUT;\r\n", sHelper->assignColor(diffColor, Material::Mul)));
          return;
       }
 #endif
@@ -711,12 +464,12 @@ void DiffuseMapFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
             new DecOp(diffColor), diffuseMap, inTex));
       }
 
-      meta->addStatement(new GenOp( "   @;\r\n", assignColor(diffColor, Material::Mul)));
+      meta->addStatement(new GenOp( "   @;\r\n", sHelper->assignColor(diffColor, Material::Mul)));
    }
    else
    {
       LangElement *statement = new GenOp( "texture2D(@, @)", diffuseMap, inTex );
-      output = new GenOp( "   @;\r\n", assignColor( statement, Material::Mul ) );
+      output = new GenOp( "   @;\r\n", sHelper->assignColor( statement, Material::Mul ) );
    }
    
 }
@@ -752,7 +505,7 @@ void DiffuseMapFeatGLSL::setTexData(   Material::StageData &stageDat,
 void OverlayTexFeatGLSL::processVert(  Vector<ShaderComponent*> &componentList, 
                                        const MaterialFeatureData &fd )
 {
-   Var *inTex = getVertTexCoord( "texCoord2" );
+   Var *inTex = sHelper->getVertTexCoord( "texCoord2" );
    AssertFatal( inTex, "OverlayTexFeatGLSL::processVert() - The second UV set was not found!" );
 
    // grab connector texcoord register
@@ -805,7 +558,7 @@ void OverlayTexFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
    diffuseMap->constNum = Var::getTexUnitNum();     // used as texture unit num here
 
    LangElement *statement = new GenOp( "texture2D(@, @)", diffuseMap, inTex );
-   output = new GenOp( "   @;\r\n", assignColor( statement, Material::LerpAlpha ) );
+   output = new GenOp( "   @;\r\n", sHelper->assignColor( statement, Material::LerpAlpha ) );
 }
 
 ShaderFeature::Resources OverlayTexFeatGLSL::getResources( const MaterialFeatureData &fd )
@@ -845,7 +598,7 @@ void DiffuseFeatureGLSL::processPix(   Vector<ShaderComponent*> &componentList,
    diffuseMaterialColor->constSortPos = cspPotentialPrimitive;
 
    MultiLine* meta = new MultiLine;
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( diffuseMaterialColor, Material::Mul ) ) );
+   meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( diffuseMaterialColor, Material::Mul ) ) );
    output = meta;
 }
 
@@ -899,7 +652,7 @@ void DiffuseVertColorFeatureGLSL::processPix(   Vector<ShaderComponent*> &compon
    }
    
    MultiLine* meta = new MultiLine;
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( vertColor, Material::Mul ) ) );
+   meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( vertColor, Material::Mul ) ) );
    output = meta;
 }
 
@@ -912,7 +665,7 @@ void LightmapFeatGLSL::processVert( Vector<ShaderComponent*> &componentList,
                                     const MaterialFeatureData &fd )
 {
    // grab tex register from incoming vert
-   Var *inTex = (Var*) LangElement::find( "texCoord2" );
+   Var *inTex = sHelper->getVertTexCoord( "texCoord2" );
 
    // grab connector texcoord register
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
@@ -985,9 +738,9 @@ void LightmapFeatGLSL::processPix(  Vector<ShaderComponent*> &componentList,
    
    // Assign to proper render target
    if( fd.features[MFT_LightbufferMRT] )
-      output = new GenOp( "   @;\r\n", assignColor( statement, Material::None, NULL, ShaderFeature::RenderTarget1 ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( statement, Material::None, NULL, RenderTarget1 ) ) );
    else
-      output = new GenOp( "   @;\r\n", assignColor( statement, Material::Mul ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( statement, Material::Mul ) ) );
 }
 
 ShaderFeature::Resources LightmapFeatGLSL::getResources( const MaterialFeatureData &fd )
@@ -1015,7 +768,7 @@ void LightmapFeatGLSL::setTexData(  Material::StageData &stageDat,
 
 U32 LightmapFeatGLSL::getOutputTargets( const MaterialFeatureData &fd ) const
 {
-   return fd.features[MFT_LightbufferMRT] ? ShaderFeature::RenderTarget1 : ShaderFeature::DefaultTarget;
+   return fd.features[MFT_LightbufferMRT] ? RenderTarget1 : DefaultTarget;
 }
 
 //****************************************************************************
@@ -1029,7 +782,7 @@ void TonemapFeatGLSL::processVert( Vector<ShaderComponent*> &componentList,
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
 
    // Set up the second set of texCoords
-   Var *inTex2 = getVertTexCoord( "texCoord2" );
+   Var *inTex2 = sHelper->getVertTexCoord( "texCoord2" );
 
    if ( inTex2 )
    {
@@ -1106,9 +859,9 @@ void TonemapFeatGLSL::processPix(  Vector<ShaderComponent*> &componentList,
 
    // Assign to proper render target
    if( fd.features[MFT_LightbufferMRT] )
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( toneMapColor, Material::None, NULL, ShaderFeature::RenderTarget1 ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( toneMapColor, Material::None, NULL, RenderTarget1 ) ) );
    else
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( toneMapColor, blendOp ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( toneMapColor, blendOp ) ) );
    
    output = meta;
 }
@@ -1139,7 +892,7 @@ void TonemapFeatGLSL::setTexData(  Material::StageData &stageDat,
 
 U32 TonemapFeatGLSL::getOutputTargets( const MaterialFeatureData &fd ) const
 {
-   return fd.features[MFT_LightbufferMRT] ? ShaderFeature::RenderTarget1 : ShaderFeature::DefaultTarget;
+   return fd.features[MFT_LightbufferMRT] ? RenderTarget1 : DefaultTarget;
 }
 
 //****************************************************************************
@@ -1253,16 +1006,16 @@ void VertLitGLSL::processPix(   Vector<ShaderComponent*> &componentList,
    
    // Output the color
    if ( fd.features[MFT_LightbufferMRT] )
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( outColor, Material::None, NULL, ShaderFeature::RenderTarget1 ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( outColor, Material::None, NULL, RenderTarget1 ) ) );
    else
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( outColor, blendOp ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( outColor, blendOp ) ) );
    
    output = meta;
 }
 
 U32 VertLitGLSL::getOutputTargets( const MaterialFeatureData &fd ) const
 {
-   return fd.features[MFT_LightbufferMRT] ? ShaderFeature::RenderTarget1 : ShaderFeature::DefaultTarget;
+   return fd.features[MFT_LightbufferMRT] ? RenderTarget1 : DefaultTarget;
 }
 
 
@@ -1284,7 +1037,7 @@ void DetailFeatGLSL::processPix( Vector<ShaderComponent*> &componentList,
                                  const MaterialFeatureData &fd )
 {
    // Get the detail texture coord.
-   Var *inTex = getInTexCoord( "detCoord", "vec2", true, componentList );
+   Var *inTex = sHelper->getInTexCoord( "detCoord", "vec2", true, componentList );
 
    // create texture var
    Var *detailMap = new Var;
@@ -1302,7 +1055,7 @@ void DetailFeatGLSL::processPix( Vector<ShaderComponent*> &componentList,
    // and a simple multiplication with the detail map.
 
    LangElement *statement = new GenOp( "( texture2D(@, @) * 2.0 ) - 1.0", detailMap, inTex );
-   output = new GenOp( "   @;\r\n", assignColor( statement, Material::Add ) );
+   output = new GenOp( "   @;\r\n", sHelper->assignColor( statement, Material::Add ) );
 }
 
 ShaderFeature::Resources DetailFeatGLSL::getResources( const MaterialFeatureData &fd )
@@ -1376,7 +1129,7 @@ void ReflectCubeFeatGLSL::processVert( Vector<ShaderComponent*> &componentList,
           fd.materialFeatures[MFT_NormalMap] )
       {
          // find incoming texture var
-         Var *inTex = getVertTexCoord( "texCoord" );
+         Var *inTex = sHelper->getVertTexCoord( "texCoord" );
 
          // grab connector texcoord register
          ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
@@ -1462,7 +1215,7 @@ void ReflectCubeFeatGLSL::processPix(  Vector<ShaderComponent*> &componentList,
           fd.materialFeatures[MFT_NormalMap] )
       {
          // grab connector texcoord register
-         Var *inTex = getInTexCoord( "outTexCoord", "vec2", true, componentList );
+         Var *inTex = sHelper->getInTexCoord( "outTexCoord", "vec2", true, componentList );
       
          // create texture var
          Var *newMap = new Var;
@@ -1535,7 +1288,7 @@ void ReflectCubeFeatGLSL::processPix(  Vector<ShaderComponent*> &componentList,
          blendOp = Material::Mul;
    }
 
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( texCube, blendOp, lerpVal ) ) );         
+   meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( texCube, blendOp, lerpVal ) ) );         
    output = meta;
 }
 
@@ -1774,7 +1527,7 @@ void RTLightingFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
 
    // Apply the lighting to the diffuse color.
    LangElement *lighting = new GenOp( "vec4( @.rgb + ambient.rgb, 1 )", rtShading );
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( lighting, Material::Mul ) ) );
+   meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( lighting, Material::Mul ) ) );
    output = meta;  
 }
 
@@ -2128,7 +1881,7 @@ void RenderTargetZeroGLSL::processPix( Vector<ShaderComponent*> &componentList, 
 {
    // Do not actually assign zero, but instead a number so close to zero it may as well be zero.
    // This will prevent a divide by zero causing an FP special on float render targets
-   output = new GenOp( "   @;\r\n", assignColor( new GenOp( "0.00001" ), Material::None, NULL, mOutputTargetMask ) );
+   output = new GenOp( "   @;\r\n", sHelper->assignColor( new GenOp( "0.00001" ), Material::None, NULL, mOutputTargetMask ) );
 }
 
 

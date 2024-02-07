@@ -195,7 +195,7 @@ void GBufferConditioner::processPix(  Vector<ShaderComponent*> &componentList,
    // If we have an alpha var then we're doing prepass lerp blending.
    if ( alphaVal )
    {
-      Var *outColor = (Var*)LangElement::find( getOutputTargetVarName( DefaultTarget ) );
+      Var *outColor = (Var*)LangElement::find( sHelper->getOutputTargetVarName( DefaultTarget ) );
       meta->addStatement( new GenOp( "   @.ba = float2( 0, @ ); // MFT_IsTranslucentZWrite\r\n", outColor, alphaVal ) );
    }
 

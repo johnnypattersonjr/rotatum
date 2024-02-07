@@ -23,6 +23,9 @@
 
 #include "shaderGenHelperGLSL.h"
 
+#include "core/strings/stringFunctions.h"
+#include "materials/materialFeatureTypes.h"
+
 Var* ShaderGenHelperGLSL::addOutVpos(MultiLine* meta, Vector<ShaderComponent*>& componentList)
 {
 	Var* ssPos = (Var*)LangElement::find("screenspacePos");
@@ -38,6 +41,84 @@ Var* ShaderGenHelperGLSL::addOutVpos(MultiLine* meta, Vector<ShaderComponent*>& 
 	meta->addStatement(new GenOp("   @ = gl_Position;\r\n", ssPos));
 
 	return ssPos;
+}
+
+LangElement* ShaderGenHelperGLSL::assignColor(LangElement* elem, Material::BlendOp blend, LangElement* lerpElem,
+                                              OutputTarget outputTarget)
+{
+	// search for color var
+	Var *color = (Var*)LangElement::find(getOutputTargetVarName(outputTarget));
+
+	if (!color)
+	{
+		// create color var
+		color = new Var;
+		color->setName(getOutputTargetVarName(outputTarget));
+		color->setType("vec4");
+
+		return new GenOp("@ = @", new DecOp(color), elem);
+	}
+
+	LangElement* assign;
+
+	switch (blend)
+	{
+	case Material::Add:
+		assign = new GenOp("@ += @", color, elem);
+		break;
+
+	case Material::Sub:
+		assign = new GenOp("@ -= @", color, elem);
+		break;
+
+	case Material::Mul:
+		assign = new GenOp("@ *= @", color, elem);
+		break;
+
+	case Material::AddAlpha:
+		assign = new GenOp("@ += @ * @.a", color, elem, elem);
+		break;
+
+	case Material::LerpAlpha:
+		if (!lerpElem)
+			lerpElem = elem;
+		assign = new GenOp("@.rgb = mix(@.rgb, (@).rgb, (@).a)", color, elem, color, lerpElem);
+		break;
+
+	case Material::ToneMap:
+		assign = new GenOp("@ = 1.0 - exp(-1.0 * @ * @)", color, color, elem);
+		break;
+
+	default:
+		AssertFatal(false, "Unrecognized color blendOp");
+		// Fallthru
+
+	case Material::None:
+		assign = new GenOp("@ = @", color, elem);
+		break;
+	}
+
+	return assign;
+}
+
+LangElement* ShaderGenHelperGLSL::expandNormalMap(LangElement* sampleNormalOp, LangElement* normalDecl, LangElement* normalVar,
+                                                  const MaterialFeatureData& fd, S32 processIndex)
+{
+	MultiLine* meta = new MultiLine;
+
+	if (fd.features.hasFeature(MFT_IsDXTnm, processIndex))
+	{
+		// DXT Swizzle trick
+		meta->addStatement(new GenOp("   @ = vec4(@.ag * 2.0 - 1.0, 0.0, 0.0);  // DXTnm\r\n", normalDecl, sampleNormalOp));
+		meta->addStatement(new GenOp("   @.z = sqrt(1.0 - dot(@.xy, @.xy));  // DXTnm\r\n", normalVar, normalVar, normalVar));
+	}
+	else
+	{
+		meta->addStatement(new GenOp( "   @ = @;\r\n", normalDecl, sampleNormalOp));
+		meta->addStatement(new GenOp( "   @.xyz = @.xyz * 2.0 - 1.0;\r\n", normalVar, normalVar));
+	}
+
+	return meta;
 }
 
 Var* ShaderGenHelperGLSL::getInVpos(MultiLine* meta, Vector<ShaderComponent*>& componentList)
@@ -70,6 +151,25 @@ Var* ShaderGenHelperGLSL::getObjTrans(Vector<ShaderComponent*>& componentList, b
 	return objTrans;
 }
 
+Var* ShaderGenHelperGLSL::getVertTexCoord(const String &name)
+{
+	Var* inTex = NULL;
+
+	for (U32 i = 0; i < LangElement::elementList.size(); i++)
+	{
+		if (!dStrcmp((char*)LangElement::elementList[i]->name, name.c_str()))
+		{
+			inTex = dynamic_cast<Var*>(LangElement::elementList[i]);
+			if (inTex)
+			{
+				break;
+			}
+		}
+	}
+
+	return inTex;
+}
+
 Var* ShaderGenHelperGLSL::getWorldView(Vector<ShaderComponent*>& componentList, bool useInstancing, GFXVertexFormat* instancingFormat, MultiLine* meta)
 {
 	Var* worldView = (Var*)LangElement::find("worldViewOnly");
@@ -83,4 +183,37 @@ Var* ShaderGenHelperGLSL::getWorldView(Vector<ShaderComponent*>& componentList, 
 	worldView->constSortPos = cspPrimitive;
 
 	return worldView;
+}
+
+LangElement* ShaderGenHelperGLSL::setupTexSpaceMat(Vector<ShaderComponent*>& componentList, Var** texSpaceMat)
+{
+	Var* N = (Var*)LangElement::find("normal");
+	Var* B = (Var*)LangElement::find("B");
+	Var* T = (Var*)LangElement::find("T");
+
+	// setup matrix var
+	*texSpaceMat = new Var;
+	(*texSpaceMat)->setType("mat3");
+	(*texSpaceMat)->setName("objToTangentSpace");
+
+	MultiLine* meta = new MultiLine;
+
+	// Recreate the binormal if we don't have one.
+	if (!B)
+	{
+		B = new Var;
+		B->setType("vec3");
+		B->setName("B");
+		meta->addStatement(new GenOp("   @ = cross(@, normalize(@));\r\n", new DecOp(B), T, N));
+	}
+
+	meta->addStatement(new GenOp("   @;\r\n", new DecOp(*texSpaceMat)));
+	// meta->addStatement(new GenOp( "   @[0] = vec3(@.x, @.x, normalize(@).x);\r\n", *texSpaceMat, T, B, N));
+	// meta->addStatement(new GenOp( "   @[1] = vec3(@.y, @.y, normalize(@).y);\r\n", *texSpaceMat, T, B, N));
+	// meta->addStatement(new GenOp( "   @[2] = vec3(@.z, @.z, normalize(@).z);\r\n", *texSpaceMat, T, B, N));
+	meta->addStatement(new GenOp( "   @[0] = @;\r\n", *texSpaceMat, T));
+	meta->addStatement(new GenOp( "   @[1] = @ * tcTANGENTW;\r\n", *texSpaceMat, B));
+	meta->addStatement(new GenOp( "   @[2] = normalize(@);\r\n", *texSpaceMat, N));
+
+	return meta;
 }

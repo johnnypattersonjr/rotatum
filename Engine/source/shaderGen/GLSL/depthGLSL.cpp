@@ -103,7 +103,7 @@ void EyeSpaceDepthOutGLSL::processPix( Vector<ShaderComponent*> &componentList,
    // If there isn't an output conditioner for the pre-pass, than just write
    // out the depth to rgba and return.
    if( !fd.features[MFT_PrePassConditioner] )
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "vec4(vec3(@),1)", depthOut ), Material::None ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( new GenOp( "vec4(vec3(@),1)", depthOut ), Material::None ) ) );
    
    output = meta;
 }
@@ -157,7 +157,7 @@ void DepthOutGLSL::processPix(   Vector<ShaderComponent*> &componentList,
 
    LangElement *depthOut = new GenOp( "vec4( @, 0, 0, 1 )", depthVar );
 
-   output = new GenOp( "   @;\r\n", assignColor( depthOut, Material::None ) );
+   output = new GenOp( "   @;\r\n", sHelper->assignColor( depthOut, Material::None ) );
 }
 
 ShaderFeature::Resources DepthOutGLSL::getResources( const MaterialFeatureData &fd )

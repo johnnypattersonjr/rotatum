@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -56,7 +57,7 @@ ConditionerFeature::~ConditionerFeature()
    smDirtyConditioners = true;
 }
 
-LangElement *ConditionerFeature::assignOutput( Var *unconditionedOutput, ShaderFeature::OutputTarget outputTarget /* = ShaderFeature::DefaultTarget*/ )
+LangElement *ConditionerFeature::assignOutput( Var *unconditionedOutput, OutputTarget outputTarget /* = DefaultTarget*/ )
 {
    LangElement *assign;
    MultiLine *meta = new MultiLine;
@@ -67,7 +68,7 @@ LangElement *ConditionerFeature::assignOutput( Var *unconditionedOutput, ShaderF
    Var *conditionedOutput = _conditionOutput( unconditionedOutput, meta );
 
    // search for color var
-   Var *color = (Var*) LangElement::find( getOutputTargetVarName(outputTarget) );
+   Var *color = (Var*) LangElement::find( sHelper->getOutputTargetVarName(outputTarget) );
 
    if ( !color )
    {
@@ -76,7 +77,7 @@ LangElement *ConditionerFeature::assignOutput( Var *unconditionedOutput, ShaderF
 
       if(GFX->getAdapterType() == OpenGL)
       {
-         color->setName( getOutputTargetVarName(outputTarget) );
+         color->setName( sHelper->getOutputTargetVarName(outputTarget) );
          color->setType( "vec4" );
          DecOp* colDecl = new DecOp(color);
 
@@ -85,7 +86,7 @@ LangElement *ConditionerFeature::assignOutput( Var *unconditionedOutput, ShaderF
       else
       {
          color->setType( "fragout" );
-         color->setName( getOutputTargetVarName(outputTarget) );
+         color->setName( sHelper->getOutputTargetVarName(outputTarget) );
          color->setStructName( "OUT" );
 
          assign = new GenOp( "@ = @", color, conditionedOutput );

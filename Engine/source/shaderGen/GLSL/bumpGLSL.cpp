@@ -65,7 +65,7 @@ void BumpFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
 	output = meta;
 
    // Get the texture coord.
-   Var *texCoord = getInTexCoord( "out_texCoord", "vec2", true, componentList );
+   Var *texCoord = sHelper->getInTexCoord( "out_texCoord", "vec2", true, componentList );
 
    // Sample the bumpmap.
    Var *bumpMap = getNormalMapTex();
@@ -146,7 +146,7 @@ void BumpFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
 	}
 		
    Var *bumpNorm = new Var( "bumpNormal", "vec4" );
-   meta->addStatement( expandNormalMap( texOp, new DecOp( bumpNorm ), bumpNorm, fd ) );
+   meta->addStatement( sHelper->expandNormalMap( texOp, new DecOp( bumpNorm ), bumpNorm, fd, getProcessIndex() ) );
 
 	// If we have a detail normal map we add the xy coords of
    // it to the base normal map.  This gives us the effect we
@@ -160,13 +160,13 @@ void BumpFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
       bumpMap->sampler = true;
       bumpMap->constNum = Var::getTexUnitNum();
 		
-      texCoord = getInTexCoord( "detCoord", "vec2", true, componentList );
+      texCoord = sHelper->getInTexCoord( "detCoord", "vec2", true, componentList );
       texOp = new GenOp( "texture2D(@, @)", bumpMap, texCoord );
 		
       Var *detailBump = new Var;
       detailBump->setName( "detailBump" );
       detailBump->setType( "vec4" );
-      meta->addStatement( expandNormalMap( texOp, new DecOp( detailBump ), detailBump, fd ) );
+      meta->addStatement( sHelper->expandNormalMap( texOp, new DecOp( detailBump ), detailBump, fd, getProcessIndex() ) );
 		
       Var *detailBumpScale = new Var;
       detailBumpScale->setType( "float" );
@@ -283,7 +283,7 @@ void ParallaxFeatGLSL::processVert( Vector<ShaderComponent*> &componentList,
    // Get the object space eye position and the world
    // to tangent transform.
    Var *eyePos = _getUniformVar( "eyePos", "vec3" );
-   Var *objToTangentSpace = getOutObjToTangentSpace( componentList, meta, fd );
+   Var *objToTangentSpace = sHelper->getOutObjToTangentSpace( componentList, meta, fd );
 	
    // send transform to pixel shader
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
@@ -305,7 +305,7 @@ void ParallaxFeatGLSL::processPix(  Vector<ShaderComponent*> &componentList,
    MultiLine *meta = new MultiLine;
 	
    // Order matters... get this first!
-   Var *texCoord = getInTexCoord( "texCoord", "vec2", true, componentList );
+   Var *texCoord = sHelper->getInTexCoord( "texCoord", "vec2", true, componentList );
 	
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
 	
@@ -449,6 +449,5 @@ void NormalsOutFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
    else
       normalOut = new GenOp( "vec4( ( -@ + 1 ) * 0.5, 1 )", wsNormal );
 	
-   meta->addStatement( new GenOp( "   @;\r\n", 
-											assignColor( normalOut, Material::None ) ) );
+   meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( normalOut, Material::None ) ) );
 }

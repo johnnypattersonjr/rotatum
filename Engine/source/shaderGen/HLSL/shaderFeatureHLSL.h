@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -44,22 +45,9 @@ public:
                         MultiLine *meta,
                         Vector<ShaderComponent*> &componentList );
 
-   /// Returns an input texture coord by name adding it
-   /// to the input connector if it doesn't exist.
-   static Var* getInTexCoord( const char *name,
-                              const char *type,
-                              bool mapsToSampler,
-                              Vector<ShaderComponent*> &componentList );
-
    static Var* getInColor( const char *name,
                            const char *type,
                            Vector<ShaderComponent*> &componentList );
-
-   /// Returns the "objToTangentSpace" transform or creates one if this
-   /// is the first feature to need it.
-   Var* getOutObjToTangentSpace( Vector<ShaderComponent*> &componentList,
-                                 MultiLine *meta,
-                                 const MaterialFeatureData &fd );
 
    /// Returns the existing output "outWorldToTangent" transform or 
    /// creates one if this is the first feature to need it.
@@ -70,16 +58,6 @@ public:
    /// Returns the input "worldToTanget" space transform 
    /// adding it to the input connector if it doesn't exist.
    static Var* getInWorldToTangent( Vector<ShaderComponent*> &componentList );
-
-   /// Returns the existing output "outViewToTangent" transform or 
-   /// creates one if this is the first feature to need it.
-   Var* getOutViewToTangent(  Vector<ShaderComponent*> &componentList,
-                              MultiLine *meta,
-                              const MaterialFeatureData &fd );
-
-   /// Returns the input "viewToTangent" space transform 
-   /// adding it to the input connector if it doesn't exist.
-   static Var* getInViewToTangent( Vector<ShaderComponent*> &componentList );
 
    /// Calculates the world space position in the vertex shader and 
    /// assigns it to the passed language element.  It does not pass 
@@ -113,41 +91,16 @@ public:
    Var* getModelView(   Vector<ShaderComponent*> &componentList,                                       
                         bool useInstancing,
                         MultiLine *meta );
-
-   ///
-   Var* getInvWorldView(   Vector<ShaderComponent*> &componentList,                                       
-                           bool useInstancing,
-                           MultiLine *meta );
-
-   // ShaderFeature
-   Var* getVertTexCoord( const String &name );
-   LangElement* setupTexSpaceMat(  Vector<ShaderComponent*> &componentList, Var **texSpaceMat );
-   LangElement* assignColor( LangElement *elem, Material::BlendOp blend, LangElement *lerpElem = NULL, ShaderFeature::OutputTarget outputTarget = ShaderFeature::DefaultTarget );
-   LangElement* expandNormalMap( LangElement *sampleNormalOp, LangElement *normalDecl, LangElement *normalVar, const MaterialFeatureData &fd );
-};
-
-
-class NamedFeatureHLSL : public ShaderFeatureHLSL
-{
-protected:
-   String mName;
-
-public:
-   NamedFeatureHLSL( const String &name )
-      : mName( name )
-   {}
-
-   virtual String getName() { return mName; }
 };
 
 class RenderTargetZeroHLSL : public ShaderFeatureHLSL
 {
 protected:
-   ShaderFeature::OutputTarget mOutputTargetMask;
+   OutputTarget mOutputTargetMask;
    String mFeatureName;
 
 public:
-   RenderTargetZeroHLSL( const ShaderFeature::OutputTarget target )
+   RenderTargetZeroHLSL( OutputTarget target )
       : mOutputTargetMask( target )
    {
       char buffer[256];

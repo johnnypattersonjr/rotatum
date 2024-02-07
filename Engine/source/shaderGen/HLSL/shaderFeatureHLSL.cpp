@@ -35,187 +35,9 @@
 
 #include "lighting/advanced/advancedLightBinManager.h"
 
-LangElement * ShaderFeatureHLSL::setupTexSpaceMat( Vector<ShaderComponent*> &, // componentList
-                                                   Var **texSpaceMat )
-{
-   Var *N = (Var*) LangElement::find( "normal" );
-   Var *B = (Var*) LangElement::find( "B" );
-   Var *T = (Var*) LangElement::find( "T" );
-
-   Var *tangentW = (Var*) LangElement::find( "tangentW" );
-   
-   // setup matrix var
-   *texSpaceMat = new Var;
-   (*texSpaceMat)->setType( "float3x3" );
-   (*texSpaceMat)->setName( "objToTangentSpace" );
-
-   MultiLine *meta = new MultiLine;
-   meta->addStatement( new GenOp( "   @;\r\n", new DecOp( *texSpaceMat ) ) );
-
-   // Protect against missing normal and tangent.
-   if ( !N || !T )
-   {
-      meta->addStatement( new GenOp( "   @[0] = float3( 1, 0, 0 ); @[1] = float3( 0, 1, 0 ); @[2] = float3( 0, 0, 1 );\r\n", 
-         *texSpaceMat, *texSpaceMat, *texSpaceMat ) );
-      return meta;
-   }
-
-   meta->addStatement( new GenOp( "   @[0] = @;\r\n", *texSpaceMat, T ) );
-   if ( B )
-      meta->addStatement( new GenOp( "   @[1] = @;\r\n", *texSpaceMat, B ) );
-   else
-   {
-      if(dStricmp((char*)T->type, "float4") == 0)
-         meta->addStatement( new GenOp( "   @[1] = cross( @, normalize(@) ) * @.w;\r\n", *texSpaceMat, T, N, T ) );
-      else if(tangentW)
-         meta->addStatement( new GenOp( "   @[1] = cross( @, normalize(@) ) * @;\r\n", *texSpaceMat, T, N, tangentW ) );
-      else
-         meta->addStatement( new GenOp( "   @[1] = cross( @, normalize(@) );\r\n", *texSpaceMat, T, N ) );
-   }
-   meta->addStatement( new GenOp( "   @[2] = normalize(@);\r\n", *texSpaceMat, N ) );
-
-   return meta;
-}
-
-LangElement* ShaderFeatureHLSL::assignColor( LangElement *elem, 
-                                             Material::BlendOp blend, 
-                                             LangElement *lerpElem, 
-                                             ShaderFeature::OutputTarget outputTarget )
-{
-
-   // search for color var
-   Var *color = (Var*) LangElement::find( getOutputTargetVarName(outputTarget) );
-
-   if ( !color )
-   {
-      // create color var
-      color = new Var;
-      color->setType( "fragout" );
-      color->setName( getOutputTargetVarName(outputTarget) );
-      color->setStructName( "OUT" );
-
-      return new GenOp( "@ = @", color, elem );
-   }
-
-   LangElement *assign;
-
-   switch ( blend )
-   {
-      case Material::Add:
-         assign = new GenOp( "@ += @", color, elem );
-         break;
-
-      case Material::Sub:
-         assign = new GenOp( "@ -= @", color, elem );
-         break;
-
-      case Material::Mul:
-         assign = new GenOp( "@ *= @", color, elem );
-         break;
-
-      case Material::AddAlpha:
-         assign = new GenOp( "@ += @ * @.a", color, elem, elem );
-         break;
-
-      case Material::LerpAlpha:
-         if ( !lerpElem )
-            lerpElem = elem;
-         assign = new GenOp( "@.rgb = lerp( @.rgb, (@).rgb, (@).a )", color, color, elem, lerpElem );
-         break;
-      
-      case Material::ToneMap:
-         assign = new GenOp( "@ = 1.0 - exp(-1.0 * @ * @)", color, color, elem );
-         break;
-         
-      default:
-         AssertFatal(false, "Unrecognized color blendOp");
-         // Fallthru
-
-      case Material::None:
-         assign = new GenOp( "@ = @", color, elem );
-         break;    
-   }
-  
-   return assign;
-}
-
-
-LangElement *ShaderFeatureHLSL::expandNormalMap(   LangElement *sampleNormalOp, 
-                                                   LangElement *normalDecl, 
-                                                   LangElement *normalVar, 
-                                                   const MaterialFeatureData &fd )
-{
-   MultiLine *meta = new MultiLine;
-
-   if ( fd.features.hasFeature( MFT_IsDXTnm, getProcessIndex() ) )
-   {
-      if ( fd.features[MFT_ImposterVert] )
-      {
-         // The imposter system uses object space normals and
-         // encodes them with the z axis in the alpha component.
-         meta->addStatement( new GenOp( "   @ = float4( normalize( @.xyw * 2.0 - 1.0 ), 0.0 ); // Obj DXTnm\r\n", normalDecl, sampleNormalOp ) );
-      }
-      else
-      {
-         // DXT Swizzle trick
-         meta->addStatement( new GenOp( "   @ = float4( @.ag * 2.0 - 1.0, 0.0, 0.0 ); // DXTnm\r\n", normalDecl, sampleNormalOp ) );
-         meta->addStatement( new GenOp( "   @.z = sqrt( 1.0 - dot( @.xy, @.xy ) ); // DXTnm\r\n", normalVar, normalVar, normalVar ) );
-      }
-   }
-   else
-   {
-      meta->addStatement( new GenOp( "   @ = @;\r\n", normalDecl, sampleNormalOp ) );
-      meta->addStatement( new GenOp( "   @.xyz = @.xyz * 2.0 - 1.0;\r\n", normalVar, normalVar ) );
-   }
-
-   return meta;
-}
-
 ShaderFeatureHLSL::ShaderFeatureHLSL()
 {
    output = NULL;
-}
-
-Var * ShaderFeatureHLSL::getVertTexCoord( const String &name )
-{
-   Var *inTex = NULL;
-
-   for( U32 i=0; i<LangElement::elementList.size(); i++ )
-   {
-      if( !dStrcmp( (char*)LangElement::elementList[i]->name, name.c_str() ) )
-      {
-         inTex = dynamic_cast<Var*>( LangElement::elementList[i] );
-         if ( inTex )
-         {
-            // NOTE: This used to do this check...
-            //
-            // dStrcmp( (char*)inTex->structName, "IN" )
-            //
-            // ... to ensure that the var was from the input
-            // vertex structure, but this kept some features
-            // ( ie. imposter vert ) from decoding their own
-            // coords for other features to use.
-            //
-            // If we run into issues with collisions between
-            // IN vars and local vars we may need to revise.
-            
-            break;
-         }
-      }
-   }
-
-   return inTex;
-}
-
-Var* ShaderFeatureHLSL::getOutObjToTangentSpace(   Vector<ShaderComponent*> &componentList,
-                                                   MultiLine *meta,
-                                                   const MaterialFeatureData &fd )
-{
-   Var *outObjToTangentSpace = (Var*)LangElement::find( "objToTangentSpace" );
-   if ( !outObjToTangentSpace )
-      meta->addStatement( setupTexSpaceMat( componentList, &outObjToTangentSpace ) );
-
-   return outObjToTangentSpace;
 }
 
 Var* ShaderFeatureHLSL::getOutWorldToTangent(   Vector<ShaderComponent*> &componentList,
@@ -229,7 +51,7 @@ Var* ShaderFeatureHLSL::getOutWorldToTangent(   Vector<ShaderComponent*> &compon
    Var *worldToTangent = (Var*)LangElement::find( "worldToTangent" );
    if ( !worldToTangent )
    {
-      Var *texSpaceMat = getOutObjToTangentSpace( componentList, meta, fd );
+      Var *texSpaceMat = sHelper->getOutObjToTangentSpace( componentList, meta, fd );
 
       if (!fd.features[MFT_ParticleNormal] )
       {
@@ -284,53 +106,6 @@ Var* ShaderFeatureHLSL::getOutWorldToTangent(   Vector<ShaderComponent*> &compon
    return outWorldToTangent;
 }
 
-Var* ShaderFeatureHLSL::getOutViewToTangent( Vector<ShaderComponent*> &componentList,
-                                             MultiLine *meta,
-                                             const MaterialFeatureData &fd )
-{
-   Var *outViewToTangent = (Var*)LangElement::find( "outViewToTangent" );
-   if ( outViewToTangent )
-      return outViewToTangent;
-
-   Var *viewToTangent = (Var*)LangElement::find( "viewToTangent" );
-   if ( !viewToTangent )
-   {
-
-      Var *texSpaceMat = getOutObjToTangentSpace( componentList, meta, fd );
-
-      if ( !fd.features[MFT_ParticleNormal] )
-      {
-         // turn obj->tangent into world->tangent
-         viewToTangent = new Var;
-         viewToTangent->setType( "float3x3" );
-         viewToTangent->setName( "viewToTangent" );
-         LangElement *viewToTangentDecl = new DecOp( viewToTangent );
-
-         // Get the view->obj transform
-         Var *viewToObj = getInvWorldView( componentList, fd.features[MFT_UseInstancing], meta );
-
-         // assign world->tangent transform
-         meta->addStatement( new GenOp( "   @ = mul( @, (float3x3)@ );\r\n", viewToTangentDecl, texSpaceMat, viewToObj ) );
-      }
-      else
-      {
-         // Assume particle normal generation has set this up in the proper space
-         viewToTangent = texSpaceMat;
-      }
-   }
-
-   // send transform to pixel shader
-   ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-
-   outViewToTangent = connectComp->getElement( RT_TEXCOORD, 1, 3 );
-   outViewToTangent->setName( "outViewToTangent" );
-   outViewToTangent->setStructName( "OUT" );
-   outViewToTangent->setType( "float3x3" );
-   meta->addStatement( new GenOp( "   @ = @;\r\n", outViewToTangent, viewToTangent ) );
-
-   return outViewToTangent;
-}
-
 Var* ShaderFeatureHLSL::getOutTexCoord(   const char *name,
                                           const char *type,
                                           bool mapsToSampler,
@@ -342,7 +117,7 @@ Var* ShaderFeatureHLSL::getOutTexCoord(   const char *name,
    Var *texCoord = (Var*)LangElement::find( outTexName );
    if ( !texCoord )
    {
-      Var *inTex = getVertTexCoord( name );
+      Var *inTex = sHelper->getVertTexCoord( name );
       AssertFatal( inTex, "ShaderFeatureHLSL::getOutTexCoord - Unknown vertex input coord!" );
 
       ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
@@ -384,28 +159,6 @@ Var* ShaderFeatureHLSL::getOutTexCoord(   const char *name,
    return texCoord;
 }
 
-Var* ShaderFeatureHLSL::getInTexCoord( const char *name,
-                                       const char *type,
-                                       bool mapsToSampler,
-                                       Vector<ShaderComponent*> &componentList )
-{
-   Var* texCoord = (Var*)LangElement::find( name );
-   if ( !texCoord )
-   {
-      ShaderConnector *connectComp = dynamic_cast<ShaderConnector*>( componentList[C_CONNECTOR] );
-      texCoord = connectComp->getElement( RT_TEXCOORD );
-      texCoord->setName( name );
-      texCoord->setStructName( "IN" );
-      texCoord->setType( type );
-      texCoord->mapsToSampler = mapsToSampler;
-   }
-
-   AssertFatal( dStrcmp( type, (const char*)texCoord->type ) == 0, 
-      "ShaderFeatureHLSL::getInTexCoord - Type mismatch!" );
-
-   return texCoord;
-}
-
 Var* ShaderFeatureHLSL::getInColor( const char *name,
                                     const char *type,
                                     Vector<ShaderComponent*> &componentList )
@@ -439,21 +192,6 @@ Var* ShaderFeatureHLSL::getInWorldToTangent( Vector<ShaderComponent*> &component
    }
 
    return worldToTangent;
-}
-
-Var* ShaderFeatureHLSL::getInViewToTangent( Vector<ShaderComponent*> &componentList )
-{
-   Var *viewToTangent = (Var*)LangElement::find( "viewToTangent" );
-   if ( !viewToTangent )
-   {
-      ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-      viewToTangent = connectComp->getElement( RT_TEXCOORD, 1, 3 );
-      viewToTangent->setName( "viewToTangent" );
-      viewToTangent->setStructName( "IN" );
-      viewToTangent->setType( "float3x3" );
-   }
-
-   return viewToTangent;
 }
 
 Var* ShaderFeatureHLSL::getNormalMapTex()
@@ -509,39 +247,6 @@ Var* ShaderFeatureHLSL::getModelView(  Vector<ShaderComponent*> &componentList,
    }
 
    return modelview;
-}
-
-Var* ShaderFeatureHLSL::getInvWorldView(  Vector<ShaderComponent*> &componentList,                                       
-                                          bool useInstancing,
-                                          MultiLine *meta )
-{
-   Var *viewToObj = (Var*)LangElement::find( "viewToObj" );
-   if ( viewToObj )
-      return viewToObj;
-
-   if ( useInstancing )
-   {
-      Var *worldView = sHelper->getWorldView( componentList, useInstancing, mInstancingFormat, meta );
-
-      viewToObj = new Var;
-      viewToObj->setType( "float3x3" );
-      viewToObj->setName( "viewToObj" );
-
-      // We just use transpose to convert the 3x3 portion 
-      // of the world view transform into its inverse.
-
-      meta->addStatement( new GenOp( "   @ = transpose( (float3x3)@ ); // Instancing!\r\n", new DecOp( viewToObj ), worldView ) );
-   }
-   else
-   {
-      viewToObj = new Var;
-      viewToObj->setType( "float4x4" );
-      viewToObj->setName( "viewToObj" );
-      viewToObj->uniform = true;
-      viewToObj->constSortPos = cspPrimitive;
-   }
-
-   return viewToObj;
 }
 
 void ShaderFeatureHLSL::getWsPosition( Vector<ShaderComponent*> &componentList,                                       
@@ -639,7 +344,7 @@ Var* ShaderFeatureHLSL::addOutDetailTexCoord(   Vector<ShaderComponent*> &compon
       return outTex;
 
    // Grab incoming texture coords.
-   Var *inTex = getVertTexCoord( "texCoord" );
+   Var *inTex = sHelper->getVertTexCoord( "texCoord" );
 
    // create detail variable
    Var *detScale = new Var;
@@ -703,7 +408,7 @@ void DiffuseMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
 {
    // grab connector texcoord register
-   Var *inTex = getInTexCoord( "texCoord", "float2", true, componentList );
+   Var *inTex = sHelper->getInTexCoord( "texCoord", "float2", true, componentList );
 
    // create texture var
    Var *diffuseMap = new Var;
@@ -728,7 +433,7 @@ void DiffuseMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
                            diffuseMap, 
                            inTex ) );
       
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( diffColor, Material::Mul ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( diffColor, Material::Mul ) ) );
       output = meta;
    }
    else if(fd.features[MFT_DiffuseMapAtlas])
@@ -803,7 +508,7 @@ void DiffuseMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
       if(!fd.features[MFT_PrePassConditioner])
       {
          meta->addStatement(new GenOp("   @ = float4(@.xy, mipLod / @.w, 1.0);\r\n", new DecOp(diffColor), inTex, atParams));
-         meta->addStatement(new GenOp("   @; return OUT;\r\n", assignColor(diffColor, Material::Mul)));
+         meta->addStatement(new GenOp("   @; return OUT;\r\n", sHelper->assignColor(diffColor, Material::Mul)));
          return;
       }
 #endif
@@ -819,12 +524,12 @@ void DiffuseMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
             new DecOp(diffColor), diffuseMap, inTex));
       }
 
-      meta->addStatement(new GenOp( "   @;\r\n", assignColor(diffColor, Material::Mul)));
+      meta->addStatement(new GenOp( "   @;\r\n", sHelper->assignColor(diffColor, Material::Mul)));
    }
    else
    {
       LangElement *statement = new GenOp( "tex2D(@, @)", diffuseMap, inTex );
-      output = new GenOp( "   @;\r\n", assignColor( statement, Material::Mul ) );
+      output = new GenOp( "   @;\r\n", sHelper->assignColor( statement, Material::Mul ) );
    }
    
 }
@@ -860,7 +565,7 @@ void DiffuseMapFeatHLSL::setTexData(   Material::StageData &stageDat,
 void OverlayTexFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList, 
                                        const MaterialFeatureData &fd )
 {
-   Var *inTex = getVertTexCoord( "texCoord2" );
+   Var *inTex = sHelper->getVertTexCoord( "texCoord2" );
    AssertFatal( inTex, "OverlayTexFeatHLSL::processVert() - The second UV set was not found!" );
 
    // grab connector texcoord register
@@ -915,7 +620,7 @@ void OverlayTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    diffuseMap->constNum = Var::getTexUnitNum();     // used as texture unit num here
 
    LangElement *statement = new GenOp( "tex2D(@, @)", diffuseMap, inTex );
-   output = new GenOp( "   @;\r\n", assignColor( statement, Material::LerpAlpha ) );
+   output = new GenOp( "   @;\r\n", sHelper->assignColor( statement, Material::LerpAlpha ) );
 }
 
 ShaderFeature::Resources OverlayTexFeatHLSL::getResources( const MaterialFeatureData &fd )
@@ -955,7 +660,7 @@ void DiffuseFeatureHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    diffuseMaterialColor->constSortPos = cspPotentialPrimitive;
 
    MultiLine * meta = new MultiLine;
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( diffuseMaterialColor, Material::Mul ) ) );
+   meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( diffuseMaterialColor, Material::Mul ) ) );
    output = meta;
 }
 
@@ -1011,7 +716,7 @@ void DiffuseVertColorFeatureHLSL::processPix(   Vector<ShaderComponent*> &compon
    }
    
    MultiLine* meta = new MultiLine;
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( vertColor, Material::Mul ) ) );
+   meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( vertColor, Material::Mul ) ) );
    output = meta;
 }
 
@@ -1024,7 +729,7 @@ void LightmapFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
                                     const MaterialFeatureData &fd )
 {
    // grab tex register from incoming vert
-   Var *inTex = getVertTexCoord( "texCoord2" );
+   Var *inTex = sHelper->getVertTexCoord( "texCoord2" );
 
    // grab connector texcoord register
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
@@ -1101,11 +806,11 @@ void LightmapFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
    MultiLine *meta = new MultiLine;
    if( fd.features[MFT_LightbufferMRT] )
    {
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( statement, Material::None, NULL, ShaderFeature::RenderTarget1 ) ) );
-      meta->addStatement( new GenOp( "   @.a = 0.0001;\r\n", LangElement::find( getOutputTargetVarName(ShaderFeature::RenderTarget1) ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( statement, Material::None, NULL, RenderTarget1 ) ) );
+      meta->addStatement( new GenOp( "   @.a = 0.0001;\r\n", LangElement::find( sHelper->getOutputTargetVarName(RenderTarget1) ) ) );
    }
    else
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( statement, Material::Mul ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( statement, Material::Mul ) ) );
 
    output = meta;
 }
@@ -1135,7 +840,7 @@ void LightmapFeatHLSL::setTexData(  Material::StageData &stageDat,
 
 U32 LightmapFeatHLSL::getOutputTargets( const MaterialFeatureData &fd ) const
 {
-   return fd.features[MFT_LightbufferMRT] ? ShaderFeature::RenderTarget1 : ShaderFeature::DefaultTarget;
+   return fd.features[MFT_LightbufferMRT] ? RenderTarget1 : DefaultTarget;
 }
 
 //****************************************************************************
@@ -1149,7 +854,7 @@ void TonemapFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
 
    // Set up the second set of texCoords
-   Var *inTex2 = getVertTexCoord( "texCoord2" );
+   Var *inTex2 = sHelper->getVertTexCoord( "texCoord2" );
 
    if ( inTex2 )
    {
@@ -1229,11 +934,11 @@ void TonemapFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
    // Assign to proper render target
    if( fd.features[MFT_LightbufferMRT] )
    {
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( toneMapColor, Material::None, NULL, ShaderFeature::RenderTarget1 ) ) );
-      meta->addStatement( new GenOp( "   @.a = 0.0001;\r\n", LangElement::find( getOutputTargetVarName(ShaderFeature::RenderTarget1) ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( toneMapColor, Material::None, NULL, RenderTarget1 ) ) );
+      meta->addStatement( new GenOp( "   @.a = 0.0001;\r\n", LangElement::find( sHelper->getOutputTargetVarName(RenderTarget1) ) ) );
    }
    else
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( toneMapColor, blendOp ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( toneMapColor, blendOp ) ) );
   
    output = meta;
 }
@@ -1264,7 +969,7 @@ void TonemapFeatHLSL::setTexData(  Material::StageData &stageDat,
 
 U32 TonemapFeatHLSL::getOutputTargets( const MaterialFeatureData &fd ) const
 {
-   return fd.features[MFT_LightbufferMRT] ? ShaderFeature::RenderTarget1 : ShaderFeature::DefaultTarget;
+   return fd.features[MFT_LightbufferMRT] ? RenderTarget1 : DefaultTarget;
 }
 
 //****************************************************************************
@@ -1379,18 +1084,18 @@ void VertLitHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    // Output the color
    if ( fd.features[MFT_LightbufferMRT] )
    {
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( outColor, Material::None, NULL, ShaderFeature::RenderTarget1 ) ) );
-      meta->addStatement( new GenOp( "   @.a = 0.0001;\r\n", LangElement::find( getOutputTargetVarName(ShaderFeature::RenderTarget1) ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( outColor, Material::None, NULL, RenderTarget1 ) ) );
+      meta->addStatement( new GenOp( "   @.a = 0.0001;\r\n", LangElement::find( sHelper->getOutputTargetVarName(RenderTarget1) ) ) );
    }
    else
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( outColor, blendOp ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( outColor, blendOp ) ) );
 
    output = meta;
 }
 
 U32 VertLitHLSL::getOutputTargets( const MaterialFeatureData &fd ) const
 {
-   return fd.features[MFT_LightbufferMRT] ? ShaderFeature::RenderTarget1 : ShaderFeature::DefaultTarget;
+   return fd.features[MFT_LightbufferMRT] ? RenderTarget1 : DefaultTarget;
 }
 
 //****************************************************************************
@@ -1411,7 +1116,7 @@ void DetailFeatHLSL::processPix( Vector<ShaderComponent*> &componentList,
                                  const MaterialFeatureData &fd )
 {
    // Get the detail texture coord.
-   Var *inTex = getInTexCoord( "detCoord", "float2", true, componentList );
+   Var *inTex = sHelper->getInTexCoord( "detCoord", "float2", true, componentList );
 
    // create texture var
    Var *detailMap = new Var;
@@ -1429,7 +1134,7 @@ void DetailFeatHLSL::processPix( Vector<ShaderComponent*> &componentList,
    // and a simple multiplication with the detail map.
 
    LangElement *statement = new GenOp( "( tex2D(@, @) * 2.0 ) - 1.0", detailMap, inTex );
-   output = new GenOp( "   @;\r\n", assignColor( statement, Material::Add ) );
+   output = new GenOp( "   @;\r\n", sHelper->assignColor( statement, Material::Add ) );
 }
 
 ShaderFeature::Resources DetailFeatHLSL::getResources( const MaterialFeatureData &fd )
@@ -1521,7 +1226,7 @@ void ReflectCubeFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
           fd.materialFeatures[MFT_NormalMap] )
       {
          // find incoming texture var
-         Var *inTex = getVertTexCoord( "texCoord" );
+         Var *inTex = sHelper->getVertTexCoord( "texCoord" );
 
          // grab connector texcoord register
          ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
@@ -1606,7 +1311,7 @@ void ReflectCubeFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
           fd.materialFeatures[MFT_NormalMap] )
       {
          // grab connector texcoord register
-         Var *inTex = getInTexCoord( "texCoord", "float2", true, componentList );
+         Var *inTex = sHelper->getInTexCoord( "texCoord", "float2", true, componentList );
       
          // create texture var
          Var *newMap = new Var;
@@ -1680,7 +1385,7 @@ void ReflectCubeFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
          blendOp = Material::Mul;
    }
 
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( texCube, blendOp, lerpVal ) ) );         
+   meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( texCube, blendOp, lerpVal ) ) );         
    output = meta;
 }
 
@@ -1944,7 +1649,7 @@ void RTLightingFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
 
    // Apply the lighting to the diffuse color.
    LangElement *lighting = new GenOp( "float4( @.rgb + @.rgb, 1 )", rtShading, ambient );
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( lighting, Material::Mul ) ) );
+   meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( lighting, Material::Mul ) ) );
    output = meta;  
 }
 
@@ -2153,7 +1858,7 @@ void VisibilityFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    // Get the visibility constant.
    Var *visibility = NULL;
    if ( fd.features[ MFT_UseInstancing ] )
-      visibility = getInTexCoord( "visibility", "float", false, componentList );
+      visibility = sHelper->getInTexCoord( "visibility", "float", false, componentList );
    else
    {
       visibility = (Var*)LangElement::find( "visibility" );
@@ -2261,7 +1966,7 @@ void RenderTargetZeroHLSL::processPix( Vector<ShaderComponent*> &componentList, 
 {
    // Do not actually assign zero, but instead a number so close to zero it may as well be zero.
    // This will prevent a divide by zero causing an FP special on float render targets
-   output = new GenOp( "   @;\r\n", assignColor( new GenOp( "0.00001" ), Material::None, NULL, mOutputTargetMask ) );
+   output = new GenOp( "   @;\r\n", sHelper->assignColor( new GenOp( "0.00001" ), Material::None, NULL, mOutputTargetMask ) );
 }
 
 

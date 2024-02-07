@@ -116,7 +116,7 @@ ShaderFeature::Resources PixelSpecularHLSL::getResources( const MaterialFeatureD
 void SpecularMapHLSL::processPix( Vector<ShaderComponent*> &componentList, const MaterialFeatureData &fd )
 {
    // Get the texture coord.
-   Var *texCoord = getInTexCoord( "texCoord", "float2", true, componentList );
+   Var *texCoord = sHelper->getInTexCoord( "texCoord", "float2", true, componentList );
 
    // create texture var
    Var *specularMap = new Var;

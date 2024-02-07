@@ -47,19 +47,6 @@ public:
                         MultiLine *meta,
                         Vector<ShaderComponent*> &componentList );
 
-   /// Returns an input texture coord by name adding it
-   /// to the input connector if it doesn't exist.
-   static Var* getInTexCoord( const char *name,
-                              const char *type,
-                              bool mapsToSampler,
-                              Vector<ShaderComponent*> &componentList );
-
-   /// Returns the "objToTangentSpace" transform or creates one if this
-   /// is the first feature to need it.
-   Var* getOutObjToTangentSpace( Vector<ShaderComponent*> &componentList,
-                                 MultiLine *meta,
-                                 const MaterialFeatureData &fd );
-
    /// Returns the existing output "worldToTangent" transform or 
    /// creates one if this is the first feature to need it.
    Var* getOutWorldToTangent( Vector<ShaderComponent*> &componentList,
@@ -70,16 +57,6 @@ public:
    /// adding it to the input connector if it doesn't exist.
    static Var* getInWorldToTangent( Vector<ShaderComponent*> &componentList );
    
-   /// Returns the existing output "viewToTangent" transform or 
-   /// creates one if this is the first feature to need it.
-   Var* getOutViewToTangent( Vector<ShaderComponent*> &componentList,
-      MultiLine *meta,
-      const MaterialFeatureData &fd );
-
-   /// Returns the input "viewToTangent" space transform 
-   /// adding it to the input connector if it doesn't exist.
-   static Var* getInViewToTangent( Vector<ShaderComponent*> &componentList );
-	
 	/// Calculates the world space position in the vertex shader and 
    /// assigns it to the passed language element.  It does not pass    /// it across the connector to the pixel shader.
    /// @see addOutWsPosition
@@ -113,42 +90,16 @@ public:
    Var* getModelView( Vector<ShaderComponent*> &componentList,                                       
 							bool useInstancing,
 							MultiLine *meta );
-	
-   ///
-   Var* getInvWorldView( Vector<ShaderComponent*> &componentList,                                       
-								bool useInstancing,
-								MultiLine *meta );
-		
-
-   // ShaderFeature
-   Var* getVertTexCoord( const String &name );
-   LangElement* setupTexSpaceMat(  Vector<ShaderComponent*> &componentList, Var **texSpaceMat );
-   LangElement* assignColor( LangElement *elem, Material::BlendOp blend, LangElement *lerpElem = NULL, ShaderFeature::OutputTarget outputTarget = ShaderFeature::DefaultTarget );
-   LangElement* expandNormalMap( LangElement *sampleNormalOp, LangElement *normalDecl, LangElement *normalVar, const MaterialFeatureData &fd );
 };
-
-
-class NamedFeatureGLSL : public ShaderFeatureGLSL
-{
-protected:
-   String mName;
-
-public:
-   NamedFeatureGLSL( const String &name )
-      : mName( name )
-   {}
-
-   virtual String getName() { return mName; }
-};
-
 
 class RenderTargetZeroGLSL : public ShaderFeatureGLSL
 {
-protected:   ShaderFeature::OutputTarget mOutputTargetMask;
+protected:
+   OutputTarget mOutputTargetMask;
    String mFeatureName;
 	
 public:
-   RenderTargetZeroGLSL( const ShaderFeature::OutputTarget target )
+   RenderTargetZeroGLSL( OutputTarget target )
 	: mOutputTargetMask( target )
    {
       char buffer[256];      dSprintf(buffer, sizeof(buffer), "Render Target Output = 0.0, output mask %04b", mOutputTargetMask);

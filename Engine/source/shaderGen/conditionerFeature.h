@@ -59,14 +59,8 @@ public:
    virtual GFXFormat getBufferFormat() const { return mBufferFormat; }
    virtual bool setBufferFormat(const GFXFormat bufferFormat) { bool ret = mBufferFormat == bufferFormat; mBufferFormat = bufferFormat; return ret; }
 
-   // zero-out these methods
-   virtual Var* getVertTexCoord( const String &name ) { AssertFatal( false, "don't use this." ); return NULL; }
-   virtual LangElement *setupTexSpaceMat(  Vector<ShaderComponent*> &componentList, Var **texSpaceMat ) { AssertFatal( false, "don't use this." );  return NULL; }
-   virtual LangElement *expandNormalMap( LangElement *sampleNormalOp, LangElement *normalDecl, LangElement *normalVar, const MaterialFeatureData &fd ) { AssertFatal( false, "don't use this." );  return NULL; }
-   virtual LangElement *assignColor( LangElement *elem, Material::BlendOp blend, LangElement *lerpElem = NULL, ShaderFeature::OutputTarget outputTarget = ShaderFeature::DefaultTarget ) { AssertFatal( false, "don't use this." ); return NULL; }
-
    // conditioned output
-   virtual LangElement *assignOutput( Var *unconditionedOutput, ShaderFeature::OutputTarget outputTarget = ShaderFeature::DefaultTarget );
+   virtual LangElement *assignOutput( Var *unconditionedOutput, OutputTarget outputTarget = DefaultTarget );
 
    // Get an HLSL/GLSL method name that will be available for the 
    // shader to read or write data to a conditioned buffer.

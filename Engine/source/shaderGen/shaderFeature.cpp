@@ -46,18 +46,6 @@ ShaderFeature::Resources ShaderFeature::getResources( const MaterialFeatureData 
    return temp; 
 }
 
-const char* ShaderFeature::getOutputTargetVarName( OutputTarget target ) const
-{
-   const char* targName = "col";
-   if ( target != DefaultTarget )
-   {
-      targName = "col1";
-      AssertFatal(target == RenderTarget1, "yeah Pat is lame and didn't want to do bit math stuff, TODO");
-   }
-
-   return targName;
-}
-
 Var* ShaderFeature::findOrCreateLocal( const char *name, 
                                        const char *type, 
                                        MultiLine *multi )

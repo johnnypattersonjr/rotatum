@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -104,7 +105,7 @@ void EyeSpaceDepthOutHLSL::processPix( Vector<ShaderComponent*> &componentList,
    // If there isn't an output conditioner for the pre-pass, than just write
    // out the depth to rgba and return.
    if( !fd.features[MFT_PrePassConditioner] )
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "float4(@.rrr,1)", depthOut ), Material::None ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", sHelper->assignColor( new GenOp( "float4(@.rrr,1)", depthOut ), Material::None ) ) );
    
    output = meta;
 }
@@ -160,7 +161,7 @@ void DepthOutHLSL::processPix(   Vector<ShaderComponent*> &componentList,
 
    LangElement *depthOut = new GenOp( "float4( @, 0, 0, 1 )", depthVar );
 
-   output = new GenOp( "   @;\r\n", assignColor( depthOut, Material::None ) );
+   output = new GenOp( "   @;\r\n", sHelper->assignColor( depthOut, Material::None ) );
 }
 
 ShaderFeature::Resources DepthOutHLSL::getResources( const MaterialFeatureData &fd )

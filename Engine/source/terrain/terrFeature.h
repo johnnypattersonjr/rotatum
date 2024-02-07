@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,12 +21,9 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _TERRFEATUREHLSL_H_
-#define _TERRFEATUREHLSL_H_
+#pragma once
 
-#ifndef _SHADERGEN_HLSL_SHADERFEATUREHLSL_H_
-#include "shaderGen/HLSL/shaderFeatureHLSL.h"
-#endif
+#include "shaderGen/shaderFeature.h"
 #ifndef _LANG_ELEMENT_H_
 #include "shaderGen/langElement.h"
 #endif
@@ -33,7 +31,7 @@
 
 /// A shared base class for terrain features which
 /// includes some helper functions.
-class TerrainFeatHLSL : public ShaderFeatureHLSL
+class TerrainFeat : public ShaderFeature
 {
 protected:
 
@@ -48,7 +46,7 @@ protected:
 };
 
 
-class TerrainBaseMapFeatHLSL : public TerrainFeatHLSL
+class TerrainBaseMapFeat : public TerrainFeat
 {
 public:
 
@@ -64,7 +62,7 @@ public:
 };
 
 
-class TerrainDetailMapFeatHLSL : public TerrainFeatHLSL
+class TerrainDetailMapFeat : public TerrainFeat
 {
 protected:
 
@@ -73,7 +71,7 @@ protected:
 
 public:
 
-   TerrainDetailMapFeatHLSL();
+   TerrainDetailMapFeat();
 
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
@@ -87,7 +85,7 @@ public:
 };
 
 
-class TerrainNormalMapFeatHLSL : public TerrainFeatHLSL
+class TerrainNormalMapFeat : public TerrainFeat
 {
 public:
 
@@ -102,7 +100,7 @@ public:
    virtual String getName() { return "Terrain Normal Texture"; }
 };
 
-class TerrainLightMapFeatHLSL : public TerrainFeatHLSL
+class TerrainLightMapFeat : public TerrainFeat
 {
 public:
 
@@ -115,7 +113,7 @@ public:
 };
 
 
-class TerrainAdditiveFeatHLSL : public TerrainFeatHLSL
+class TerrainAdditiveFeat : public TerrainFeat
 {
 public:
 
@@ -124,5 +122,3 @@ public:
 
    virtual String getName() { return "Terrain Additive"; }
 };
-
-#endif // _TERRFEATUREHLSL_H_

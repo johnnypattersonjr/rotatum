@@ -77,18 +77,6 @@ public:
 //**************************************************************************
 class ShaderFeature
 {
-public:
-
-   // Bitfield which allows a shader feature to say which render targets it outputs
-   // data to (could be more than one).
-   enum OutputTarget
-   {
-      DefaultTarget =   1 << 0,
-      RenderTarget1 =   1 << 1,
-      RenderTarget2 =   1 << 2,
-      RenderTarget3 =   1 << 3,
-   };
-
 protected:
 
    LangElement *output;
@@ -160,32 +148,6 @@ public:
    // Virtual Functions
    //-----------------------------------------------------------------------
    
-   /// Get the incoming base texture coords - useful for bumpmap and detail maps
-   virtual Var* getVertTexCoord( const String &name ) = 0;
-
-   /// Set up a texture space matrix - to pass into pixel shader
-   virtual LangElement * setupTexSpaceMat(  Vector<ShaderComponent*> &componentList, 
-      Var **texSpaceMat ) = 0;
-
-   /// Expand and assign a normal map. This takes care of compressed normal maps as well.
-   virtual LangElement * expandNormalMap( LangElement *sampleNormalOp, 
-      LangElement *normalDecl, LangElement *normalVar, const MaterialFeatureData &fd ) = 0;
-
-   /// Helper function for applying the color to shader output.
-   ///
-   /// @param elem         The rbg or rgba color to assign.
-   ///
-   /// @param blend        The type of blending to perform.
-   ///
-   /// @param lerpElem     The optional lerp parameter when doing a LerpAlpha blend, 
-   ///                     if not set then the elem is used.
-   ///
-   virtual LangElement* assignColor(   LangElement *elem, 
-                                       Material::BlendOp blend, 
-                                       LangElement *lerpElem = NULL,
-                                       ShaderFeature::OutputTarget outputTarget = ShaderFeature::DefaultTarget ) = 0;
-
-
    //-----------------------------------------------------------------------
    /*!
       Process vertex shader - This function is used by each feature to
@@ -271,9 +233,6 @@ public:
    /// Gets the render target this shader feature is assigning data to.
    virtual U32 getOutputTargets( const MaterialFeatureData &fd ) const { return DefaultTarget; }
 
-   /// Returns the name of output targer var.
-   const char* getOutputTargetVarName( OutputTarget target = DefaultTarget ) const;
-
    // Called from ProcessedShaderMaterial::determineFeatures to enable/disable features.
    virtual void determineFeature(   Material *material, 
                                     const GFXVertexFormat *vertexFormat,
@@ -294,6 +253,19 @@ public:
    static Var* findOrCreateLocal(   const char *name, 
                                     const char *type, 
                                     MultiLine *multi );
+};
+
+class NamedFeature : public ShaderFeature
+{
+protected:
+   String mName;
+
+public:
+   NamedFeature( const String &name )
+      : mName( name )
+   {}
+
+   virtual String getName() { return mName; }
 };
 
 #endif // _SHADERFEATURE_H_

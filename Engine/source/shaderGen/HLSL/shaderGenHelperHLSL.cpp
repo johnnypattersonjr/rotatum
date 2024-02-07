@@ -24,6 +24,7 @@
 #include "shaderGenHelperHLSL.h"
 
 #include "gfx/gfxDevice.h"
+#include "materials/materialFeatureTypes.h"
 
 Var* ShaderGenHelperHLSL::addOutVpos(MultiLine* meta, Vector<ShaderComponent*>& componentList)
 {
@@ -52,6 +53,94 @@ Var* ShaderGenHelperHLSL::addOutVpos(MultiLine* meta, Vector<ShaderComponent*>& 
 	}
 
 	return outVpos;
+}
+
+LangElement* ShaderGenHelperHLSL::assignColor(LangElement* elem, Material::BlendOp blend, LangElement* lerpElem,
+                                              OutputTarget outputTarget)
+{
+	// search for color var
+	Var* color = (Var*)LangElement::find(getOutputTargetVarName(outputTarget));
+
+	if ( !color )
+	{
+		// create color var
+		color = new Var;
+		color->setType("fragout");
+		color->setName(getOutputTargetVarName(outputTarget));
+		color->setStructName("OUT");
+
+		return new GenOp("@ = @", color, elem);
+	}
+
+	LangElement* assign;
+
+	switch (blend)
+	{
+	case Material::Add:
+		assign = new GenOp("@ += @", color, elem);
+		break;
+
+	case Material::Sub:
+		assign = new GenOp("@ -= @", color, elem);
+		break;
+
+	case Material::Mul:
+		assign = new GenOp("@ *= @", color, elem);
+		break;
+
+	case Material::AddAlpha:
+		assign = new GenOp("@ += @ * @.a", color, elem, elem);
+		break;
+
+	case Material::LerpAlpha:
+		if (!lerpElem)
+			lerpElem = elem;
+		assign = new GenOp("@.rgb = lerp(@.rgb, (@).rgb, (@).a)", color, color, elem, lerpElem);
+		break;
+
+	case Material::ToneMap:
+		assign = new GenOp("@ = 1.0 - exp(-1.0 * @ * @)", color, color, elem);
+		break;
+
+	default:
+		AssertFatal(false, "Unrecognized color blendOp");
+		// Fallthru
+
+	case Material::None:
+		assign = new GenOp("@ = @", color, elem);
+		break;
+	}
+
+	return assign;
+}
+
+LangElement* ShaderGenHelperHLSL::expandNormalMap(LangElement* sampleNormalOp, LangElement* normalDecl, LangElement* normalVar,
+                                                  const MaterialFeatureData& fd, S32 processIndex)
+{
+	MultiLine* meta = new MultiLine;
+
+	if (fd.features.hasFeature(MFT_IsDXTnm, processIndex))
+	{
+		if (fd.features[MFT_ImposterVert])
+		{
+			// The imposter system uses object space normals and
+			// encodes them with the z axis in the alpha component.
+			meta->addStatement(new GenOp("   @ = float4(normalize( @.xyw * 2.0 - 1.0), 0.0); // Obj DXTnm\r\n", normalDecl, sampleNormalOp));
+		}
+		else
+		{
+			// DXT Swizzle trick
+			meta->addStatement(new GenOp("   @ = float4(@.ag * 2.0 - 1.0, 0.0, 0.0); // DXTnm\r\n", normalDecl, sampleNormalOp));
+			meta->addStatement(new GenOp("   @.z = sqrt(1.0 - dot(@.xy, @.xy)); // DXTnm\r\n", normalVar, normalVar, normalVar));
+		}
+	}
+	else
+	{
+		meta->addStatement(new GenOp("   @ = @;\r\n", normalDecl, sampleNormalOp));
+		meta->addStatement(new GenOp("   @.xyz = @.xyz * 2.0 - 1.0;\r\n", normalVar, normalVar));
+	}
+
+	return meta;
 }
 
 Var* ShaderGenHelperHLSL::getInVpos(MultiLine* meta, Vector<ShaderComponent*>& componentList)
@@ -121,6 +210,37 @@ Var* ShaderGenHelperHLSL::getObjTrans(Vector<ShaderComponent*>& componentList, b
 	return objTrans;
 }
 
+Var* ShaderGenHelperHLSL::getVertTexCoord(const String &name)
+{
+	Var* inTex = NULL;
+
+	for (U32 i = 0; i < LangElement::elementList.size(); i++)
+	{
+		if (!dStrcmp((char*)LangElement::elementList[i]->name, name.c_str()))
+		{
+			inTex = dynamic_cast<Var*>(LangElement::elementList[i]);
+			if (inTex)
+			{
+				// NOTE: This used to do this check...
+				//
+				// dStrcmp((char*)inTex->structName, "IN")
+				//
+				// ... to ensure that the var was from the input
+				// vertex structure, but this kept some features
+				// ( ie. imposter vert ) from decoding their own
+				// coords for other features to use.
+				//
+				// If we run into issues with collisions between
+				// IN vars and local vars we may need to revise.
+
+				break;
+			}
+		}
+	}
+
+	return inTex;
+}
+
 Var* ShaderGenHelperHLSL::getWorldView(Vector<ShaderComponent*>& componentList, bool useInstancing, GFXVertexFormat* instancingFormat, MultiLine* meta)
 {
 	Var* worldView = (Var*)LangElement::find("worldViewOnly");
@@ -157,4 +277,46 @@ Var* ShaderGenHelperHLSL::getWorldView(Vector<ShaderComponent*>& componentList, 
 	}
 
 	return worldView;
+}
+
+LangElement* ShaderGenHelperHLSL::setupTexSpaceMat(Vector<ShaderComponent*>& componentList, Var** texSpaceMat)
+{
+	Var* N = (Var*)LangElement::find("normal");
+	Var* B = (Var*)LangElement::find("B");
+	Var* T = (Var*)LangElement::find("T");
+
+	Var* tangentW = (Var*)LangElement::find("tangentW");
+
+	// setup matrix var
+	*texSpaceMat = new Var;
+	(*texSpaceMat)->setType("float3x3");
+	(*texSpaceMat)->setName("objToTangentSpace");
+
+	MultiLine* meta = new MultiLine;
+	meta->addStatement(new GenOp("   @;\r\n", new DecOp(*texSpaceMat)));
+
+	// Protect against missing normal and tangent.
+	if (!N || !T)
+	{
+		meta->addStatement(new GenOp("   @[0] = float3(1, 0, 0); @[1] = float3(0, 1, 0); @[2] = float3(0, 0, 1);\r\n", *texSpaceMat, *texSpaceMat, *texSpaceMat));
+		return meta;
+	}
+
+	meta->addStatement(new GenOp("   @[0] = @;\r\n", *texSpaceMat, T));
+	if (B)
+	{
+		meta->addStatement(new GenOp("   @[1] = @;\r\n", *texSpaceMat, B));
+	}
+	else
+	{
+		if (dStricmp((char*)T->type, "float4") == 0)
+			meta->addStatement(new GenOp("   @[1] = cross(@, normalize(@)) * @.w;\r\n", *texSpaceMat, T, N, T));
+		else if(tangentW)
+			meta->addStatement(new GenOp("   @[1] = cross(@, normalize(@)) * @;\r\n", *texSpaceMat, T, N, tangentW));
+		else
+			meta->addStatement(new GenOp("   @[1] = cross(@, normalize(@));\r\n", *texSpaceMat, T, N));
+	}
+	meta->addStatement(new GenOp("   @[2] = normalize(@);\r\n", *texSpaceMat, N));
+
+	return meta;
 }
