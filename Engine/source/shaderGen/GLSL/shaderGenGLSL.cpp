@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -80,6 +81,7 @@ void ShaderGenPrinterGLSL::printLine(Stream& stream, const String& line)
 
 const char* ShaderGenComponentFactoryGLSL::typeToString( GFXDeclType type )
 {
+   // Use HLSL types and rely on compatibility aliases until string-based type checking is removed.
    switch ( type )
    {
       default:
@@ -87,14 +89,14 @@ const char* ShaderGenComponentFactoryGLSL::typeToString( GFXDeclType type )
          return "float";
 
       case GFXDeclType_Float2:
-         return "vec2";
+         return "float2";
 
       case GFXDeclType_Float3:
-         return "vec3";
+         return "float3";
 
       case GFXDeclType_Float4:
       case GFXDeclType_Color:
-         return "vec4";
+         return "float4";
    }
 }
 
@@ -138,9 +140,9 @@ ShaderComponent* ShaderGenComponentFactoryGLSL::createVertexInputConnector( cons
       {
          var = vertComp->getElement( RT_TEXCOORD );
          if ( element.getSemanticIndex() == 0 )
-            var->setName( "texCoord" );
+            var->setName( "vert_texCoord" );
          else
-            var->setName( String::ToString( "texCoord%d", element.getSemanticIndex() + 1 ) );
+            var->setName( String::ToString( "vert_texCoord%d", element.getSemanticIndex() + 1 ) );
       }
       else
       {

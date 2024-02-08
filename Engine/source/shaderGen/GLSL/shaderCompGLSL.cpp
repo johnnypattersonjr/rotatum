@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -118,9 +119,9 @@ void AppVertConnectorGLSL::print( Stream &stream )
       const char* swizzle;
       if(!dStrcmp((const char*)var->type, "float"))
          swizzle = "x";
-      else if(!dStrcmp((const char*)var->type, "vec2"))
+      else if(!dStrcmp((const char*)var->type, "float2") || !dStrcmp((const char*)var->type, "vec2"))
          swizzle = "xy";
-      else if(!dStrcmp((const char*)var->type, "vec3"))
+      else if(!dStrcmp((const char*)var->type, "float3") || !dStrcmp((const char*)var->type, "vec3"))
          swizzle = "xyz";
       else
          swizzle = "xyzw";

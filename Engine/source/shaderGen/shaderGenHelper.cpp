@@ -45,6 +45,97 @@ Var* ShaderGenHelper::getInTexCoord(const char* name, const char* type, bool map
 	return texCoord;
 }
 
+Var* ShaderGenHelper::getInWorldToTangent(Vector<ShaderComponent*>& componentList)
+{
+	Var* worldToTangent = (Var*)LangElement::find("worldToTangent");
+	if (!worldToTangent)
+	{
+		ShaderConnector* connectComp = dynamic_cast<ShaderConnector*>(componentList[C_CONNECTOR]);
+		worldToTangent = connectComp->getElement(RT_TEXCOORD, 1, 3);
+		worldToTangent->setName("worldToTangent");
+		if (GFX->getAdapterType() == Direct3D9)
+			worldToTangent->setStructName("IN");
+		worldToTangent->setType("float3x3");
+	}
+
+	return worldToTangent;
+}
+
+Var* ShaderGenHelper::getNormalMapTex()
+{
+	Var* normalMap = (Var*)LangElement::find("bumpMap");
+	if (!normalMap)
+	{
+		normalMap = new Var;
+		normalMap->setType("sampler2D");
+		normalMap->setName("bumpMap");
+		normalMap->uniform = true;
+		normalMap->sampler = true;
+		normalMap->constNum = Var::getTexUnitNum();
+	}
+
+	return normalMap;
+}
+
+Var* ShaderGenHelper::getOutWorldToTangent(Vector<ShaderComponent*>& componentList, GFXVertexFormat* instancingFormat, MultiLine* meta, const MaterialFeatureData& fd)
+{
+	Var* worldToTangent = (Var*)LangElement::find("worldToTangent");
+	if (!worldToTangent)
+	{
+		Var* texSpaceMat = getOutObjToTangentSpace(componentList, meta, fd);
+
+		if (!fd.features[MFT_ParticleNormal])
+		{
+			// turn obj->tangent into world->tangent
+			ShaderConnector* connectComp = dynamic_cast<ShaderConnector*>(componentList[C_CONNECTOR]);
+			worldToTangent = connectComp->getElement(RT_TEXCOORD, 1, 3);
+			worldToTangent->setName("worldToTangent");
+			if (GFX->getAdapterType() == Direct3D9)
+				worldToTangent->setStructName("OUT");
+			worldToTangent->setType("float3x3");
+
+			// Get the world->obj transform
+			Var* worldToObj = (Var*)LangElement::find("worldToObj");
+			if (!worldToObj)
+			{
+				worldToObj = new Var;
+				worldToObj->setName("worldToObj");
+
+				if (fd.features[MFT_UseInstancing])
+				{
+					// We just use transpose to convert the 3x3 portion of
+					// the object transform to its inverse.
+					worldToObj->setType("float3x3");
+					Var *objTrans = getObjTrans(componentList, true, instancingFormat, meta);
+					if (GFX->getAdapterType() == Direct3D9)
+						meta->addStatement(new GenOp( "   @ = transpose((float3x3)@); // Instancing!\r\n", new DecOp(worldToObj), objTrans));
+					else
+						meta->addStatement(new GenOp( "   @ = transpose(mat3(@)); // Instancing!\r\n", new DecOp(worldToObj), objTrans));
+				}
+				else
+				{
+					worldToObj->setType("float4x4");
+					worldToObj->uniform = true;
+					worldToObj->constSortPos = cspPrimitive;
+				}
+			}
+
+			// assign world->tangent transform
+			if (GFX->getAdapterType() == Direct3D9)
+				meta->addStatement(new GenOp( "   @ = mul(@, (float3x3)@);\r\n", worldToTangent, texSpaceMat, worldToObj));
+			else
+				meta->addStatement(new GenOp( "   @ = @ * mat3(@);\r\n", worldToTangent, texSpaceMat, worldToObj));
+		}
+		else
+		{
+			// Assume particle normal generation has set this up in the proper space
+			worldToTangent = texSpaceMat;
+		}
+	}
+
+	return worldToTangent;
+}
+
 Var* ShaderGenHelper::getInViewToTangent(Vector<ShaderComponent*>& componentList)
 {
 	Var* viewToTangent = (Var*)LangElement::find("viewToTangent");
@@ -75,10 +166,13 @@ Var* ShaderGenHelper::getInvWorldView(Vector<ShaderComponent*>& componentList, b
 		viewToObj->setType("float3x3");
 		viewToObj->setName("viewToObj");
 
-		// We just use transpose to convert the 3x3 portion 
+		// We just use transpose to convert the 3x3 portion
 		// of the world view transform into its inverse.
 
-		meta->addStatement(new GenOp("   @ = transpose((float3x3)@); // Instancing!\r\n", new DecOp(viewToObj), worldView));
+		if (GFX->getAdapterType() == Direct3D9)
+			meta->addStatement(new GenOp("   @ = transpose((float3x3)@); // Instancing!\r\n", new DecOp(viewToObj), worldView));
+		else
+			meta->addStatement(new GenOp("   @ = transpose(mat3(@)); // Instancing!\r\n", new DecOp(viewToObj), worldView));
 	}
 	else
 	{

@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,13 +24,19 @@
 // These are some simple wrappers for simple 
 // HLSL compatibility.
 
-#define float4 vec4
-#define float3 vec3
 #define float2 vec2
+#define float2x2 mat2
+#define float3 vec3
+#define float3x3 mat3
+#define float4 vec4
+#define float4x4 mat4
 
 #define texCUBE textureCube
 #define tex2D texture2D
+#define tex2Dlod texture2DLod
 
+#define atan2 atan
+#define frac fract
 #define lerp mix
 
 float saturate( float val ) { return clamp( val, 0.0, 1.0 ); }

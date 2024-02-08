@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,29 +21,23 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _BUMP_HLSL_H_
-#define _BUMP_HLSL_H_
+#pragma once
 
-#ifndef _SHADERGEN_HLSL_SHADERFEATUREHLSL_H_
-#include "shaderGen/HLSL/shaderFeatureHLSL.h"
-#endif
-#ifndef _LANG_ELEMENT_H_
 #include "shaderGen/langElement.h"
-#endif
+#include "shaderGen/shaderFeature.h"
 
 struct RenderPassData;
 class MultiLine;
-
 
 /// The Bumpmap feature will read the normal map and
 /// transform it by the inverse of the worldToTanget 
 /// matrix.  This normal is then used by subsequent
 /// shader features.
-class BumpFeatHLSL : public ShaderFeatureHLSL
+class BumpFeat : public ShaderFeature
 {
 public:
 
-   // ShaderFeatureHLSL
+   // ShaderFeature
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
    virtual void processPix( Vector<ShaderComponent*> &componentList, 
@@ -60,7 +55,7 @@ public:
 /// This feature either generates the cheap yet effective offset
 /// mapping style parallax or the much more expensive occlusion 
 /// mapping technique based on the enabled feature flags.
-class ParallaxFeatHLSL : public ShaderFeatureHLSL
+class ParallaxFeat : public ShaderFeature
 {
 protected:
 
@@ -72,9 +67,9 @@ protected:
 
 public:
 
-   ParallaxFeatHLSL();
+   ParallaxFeat();
 
-   // ShaderFeatureHLSL
+   // ShaderFeature
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
    virtual void processPix(   Vector<ShaderComponent*> &componentList, 
@@ -90,11 +85,11 @@ public:
 
 /// This feature is used to render normals to the 
 /// diffuse target for imposter rendering.
-class NormalsOutFeatHLSL : public ShaderFeatureHLSL
+class NormalsOutFeat : public ShaderFeature
 {
 public:
 
-   // ShaderFeatureHLSL
+   // ShaderFeature
    virtual void processVert(  Vector<ShaderComponent*> &componentList,
                               const MaterialFeatureData &fd );
    virtual void processPix( Vector<ShaderComponent*> &componentList, 
@@ -102,5 +97,3 @@ public:
    virtual Material::BlendOp getBlendOp(){ return Material::LerpAlpha; }  
    virtual String getName() { return "NormalsOut"; }
 };
-
-#endif // _BUMP_HLSL_H_

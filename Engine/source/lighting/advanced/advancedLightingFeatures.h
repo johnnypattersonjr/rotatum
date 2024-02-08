@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,6 +27,7 @@
 #include "gfx/gfxEnums.h"
 #endif
 
+#include "shaderGen/bump.h"
 
 class AdvancedLightingFeatures
 {
@@ -37,6 +39,33 @@ public:
 private:
 
    static bool smFeaturesRegistered;
+};
+
+/// Used to write the normals during the depth/normal prepass.
+class DeferredBumpFeat : public BumpFeat
+{
+   typedef BumpFeat Parent;
+
+public:
+   virtual void processVert(  Vector<ShaderComponent*> &componentList,
+                              const MaterialFeatureData &fd );
+
+   virtual void processPix(   Vector<ShaderComponent*> &componentList,
+                              const MaterialFeatureData &fd );
+
+   virtual Material::BlendOp getBlendOp() { return Material::LerpAlpha; }
+
+   virtual Resources getResources( const MaterialFeatureData &fd );
+
+   virtual void setTexData(   Material::StageData &stageDat,
+                              const MaterialFeatureData &fd,
+                              RenderPassData &passData,
+                              U32 &texIndex );
+
+   virtual String getName()
+   {
+      return "Bumpmap [Deferred]";
+   }
 };
 
 #endif // _ADVANCEDLIGHTINGFEATURES_H_

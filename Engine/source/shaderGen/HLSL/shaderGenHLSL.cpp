@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------------
+// Copyright (c) Johnny Patterson
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -158,9 +159,9 @@ ShaderComponent* ShaderGenComponentFactoryHLSL::createVertexInputConnector( cons
       {
          var = vertComp->getIndexedElement( element.getSemanticIndex(), RT_TEXCOORD );
          if ( element.getSemanticIndex() == 0 )
-            var->setName( "texCoord" );
+            var->setName( "vert_texCoord" );
          else
-            var->setName( String::ToString( "texCoord%d", element.getSemanticIndex() + 1 ) );
+            var->setName( String::ToString( "vert_texCoord%d", element.getSemanticIndex() + 1 ) );
       }
       else
       {

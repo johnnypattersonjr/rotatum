@@ -26,6 +26,57 @@
 #include "gfx/gfxDevice.h"
 #include "materials/materialFeatureTypes.h"
 
+Var* ShaderGenHelperHLSL::addOutDetailTexCoord(Vector<ShaderComponent*>& componentList, MultiLine* meta, bool useTexAnim)
+{
+	// Check if its already added.
+	Var* outTex = (Var*)LangElement::find("detCoord");
+	if (outTex)
+		return outTex;
+
+	// Grab incoming texture coords.
+	Var* inTex = getVertTexCoord("vert_texCoord");
+
+	// create detail variable
+	Var* detScale = new Var;
+	detScale->setType("float2");
+	detScale->setName("detailScale");
+	detScale->uniform = true;
+	detScale->constSortPos = cspPotentialPrimitive;
+
+	// grab connector texcoord register
+	ShaderConnector* connectComp = dynamic_cast<ShaderConnector*>(componentList[C_CONNECTOR]);
+	outTex = connectComp->getElement(RT_TEXCOORD);
+	outTex->setName("detCoord");
+	outTex->setStructName("OUT");
+	outTex->setType("float2");
+	outTex->mapsToSampler = true;
+
+	if (useTexAnim)
+	{
+		inTex->setType("float4");
+
+		// Find or create the texture matrix.
+		Var* texMat = (Var*)LangElement::find("texMat");
+		if (!texMat)
+		{
+			texMat = new Var;
+			texMat->setType("float4x4");
+			texMat->setName("texMat");
+			texMat->uniform = true;
+			texMat->constSortPos = cspPass;
+		}
+
+		meta->addStatement(new GenOp("   @ = mul(@, @) * @;\r\n", outTex, texMat, inTex, detScale));
+	}
+	else
+	{
+		// setup output to mul texCoord by detail scale
+		meta->addStatement(new GenOp("   @ = @ * @;\r\n", outTex, inTex, detScale));
+	}
+
+	return outTex;
+}
+
 Var* ShaderGenHelperHLSL::addOutVpos(MultiLine* meta, Vector<ShaderComponent*>& componentList)
 {
 	// Nothing to do if we're on SM 3.0... we use the real vpos.
@@ -171,7 +222,8 @@ Var* ShaderGenHelperHLSL::getInVpos(MultiLine* meta, Vector<ShaderComponent*>& c
 	return vpos;
 }
 
-Var* ShaderGenHelperHLSL::getObjTrans(Vector<ShaderComponent*>& componentList, bool useInstancing, GFXVertexFormat* instancingFormat, MultiLine* meta)
+Var* ShaderGenHelperHLSL::getObjTrans(Vector<ShaderComponent*>& componentList, bool useInstancing,
+                                      GFXVertexFormat* instancingFormat, MultiLine* meta)
 {
 	Var* objTrans = (Var*)LangElement::find("objTrans");
 	if (objTrans)
@@ -210,6 +262,54 @@ Var* ShaderGenHelperHLSL::getObjTrans(Vector<ShaderComponent*>& componentList, b
 	return objTrans;
 }
 
+Var* ShaderGenHelperHLSL::getOutTexCoord(const char* name, const char* type, bool mapsToSampler, bool useTexAnim, MultiLine* meta,
+                                         Vector<ShaderComponent*>& componentList)
+{
+	Var* texCoord = (Var*)LangElement::find(name);
+	if (!texCoord )
+	{
+		String vertTexCoordName = String::ToString("vert_%s", name);
+		Var* inTex = getVertTexCoord(vertTexCoordName);
+		AssertFatal(inTex, "ShaderGenHelperHLSL::getOutTexCoord - Unknown vertex input coord!");
+
+		ShaderConnector* connectComp = dynamic_cast<ShaderConnector*>(componentList[C_CONNECTOR]);
+
+		texCoord = connectComp->getElement(RT_TEXCOORD);
+		texCoord->setName(name);
+		texCoord->setStructName("OUT");
+		texCoord->setType(type);
+		texCoord->mapsToSampler = mapsToSampler;
+
+		if (useTexAnim)
+		{
+			inTex->setType("float4");
+
+			// create texture mat var
+			Var* texMat = new Var;
+			texMat->setType("float4x4");
+			texMat->setName("texMat");
+			texMat->uniform = true;
+			texMat->constSortPos = cspPass;
+
+			// Statement allows for casting of different types which
+			// eliminates vector truncation problems.
+			String statement = String::ToString("   @ = (%s)mul(@, @);\r\n", type);
+			meta->addStatement(new GenOp(statement, texCoord, texMat, inTex));
+		}
+		else
+		{
+			// Statement allows for casting of different types which
+			// eliminates vector truncation problems.
+			String statement = String::ToString("   @ = (%s)@;\r\n", type);
+			meta->addStatement(new GenOp(statement, texCoord, inTex));
+		}
+	}
+
+	AssertFatal(dStrcmp(type, (const char*)texCoord->type) == 0, "ShaderGenHelperHLSL::getOutTexCoord - Type mismatch!");
+
+	return texCoord;
+}
+
 Var* ShaderGenHelperHLSL::getVertTexCoord(const String &name)
 {
 	Var* inTex = NULL;
@@ -241,7 +341,8 @@ Var* ShaderGenHelperHLSL::getVertTexCoord(const String &name)
 	return inTex;
 }
 
-Var* ShaderGenHelperHLSL::getWorldView(Vector<ShaderComponent*>& componentList, bool useInstancing, GFXVertexFormat* instancingFormat, MultiLine* meta)
+Var* ShaderGenHelperHLSL::getWorldView(Vector<ShaderComponent*>& componentList, bool useInstancing,
+                                       GFXVertexFormat* instancingFormat, MultiLine* meta)
 {
 	Var* worldView = (Var*)LangElement::find("worldViewOnly");
 	if (worldView)
@@ -298,7 +399,8 @@ LangElement* ShaderGenHelperHLSL::setupTexSpaceMat(Vector<ShaderComponent*>& com
 	// Protect against missing normal and tangent.
 	if (!N || !T)
 	{
-		meta->addStatement(new GenOp("   @[0] = float3(1, 0, 0); @[1] = float3(0, 1, 0); @[2] = float3(0, 0, 1);\r\n", *texSpaceMat, *texSpaceMat, *texSpaceMat));
+		meta->addStatement(new GenOp("   @[0] = float3(1, 0, 0); @[1] = float3(0, 1, 0); @[2] = float3(0, 0, 1);\r\n",
+		                             *texSpaceMat, *texSpaceMat, *texSpaceMat));
 		return meta;
 	}
 

@@ -132,14 +132,21 @@ void TerrainBaseMapFeat::processVert( Vector<ShaderComponent*> &componentList, c
    MultiLine *meta = new MultiLine;
    output = meta;
 
+   ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
+
+   // Pass the texture coord to the pixel shader.
+   Var *outTex = connectComp->getElement( RT_TEXCOORD );
+   outTex->setName( "texCoord" );
+   if ( GFX->getAdapterType() == Direct3D9 )
+      outTex->setStructName( "OUT" );
+   outTex->setType( "float3" );
+   outTex->mapsToSampler = true;
+
    // Generate the incoming texture var.
-   Var *inTex;
    {
       Var *inPos = (Var*)LangElement::find( "inPosition" );
       if ( !inPos )
          inPos = (Var*)LangElement::find( "position" );
-
-      inTex = new Var( "texCoord", "float3" );
 
       Var *oneOverTerrainSize = _getUniformVar( "oneOverTerrainSize", "float", cspPass );
 
@@ -154,19 +161,8 @@ void TerrainBaseMapFeat::processVert( Vector<ShaderComponent*> &componentList, c
       // coord y scale to compensate when rendering.
       //
       meta->addStatement( new GenOp( "   @ = @.xyz * float3( @, @, -@ );\r\n", 
-         new DecOp( inTex ), inPos, oneOverTerrainSize, oneOverTerrainSize, oneOverTerrainSize ) );
+         outTex, inPos, oneOverTerrainSize, oneOverTerrainSize, oneOverTerrainSize ) );
    }
-
-   ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-
-   // Pass the texture coord to the pixel shader.
-   Var *outTex = connectComp->getElement( RT_TEXCOORD );
-   outTex->setName( "outTexCoord" );
-   if ( GFX->getAdapterType() == Direct3D9 )
-      outTex->setStructName( "OUT" );
-   outTex->setType( "float3" );
-   outTex->mapsToSampler = true;
-   meta->addStatement( new GenOp( "   @.xy = @.xy;\r\n", outTex, inTex ) );
 
    // If this shader has a side projected layer then we 
    // pass the dot product between the +Y and the normal
@@ -342,7 +338,7 @@ void TerrainDetailMapFeat::processPix( Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
 {
    const U32 detailIndex = getProcessIndex();
-   Var *inTex = sHelper->getVertTexCoord( "texCoord" );
+   Var *inTex = (Var*)LangElement::find( "texCoord" );
    
    MultiLine *meta = new MultiLine;
 
@@ -608,7 +604,7 @@ void TerrainNormalMapFeat::processPix( Vector<ShaderComponent*> &componentList,
 
    /// Get the texture coord.
    Var *inDet = _getInDetailCoord( componentList );
-   Var *inTex = sHelper->getVertTexCoord( "texCoord" );
+   Var *inTex = (Var*)LangElement::find( "texCoord" );
 
    // Sample the normal map.
    //

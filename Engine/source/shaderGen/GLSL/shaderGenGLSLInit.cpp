@@ -23,12 +23,12 @@
 
 #include "platform/platform.h"
 
+#include "shaderGen/bump.h"
 #include "shaderGen/shaderGen.h"
 #include "shaderGen/GLSL/shaderGenGLSL.h"
 #include "shaderGen/GLSL/shaderGenHelperGLSL.h"
 #include "shaderGen/GLSL/shaderFeatureGLSL.h"
 #include "shaderGen/featureMgr.h"
-#include "shaderGen/GLSL/bumpGLSL.h"
 #include "shaderGen/GLSL/pixSpecularGLSL.h"
 #include "shaderGen/GLSL/depthGLSL.h"
 #include "shaderGen/GLSL/paraboloidGLSL.h"
@@ -58,8 +58,8 @@ void _initShaderGenGLSL( ShaderGen *shaderGen )
    FEATUREMGR->registerFeature( MFT_LightMap, new LightmapFeatGLSL );
    FEATUREMGR->registerFeature( MFT_ToneMap, new TonemapFeatGLSL );
    FEATUREMGR->registerFeature( MFT_VertLit, new VertLitGLSL );
-   FEATUREMGR->registerFeature( MFT_Parallax, new ParallaxFeatGLSL );
-   FEATUREMGR->registerFeature( MFT_NormalMap, new BumpFeatGLSL );
+   FEATUREMGR->registerFeature( MFT_Parallax, new ParallaxFeat );
+   FEATUREMGR->registerFeature( MFT_NormalMap, new BumpFeat );
    FEATUREMGR->registerFeature( MFT_DetailNormalMap, new NamedFeature( "Detail Normal Map" ) );
    FEATUREMGR->registerFeature( MFT_DetailMap, new DetailFeatGLSL );
    FEATUREMGR->registerFeature( MFT_CubeMap, new ReflectCubeFeatGLSL );
@@ -74,7 +74,7 @@ void _initShaderGenGLSL( ShaderGen *shaderGen )
    FEATUREMGR->registerFeature( MFT_RenderTarget1_Zero, new RenderTargetZeroGLSL( RenderTarget1 ) );
    FEATUREMGR->registerFeature( MFT_DiffuseMapAtlas, new NamedFeature( "Diffuse Map Atlas" ) );
    FEATUREMGR->registerFeature( MFT_NormalMapAtlas, new NamedFeature( "Normal Map Atlas" ) );
-   FEATUREMGR->registerFeature( MFT_NormalsOut, new NormalsOutFeatGLSL );
+   FEATUREMGR->registerFeature( MFT_NormalsOut, new NormalsOutFeat );
    FEATUREMGR->registerFeature( MFT_DepthOut, new DepthOutGLSL );
    FEATUREMGR->registerFeature( MFT_EyeSpaceDepthOut, new EyeSpaceDepthOutGLSL() );
    FEATUREMGR->registerFeature( MFT_HDROut, new HDROutGLSL );

@@ -24,7 +24,6 @@
 #define _DEFERREDFEATURESHLSL_H_
 
 #include "shaderGen/HLSL/shaderFeatureHLSL.h"
-#include "shaderGen/HLSL/bumpHLSL.h"
 #include "shaderGen/HLSL/pixSpecularHLSL.h"
 
 class ConditionerMethodDependency;
@@ -70,34 +69,6 @@ public:
    virtual String getName()
    {
       return "Deferred RT Lighting";
-   }
-};
-
-
-/// This is used during the 
-class DeferredBumpFeatHLSL : public BumpFeatHLSL
-{
-   typedef BumpFeatHLSL Parent;
-
-public:
-   virtual void processVert(  Vector<ShaderComponent*> &componentList,
-                              const MaterialFeatureData &fd );
-
-   virtual void processPix(   Vector<ShaderComponent*> &componentList, 
-                              const MaterialFeatureData &fd );
-
-   virtual Material::BlendOp getBlendOp() { return Material::LerpAlpha; }
-
-   virtual Resources getResources( const MaterialFeatureData &fd );
-
-   virtual void setTexData(   Material::StageData &stageDat,
-                              const MaterialFeatureData &fd,
-                              RenderPassData &passData,
-                              U32 &texIndex );
-
-   virtual String getName()
-   {
-      return "Bumpmap [Deferred]";
    }
 };
 

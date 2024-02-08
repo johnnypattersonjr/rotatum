@@ -39,24 +39,6 @@ class ShaderFeatureGLSL : public ShaderFeature
 public:
    ShaderFeatureGLSL();
 
-   ///
-   Var* getOutTexCoord( const char *name,
-                        const char *type,
-                        bool mapsToSampler,
-                        bool useTexAnim,
-                        MultiLine *meta,
-                        Vector<ShaderComponent*> &componentList );
-
-   /// Returns the existing output "worldToTangent" transform or 
-   /// creates one if this is the first feature to need it.
-   Var* getOutWorldToTangent( Vector<ShaderComponent*> &componentList,
-                              MultiLine *meta,
-                              const MaterialFeatureData &fd );
-
-   /// Returns the input "worldToTanget" space transform 
-   /// adding it to the input connector if it doesn't exist.
-   static Var* getInWorldToTangent( Vector<ShaderComponent*> &componentList );
-   
 	/// Calculates the world space position in the vertex shader and 
    /// assigns it to the passed language element.  It does not pass    /// it across the connector to the pixel shader.
    /// @see addOutWsPosition
@@ -77,14 +59,6 @@ public:
 	
    /// Returns the world space view vector from the wsPosition.
    static Var* getWsView( Var *wsPosition, MultiLine *meta );
-	
-   /// Returns the input normal map texture.
-   static Var* getNormalMapTex();
-	
-   ///
-   Var* addOutDetailTexCoord( Vector<ShaderComponent*> &componentList, 
-									  MultiLine *meta,
-									  bool useTexAnim );
 
 	///
    Var* getModelView( Vector<ShaderComponent*> &componentList,                                       

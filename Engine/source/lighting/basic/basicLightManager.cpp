@@ -41,9 +41,9 @@
 #include "math/util/frustum.h"
 #include "scene/sceneObject.h"
 #include "renderInstance/renderPrePassMgr.h"
+#include "shaderGen/bump.h"
 #include "shaderGen/featureMgr.h"
 #include "shaderGen/GLSL/shaderFeatureGLSL.h"
-#include "shaderGen/GLSL/bumpGLSL.h"
 #include "shaderGen/GLSL/pixSpecularGLSL.h"
 #include "lighting/basic/blInteriorSystem.h"
 #include "lighting/basic/blTerrainSystem.h"
@@ -51,7 +51,6 @@
 
 #ifdef TORQUE_OS_WIN32
 #include "shaderGen/HLSL/shaderFeatureHLSL.h"
-#include "shaderGen/HLSL/bumpHLSL.h"
 #include "shaderGen/HLSL/pixSpecularHLSL.h"
 #endif
 
@@ -168,7 +167,7 @@ void BasicLightManager::activate( SceneManager *sceneManager )
    {
       FEATUREMGR->registerFeature( MFT_LightMap, new LightmapFeatGLSL );
       FEATUREMGR->registerFeature( MFT_ToneMap, new TonemapFeatGLSL );
-      FEATUREMGR->registerFeature( MFT_NormalMap, new BumpFeatGLSL );
+      FEATUREMGR->registerFeature( MFT_NormalMap, new BumpFeat );
       FEATUREMGR->registerFeature( MFT_RTLighting, new RTLightingFeatGLSL );
       FEATUREMGR->registerFeature( MFT_PixSpecular, new PixelSpecularGLSL );
    }
@@ -177,7 +176,7 @@ void BasicLightManager::activate( SceneManager *sceneManager )
 #ifdef TORQUE_OS_WIN32
       FEATUREMGR->registerFeature( MFT_LightMap, new LightmapFeatHLSL );
       FEATUREMGR->registerFeature( MFT_ToneMap, new TonemapFeatHLSL );
-      FEATUREMGR->registerFeature( MFT_NormalMap, new BumpFeatHLSL );
+      FEATUREMGR->registerFeature( MFT_NormalMap, new BumpFeat );
       FEATUREMGR->registerFeature( MFT_RTLighting, new RTLightingFeatHLSL );
       FEATUREMGR->registerFeature( MFT_PixSpecular, new PixelSpecularHLSL );
 #endif

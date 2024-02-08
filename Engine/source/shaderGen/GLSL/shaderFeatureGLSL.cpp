@@ -40,140 +40,6 @@ ShaderFeatureGLSL::ShaderFeatureGLSL()
    output = NULL;
 }
 
-Var* ShaderFeatureGLSL::getOutWorldToTangent(   Vector<ShaderComponent*> &componentList,
-															MultiLine *meta,
-															const MaterialFeatureData &fd )
-{
-   Var *outWorldToTangent = (Var*)LangElement::find( "outWorldToTangent" );
-   if ( outWorldToTangent )
-		return outWorldToTangent;
-	
-	Var *worldToTangent = (Var*)LangElement::find( "worldToTangent" );
-   if ( !worldToTangent )
-   {
-      Var *texSpaceMat = sHelper->getOutObjToTangentSpace( componentList, meta, fd );
-		
-      if(!fd.features[MFT_ParticleNormal])
-      {
-			// turn obj->tangent into world->tangent
-         worldToTangent = new Var;
-         worldToTangent->setType( "mat3x3" );
-         worldToTangent->setName( "worldToTangent" );
-         LangElement *worldToTangentDecl = new DecOp( worldToTangent );
-			
-         // Get the world->obj transform
-         Var *worldToObj = (Var*)LangElement::find( "worldToObj" );
-			if ( !worldToObj )
-         {
-				worldToObj = new Var;
-				worldToObj->setName( "worldToObj" );
-				worldToObj->setType( "mat4x4" );
-				worldToObj->uniform = true;
-				worldToObj->constSortPos = cspPrimitive;
-			}
-			
-         // assign world->tangent transform
-         meta->addStatement( new GenOp( "   @ = @ * mat3x3( @[0].xyz, @[1].xyz, @[2].xyz );\r\n", worldToTangentDecl, texSpaceMat, worldToObj, worldToObj, worldToObj ) );
-      }
-      else
-      {
-         worldToTangent = texSpaceMat;
-      }
-	}
-	
-	// send transform to pixel shader
-	ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-	
-	outWorldToTangent = connectComp->getElement( RT_TEXCOORD, 1, 3 );
-	outWorldToTangent->setName( "outWorldToTangent" );
-	outWorldToTangent->setType( "mat3x3" );
-	meta->addStatement( new GenOp( "   @ = @;\r\n", outWorldToTangent, worldToTangent ) );
-	
-   return outWorldToTangent;
-}
-
-Var* ShaderFeatureGLSL::getOutTexCoord(   const char *name,
-                                          const char *type,
-                                          bool mapsToSampler,
-                                          bool useTexAnim,
-                                          MultiLine *meta,
-                                          Vector<ShaderComponent*> &componentList )
-{
-   String outTexName = String::ToString( "out_%s", name );
-   Var *texCoord = (Var*)LangElement::find( outTexName );
-   if ( !texCoord )
-   {
-      Var *inTex = sHelper->getVertTexCoord( name );
-      AssertFatal( inTex, "ShaderFeatureGLSL::getOutTexCoord - Unknown vertex input coord!" );
-
-      ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-
-      texCoord = connectComp->getElement( RT_TEXCOORD );
-      texCoord->setName( outTexName );
-      texCoord->setType( type );
-      texCoord->mapsToSampler = mapsToSampler;
-
-      if( useTexAnim )
-      {
-         inTex->setType( "vec4" );
-         
-         // create texture mat var
-         Var *texMat = new Var;
-         texMat->setType( "mat4" );
-         texMat->setName( "texMat" );
-         texMat->uniform = true;
-         texMat->constSortPos = cspPass;      
-         
-			// Statement allows for casting of different types which
-		   // eliminates vector truncation problems.
-			String statement = String::ToString( "   @ = %s(@ * @);\r\n", type );
-			meta->addStatement( new GenOp( statement , texCoord, texMat, inTex ) );      
-      }
-      else
-		{
-			// Statement allows for casting of different types which
-		   // eliminates vector truncation problems.
-			String statement = String::ToString( "   @ = %s(@);\r\n", type );
-         meta->addStatement( new GenOp( statement, texCoord, inTex ) );
-		}
-	}
-
-   AssertFatal( dStrcmp( type, (const char*)texCoord->type ) == 0, 
-      "ShaderFeatureGLSL::getOutTexCoord - Type mismatch!" );
-
-   return texCoord;
-}
-
-Var* ShaderFeatureGLSL::getInWorldToTangent( Vector<ShaderComponent*> &componentList )
-{
-   Var *worldToTangent = (Var*)LangElement::find( "outWorldToTangent" );
-   if ( !worldToTangent )
-   {
-      ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-      worldToTangent = connectComp->getElement( RT_TEXCOORD, 1, 3 );
-      worldToTangent->setName( "outWorldToTangent" );
-      worldToTangent->setType( "mat3x3" );
-   }
-
-   return worldToTangent;
-}
-
-Var* ShaderFeatureGLSL::getNormalMapTex()
-{
-   Var *normalMap = (Var*)LangElement::find( "bumpMap" );
-   if ( !normalMap )
-   {
-      normalMap = new Var;
-      normalMap->setType( "sampler2D" );
-      normalMap->setName( "bumpMap" );
-      normalMap->uniform = true;
-      normalMap->sampler = true;
-      normalMap->constNum = Var::getTexUnitNum();
-   }
-
-   return normalMap;
-}
-
 Var* ShaderFeatureGLSL::getModelView(  Vector<ShaderComponent*> &componentList,                                       
 												 bool useInstancing,
 												 MultiLine *meta )
@@ -275,58 +141,6 @@ Var* ShaderFeatureGLSL::getWsView( Var *wsPosition, MultiLine *meta )
    return wsView;
 }
 
-Var* ShaderFeatureGLSL::addOutDetailTexCoord(   Vector<ShaderComponent*> &componentList, 
-															MultiLine *meta,
-															bool useTexAnim )
-{
-	// Check if its already added.
-	Var *outTex = (Var*)LangElement::find( "detCoord" );
-	if ( outTex )
-		return outTex;
-	
-	// Grab incoming texture coords.
-	Var *inTex = sHelper->getVertTexCoord( "texCoord" );
-	
-	// create detail variable
-	Var *detScale = new Var;
-	detScale->setType( "vec2" );
-	detScale->setName( "detailScale" );
-	detScale->uniform = true;
-	detScale->constSortPos = cspPotentialPrimitive;
-	
-	// grab connector texcoord register
-	ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-	outTex = connectComp->getElement( RT_TEXCOORD );
-	outTex->setName( "detCoord" );
-	outTex->setType( "vec2" );
-	outTex->mapsToSampler = true;
-	
-	if ( useTexAnim )
-	{
-		inTex->setType( "vec4" );
-		
-		// Find or create the texture matrix.
-		Var *texMat = (Var*)LangElement::find( "texMat" );
-		if ( !texMat )
-		{
-			texMat = new Var;
-			texMat->setType( "mat4x4" );
-			texMat->setName( "texMat" );
-			texMat->uniform = true;
-			texMat->constSortPos = cspPass;   
-		}
-		
-		meta->addStatement( new GenOp( "   @ = (@ * @) * @;\r\n", outTex, texMat, inTex, detScale ) );
-	}
-	else
-	{
-		// setup output to mul texCoord by detail scale
-		meta->addStatement( new GenOp( "   @ = @ * @;\r\n", outTex, inTex, detScale ) );
-	}
-	
-	return outTex;
-}
-
 //****************************************************************************
 // Base Texture
 //****************************************************************************
@@ -335,12 +149,7 @@ void DiffuseMapFeatGLSL::processVert(  Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
 {
    MultiLine *meta = new MultiLine;
-   getOutTexCoord(   "texCoord", 
-                     "vec2", 
-                     true, 
-                     fd.features[MFT_TexAnim], 
-                     meta, 
-                     componentList );
+   sHelper->getOutTexCoord( "texCoord", "float2", true, fd.features[MFT_TexAnim], meta, componentList );
    output = meta;
 }
 
@@ -348,7 +157,7 @@ void DiffuseMapFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
 {
    // grab connector texcoord register
-   Var *inTex = sHelper->getInTexCoord( "out_texCoord", "vec2", true, componentList );
+   Var *inTex = sHelper->getInTexCoord( "texCoord", "float2", true, componentList );
 
    // create texture var
    Var *diffuseMap = new Var;
@@ -505,13 +314,13 @@ void DiffuseMapFeatGLSL::setTexData(   Material::StageData &stageDat,
 void OverlayTexFeatGLSL::processVert(  Vector<ShaderComponent*> &componentList, 
                                        const MaterialFeatureData &fd )
 {
-   Var *inTex = sHelper->getVertTexCoord( "texCoord2" );
+   Var *inTex = sHelper->getVertTexCoord( "vert_texCoord2" );
    AssertFatal( inTex, "OverlayTexFeatGLSL::processVert() - The second UV set was not found!" );
 
    // grab connector texcoord register
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
    Var *outTex = connectComp->getElement( RT_TEXCOORD );
-   outTex->setName( "outTexCoord2" );
+   outTex->setName( "texCoord2" );
    outTex->setType( "vec2" );
    outTex->mapsToSampler = true;
 
@@ -545,7 +354,7 @@ void OverlayTexFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
    // grab connector texcoord register
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
    Var *inTex = connectComp->getElement( RT_TEXCOORD );
-   inTex->setName( "outTexCoord2" );
+   inTex->setName( "texCoord2" );
    inTex->setType( "vec2" );
    inTex->mapsToSampler = true;
 
@@ -665,12 +474,12 @@ void LightmapFeatGLSL::processVert( Vector<ShaderComponent*> &componentList,
                                     const MaterialFeatureData &fd )
 {
    // grab tex register from incoming vert
-   Var *inTex = sHelper->getVertTexCoord( "texCoord2" );
+   Var *inTex = sHelper->getVertTexCoord( "vert_texCoord2" );
 
    // grab connector texcoord register
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
    Var *outTex = connectComp->getElement( RT_TEXCOORD );
-   outTex->setName( "outTexCoord2" );
+   outTex->setName( "texCoord2" );
    outTex->setType( "vec2" );
    outTex->mapsToSampler = true;
 
@@ -684,7 +493,7 @@ void LightmapFeatGLSL::processPix(  Vector<ShaderComponent*> &componentList,
    // grab connector texcoord register
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
    Var *inTex = connectComp->getElement( RT_TEXCOORD );
-   inTex->setName( "outTexCoord2" );
+   inTex->setName( "texCoord2" );
    inTex->setType( "vec2" );
    inTex->mapsToSampler = true;
 
@@ -782,7 +591,7 @@ void TonemapFeatGLSL::processVert( Vector<ShaderComponent*> &componentList,
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
 
    // Set up the second set of texCoords
-   Var *inTex2 = sHelper->getVertTexCoord( "texCoord2" );
+   Var *inTex2 = sHelper->getVertTexCoord( "vert_texCoord2" );
 
    if ( inTex2 )
    {
@@ -1027,9 +836,7 @@ void DetailFeatGLSL::processVert(   Vector<ShaderComponent*> &componentList,
                                     const MaterialFeatureData &fd )
 {
 	MultiLine *meta = new MultiLine;
-	addOutDetailTexCoord( componentList, 
-								meta,
-								fd.features[MFT_TexAnim] );
+	sHelper->addOutDetailTexCoord( componentList, meta, fd.features[MFT_TexAnim] );
 	output = meta;
 }
 
@@ -1037,7 +844,7 @@ void DetailFeatGLSL::processPix( Vector<ShaderComponent*> &componentList,
                                  const MaterialFeatureData &fd )
 {
    // Get the detail texture coord.
-   Var *inTex = sHelper->getInTexCoord( "detCoord", "vec2", true, componentList );
+   Var *inTex = sHelper->getInTexCoord( "detCoord", "float2", true, componentList );
 
    // create texture var
    Var *detailMap = new Var;
@@ -1129,13 +936,13 @@ void ReflectCubeFeatGLSL::processVert( Vector<ShaderComponent*> &componentList,
           fd.materialFeatures[MFT_NormalMap] )
       {
          // find incoming texture var
-         Var *inTex = sHelper->getVertTexCoord( "texCoord" );
+         Var *inTex = sHelper->getVertTexCoord( "vert_texCoord" );
 
          // grab connector texcoord register
          ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
          Var *outTex = connectComp->getElement( RT_TEXCOORD );
-         outTex->setName( "outTexCoord" );
-         outTex->setType( "vec2" );
+         outTex->setName( "texCoord" );
+         outTex->setType( "float2" );
          outTex->mapsToSampler = true;
 
          // setup language elements to output incoming tex coords to output
@@ -1215,7 +1022,7 @@ void ReflectCubeFeatGLSL::processPix(  Vector<ShaderComponent*> &componentList,
           fd.materialFeatures[MFT_NormalMap] )
       {
          // grab connector texcoord register
-         Var *inTex = sHelper->getInTexCoord( "outTexCoord", "vec2", true, componentList );
+         Var *inTex = sHelper->getInTexCoord( "texCoord", "float2", true, componentList );
       
          // create texture var
          Var *newMap = new Var;
@@ -1935,15 +1742,8 @@ void FoliageFeatureGLSL::processVert( Vector<ShaderComponent*> &componentList,
    Var *outColor = new Var( "inDiffuse", "vec4" );
 	meta->addStatement( new GenOp( "   @ = @;\n", new DecOp( outColor ), inColor ) );
 	
-	Var *inParams = (Var*)LangElement::find( "texCoord" );   
-	Var *outParams = getOutTexCoord(   "texCoord", 
-											  "vec2", 
-											  true, 
-											  fd.features[MFT_TexAnim], 
-											  meta, 
-											  componentList );
-	
-	
+   Var *inParams = (Var*)LangElement::find( "texCoord" );
+   Var *outParams = sHelper->getOutTexCoord( "texCoord", "float2", true, fd.features[MFT_TexAnim], meta, componentList );
 	
    // Declare the normal and tangent variables since they do not exist
    // in this vert type, but we do need to set them up for others.
@@ -2107,7 +1907,7 @@ void ImposterVertFeatureGLSL::processVert(   Vector<ShaderComponent*> &component
    meta->addStatement( new GenOp( "   @;\r\n", new DecOp( outInPosition ) ) );         
 	
    Var *outTexCoord = new Var;
-   outTexCoord->setType( "vec2" );
+   outTexCoord->setType( "float2" );
    outTexCoord->setName( "texCoord" );
    meta->addStatement( new GenOp( "   @;\r\n", new DecOp( outTexCoord ) ) );         
 	
@@ -2115,7 +1915,7 @@ void ImposterVertFeatureGLSL::processVert(   Vector<ShaderComponent*> &component
    outWorldToTangent->setType( "mat3" );
    outWorldToTangent->setName( "worldToTangent" );
    meta->addStatement( new GenOp( "   @;\r\n", new DecOp( outWorldToTangent ) ) );
-	//Var *outWorldToTangent = getOutWorldToTangent( componentList, meta, fd );
+	//Var *outWorldToTangent = sHelper->getOutWorldToTangent( componentList, mInstancingFormat, meta, fd );
 	
    // Add imposterFade to the OUT structure.
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );

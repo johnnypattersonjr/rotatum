@@ -49,9 +49,20 @@ public:
 	/// to the input connector if it doesn't exist.
 	Var* getInTexCoord(const char* name, const char* type, bool mapsToSampler, Vector<ShaderComponent*> &componentList);
 
+	/// Returns the input "worldToTanget" space transform
+	/// adding it to the input connector if it doesn't exist.
+	Var* getInWorldToTangent(Vector<ShaderComponent*>& componentList);
+
+	/// Returns the input normal map texture.
+	Var* getNormalMapTex();
+
 	/// Returns the "objToTangentSpace" transform or creates one if this
 	/// is the first feature to need it.
 	Var* getOutObjToTangentSpace(Vector<ShaderComponent*>& componentList, MultiLine* meta, const MaterialFeatureData& fd);
+
+	/// Returns the existing output "outWorldToTangent" transform or
+	/// creates one if this is the first feature to need it.
+	Var* getOutWorldToTangent(Vector<ShaderComponent*>& componentList, GFXVertexFormat* instancingFormat, MultiLine* meta, const MaterialFeatureData& fd);
 
 	/// Returns the input "viewToTangent" space transform
 	/// adding it to the input connector if it doesn't exist.
@@ -65,6 +76,8 @@ public:
 	/// Returns the existing output "viewToTangent" transform or
 	/// creates one if this is the first feature to need it.
 	Var* getOutViewToTangent(Vector<ShaderComponent*>& componentList, GFXVertexFormat* instancingFormat, MultiLine* meta, const MaterialFeatureData& fd);
+
+	virtual Var* addOutDetailTexCoord(Vector<ShaderComponent*>& componentList, MultiLine* meta, bool useTexAnim) = 0;
 
 	virtual Var* addOutVpos(MultiLine* meta, Vector<ShaderComponent*>& componentList) = 0;
 
@@ -85,6 +98,8 @@ public:
 	virtual Var* getInVpos(MultiLine* meta, Vector<ShaderComponent*>& componentList) = 0;
 
 	virtual Var* getObjTrans(Vector<ShaderComponent*>& componentList, bool useInstancing, GFXVertexFormat* instancingFormat, MultiLine* meta) = 0;
+
+	virtual Var* getOutTexCoord(const char* name, const char* type, bool mapsToSampler, bool useTexAnim, MultiLine* meta, Vector<ShaderComponent*>& componentList) = 0;
 
 	/// Get the incoming base texture coords - useful for bumpmap and detail maps
 	virtual Var* getVertTexCoord(const String &name) = 0;

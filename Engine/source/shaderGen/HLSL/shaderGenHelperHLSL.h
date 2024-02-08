@@ -28,11 +28,13 @@
 class ShaderGenHelperHLSL : public ShaderGenHelper
 {
 public:
+	virtual Var* addOutDetailTexCoord(Vector<ShaderComponent*>& componentList, MultiLine* meta, bool useTexAnim);
 	virtual Var* addOutVpos(MultiLine* meta, Vector<ShaderComponent*>& componentList);
 	virtual LangElement* assignColor(LangElement* elem, Material::BlendOp blend, LangElement* lerpElem = NULL, OutputTarget outputTarget = DefaultTarget);
 	virtual LangElement* expandNormalMap(LangElement* sampleNormalOp, LangElement* normalDecl, LangElement* normalVar, const MaterialFeatureData& fd, S32 processIndex);
 	virtual Var* getInVpos(MultiLine* meta, Vector<ShaderComponent*>& componentList);
 	virtual Var* getObjTrans(Vector<ShaderComponent*>& componentList, bool useInstancing, GFXVertexFormat* instancingFormat, MultiLine* meta);
+	virtual Var* getOutTexCoord(const char* name, const char* type, bool mapsToSampler, bool useTexAnim, MultiLine* meta, Vector<ShaderComponent*>& componentList);
 	virtual Var* getVertTexCoord(const String &name);
 	virtual Var* getWorldView(Vector<ShaderComponent*>& componentList, bool useInstancing, GFXVertexFormat* instancingFormat, MultiLine* meta);
 	virtual LangElement* setupTexSpaceMat(Vector<ShaderComponent*>& componentList, Var** texSpaceMat);
